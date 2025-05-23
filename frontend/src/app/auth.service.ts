@@ -1,39 +1,34 @@
+// src/app/auth.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { tap } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 
-@Injectable({providedIn: 'root'})
+export interface LoginResponse {
+  token: string;
+  // …any other fields your API returns
+}
+
+@Injectable({ providedIn: 'root' })
 export class AuthService {
-  private apiUrl = 'http://localhost:8000/auth';
+  private apiUrl = '/api'; // adjust to your backend base URL
+
   constructor(private http: HttpClient) {}
 
-  login(email: string, password: string) {
-    return this.http.post<{ access_token: string }>(
+  /**
+   * Send credentials as separate params so you can call:
+   *   this.auth.login(email, password)
+   */
+  login(email: string, password: string): Observable<LoginResponse> {
+    return this.http.post<LoginResponse>(
       `${this.apiUrl}/login`,
       { email, password }
-    ).pipe(
-      tap(res => localStorage.setItem('token', res.access_token))
     );
   }
 
-  signup(email: string, password: string) {
-    return this.http.post<{ access_token: string }>(
-      `${this.apiUrl}/signup`,
-      { email, password }
-    ).pipe(
-      tap(res => localStorage.setItem('token', res.access_token))
-    );
-  }
-
-  logout() {
-    localStorage.removeItem('token');
-  }
-
-  get token() {
-    return localStorage.getItem('token');
-  }
-
-  get isLoggedIn() {
-    return !!this.token;
+  /**
+   * Persist the JWT (or whatever token your API returns)
+   */
+  saveToken(token: string): void {
+    localStorage.setItem('auth_token', token);
   }
 }

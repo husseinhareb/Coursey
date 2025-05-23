@@ -1,36 +1,58 @@
 // src/app/login/login.component.ts
-import { Component }               from '@angular/core';
-import { CommonModule }            from '@angular/common';
-import { FormsModule }             from '@angular/forms';
-import { Router }                  from '@angular/router';
-
-import { AuthService }             from '../auth.service';
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+import { AuthService } from '../auth.service';
+import { Router } from '@angular/router';
 
 @Component({
+  standalone: true,
   selector: 'app-login',
-  standalone: true,               // <-- standalone
-  imports: [
-    CommonModule,                 // for *ngIf
-    FormsModule                   // for [(ngModel)]
-  ],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
-export class LoginComponent {
-  email: string = '';
-  password: string = '';
+export class LoginComponent implements OnInit {
+  loginForm!: FormGroup;
   error: string = '';
+  loading: boolean = false;
 
   constructor(
-    private auth: AuthService,
+    private fb: FormBuilder,
+    private authService: AuthService,
     private router: Router
   ) {}
 
+  ngOnInit(): void {
+    this.loginForm = this.fb.group({
+      email:    ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required, Validators.minLength(6)]]
+    });
+  }
+
+  /** Shortcut for template: f.email, f.password, etc. */
+  get f() {
+    return this.loginForm.controls;
+  }
+
   onSubmit(): void {
+    if (this.loginForm.invalid) {
+      return;
+    }
     this.error = '';
-    this.auth.login(this.email, this.password).subscribe({
-      next: () => this.router.navigate(['/']),
-      error: err => this.error = err.error?.detail || 'Login failed'
+    this.loading = true;
+
+    const { email, password } = this.loginForm.value;
+    this.authService.login(email, password).subscribe({
+      next: (res) => {
+        this.loading = false;
+        this.authService.saveToken(res.token);
+        this.router.navigate(['/dashboard']);
+      },
+      error: (err: any) => {
+        this.loading = false;
+        this.error = err.error?.detail || 'Login failed';
+      }
     });
   }
 }

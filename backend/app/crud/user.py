@@ -1,3 +1,5 @@
+# /app/crud/user.py
+
 from app.db.mongodb import users_collection
 from app.schemas.user import UserIn, UserDB
 from app.services.auth import hash_password

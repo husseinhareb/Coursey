@@ -1,3 +1,4 @@
+# /app/routers/auth.py
 from fastapi import APIRouter, HTTPException, Depends
 from app.schemas.user import UserIn, Token
 from app.crud.user import create_user, authenticate_user
