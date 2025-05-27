@@ -1,25 +1,34 @@
 <h2>Sign Up</h2>
 
 <form [formGroup]="signupForm" (ngSubmit)="onSubmit()">
-  <label for="email">Email:</label>
-  <input id="email" formControlName="email" type="email">
-  <div *ngIf="signupForm.get('email')?.invalid && signupForm.get('email')?.touched">
-    Valid email is required.
+  <!-- First Name -->
+  <label for="first_name">First Name:</label>
+  <input id="first_name" formControlName="first_name" type="text" />
+  <div *ngIf="signupForm.get('first_name')?.invalid && signupForm.get('first_name')?.touched">
+    First name is required.
   </div>
 
-  <label for="password">Password:</label>
-  <input id="password" formControlName="password" type="password">
-  <div *ngIf="signupForm.get('password')?.invalid && signupForm.get('password')?.touched">
-    Password is required.
+  <!-- Last Name -->
+  <label for="last_name">Last Name:</label>
+  <input id="last_name" formControlName="last_name" type="text" />
+  <div *ngIf="signupForm.get('last_name')?.invalid && signupForm.get('last_name')?.touched">
+    Last name is required.
+  </div>
+
+  <!-- Email -->
+  <label for="email">Email:</label>
+  <input id="email" formControlName="email" type="email" />
+  <div *ngIf="signupForm.get('email')?.invalid && signupForm.get('email')?.touched">
+    A valid email is required.
   </div>
 
   <button type="submit" [disabled]="signupForm.invalid">Sign Up</button>
 </form>
 
-<div *ngIf="signupSuccess" style="color: green;">
-  Signup successful!
+<div *ngIf="signupSuccess" class="success">
+  Signup successful! Your username &amp; password have been generated.  
+  You’ll receive them by email (or check your profile page).
 </div>
-
-<div *ngIf="signupError" style="color: red;">
+<div *ngIf="signupError" class="error">
   {{ signupError }}
 </div>

@@ -1,0 +1,24 @@
+.navbar {
+  background: #f8f9fa;
+  padding: 0.5rem 1rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.nav-list {
+  list-style: none;
+  display: flex;
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-list a {
+  text-decoration: none;
+  font-weight: 500;
+  color: #333;
+}
+
+.nav-list a.active {
+  border-bottom: 2px solid #007bff;
+  color: #007bff;
+}
