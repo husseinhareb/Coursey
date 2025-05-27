@@ -5,7 +5,7 @@ from datetime import datetime
 
 from app.db.mongodb import users_collection
 from app.schemas.user import UserIn, UserDB
-from app.services.auth import hash_password, verify_password
+
 
 async def create_user(user_in: UserIn, created_by: Optional[str] = None) -> Optional[UserDB]:
     # prevent duplicate emails
@@ -14,6 +14,9 @@ async def create_user(user_in: UserIn, created_by: Optional[str] = None) -> Opti
         return None
 
     now = datetime.utcnow()
+    # local import to avoid circular dependency
+    from app.services.auth import hash_password
+
     user_doc = {
         "email": user_in.email,
         "username": user_in.username,
@@ -34,7 +37,7 @@ async def create_user(user_in: UserIn, created_by: Optional[str] = None) -> Opti
     if not created:
         return None
 
-    # Convert Mongo ObjectId to str so Pydantic can validate
+    # stringify ObjectId for Pydantic
     created["_id"] = str(created["_id"])
     return UserDB(**created)
 
@@ -44,9 +47,11 @@ async def authenticate_user(email: str, password: str) -> Optional[UserDB]:
     if not user:
         return None
 
+    # local import to avoid circular dependency
+    from app.services.auth import verify_password
+
     if not verify_password(password, user["hashed_password"]):
         return None
 
-    # Convert Mongo ObjectId to str for Pydantic
     user["_id"] = str(user["_id"])
     return UserDB(**user)

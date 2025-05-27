@@ -1,13 +1,14 @@
 # /app/main.py
+# /app/main.py
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routers import auth
+from app.routers import auth, course
 
 app = FastAPI()
 
 origins = [
-    "http://localhost:4200",  # your Angular dev server
-    # add other origins if deploying elsewhere
+    "http://localhost:4200",  
 ]
 
 app.add_middleware(
@@ -19,3 +20,4 @@ app.add_middleware(
 )
 
 app.include_router(auth.router)
+app.include_router(course.router) 
