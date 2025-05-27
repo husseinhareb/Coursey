@@ -1,11 +1,7 @@
 <nav class="navbar">
   <ul class="nav-list">
     <li>
-      <a
-        routerLink="/"
-        routerLinkActive="active"
-        [routerLinkActiveOptions]="{ exact: true }"
-      >
+      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
         Home
       </a>
     </li>
@@ -14,9 +10,14 @@
         Sign Up
       </a>
     </li>
-        <li>
+    <li>
       <a routerLink="/login" routerLinkActive="active">
         Log in
+      </a>
+    </li>
+    <li>
+      <a routerLink="/users" routerLinkActive="active">
+        Users
       </a>
     </li>
     <!-- add more links as needed: -->

@@ -1,0 +1,31 @@
+<section *ngIf="loading">Loading users…</section>
+<section *ngIf="error" class="error">{{ error }}</section>
+
+<table *ngIf="!loading && !error">
+  <thead>
+    <tr>
+      <th>Avatar</th>
+      <th>First Name</th>
+      <th>Last Name</th>
+      <th>Email</th>
+      <th>Phone</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let u of users">
+      <td>
+        <img
+          *ngIf="u.profile_pic_path"
+          [src]="u.profile_pic_path"
+          alt="avatar"
+          width="40"
+          height="40"
+        />
+      </td>
+      <td>{{ u.first_name }}</td>
+      <td>{{ u.last_name }}</td>
+      <td>{{ u.email }}</td>
+      <td>{{ u.phone_number || '-' }}</td>
+    </tr>
+  </tbody>
+</table>
