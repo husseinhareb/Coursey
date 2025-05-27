@@ -1,8 +1,12 @@
 # /app/schemas/user.py
-# /app/schemas/user.py
+
 from pydantic import BaseModel, EmailStr, Field
 from typing import Optional
 from datetime import datetime
+
+class LoginIn(BaseModel):
+    email: EmailStr
+    password: str
 
 class UserIn(BaseModel):
     email: EmailStr
@@ -31,7 +35,8 @@ class UserDB(BaseModel):
 
     class Config:
         allow_population_by_field_name = True
-        json_encoders = {datetime: lambda dt: dt.isoformat()}
+        json_encoders = { datetime: lambda dt: dt.isoformat() }
+        orm_mode = True
 
 class UserOut(BaseModel):
     id: str = Field(..., alias="_id")
@@ -48,8 +53,8 @@ class UserOut(BaseModel):
 
     class Config:
         allow_population_by_field_name = True
+        json_encoders = { datetime: lambda dt: dt.isoformat() }
         orm_mode = True
-        json_encoders = {datetime: lambda dt: dt.isoformat()}
 
 class Token(BaseModel):
     access_token: str
