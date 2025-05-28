@@ -1,0 +1,28 @@
+<!-- src/app/users/manage-enrollments.component.html -->
+
+<h2>Manage Enrollments</h2>
+<div *ngIf="loading">Loading…</div>
+<div *ngIf="error" class="error">{{ error }}</div>
+
+<table *ngIf="!loading">
+  <thead>
+    <tr>
+      <th>Course</th>
+      <th>Enrolled?</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let c of courses">
+      <td>{{ c.title }}</td>
+      <td>
+        <!-- assign #cb, then pass cb.checked (a boolean) -->
+        <input
+          type="checkbox"
+          #cb
+          [checked]="enrollments.has(c.id)"
+          (change)="toggle(c.id, cb.checked)"
+        />
+      </td>
+    </tr>
+  </tbody>
+</table>

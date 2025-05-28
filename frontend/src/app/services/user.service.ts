@@ -26,6 +26,11 @@ export interface User {
   updatedAt:    string;
 }
 
+export interface Enrollment {
+  courseId:   string;
+  enrolledAt: string; // ISO
+}
+
 @Injectable({ providedIn: 'root' })
 export class UserService {
   private base = `${environment.apiUrl}/users`;
@@ -51,5 +56,19 @@ export class UserService {
     return this.http.get<any[]>(`${this.base}/`).pipe(
       map(list => list.map(u => ({ ...u, id: u._id })))
     );
+  }
+
+    listEnrollments(userId: string): Observable<Enrollment[]> {
+    return this.http.get<Enrollment[]>(`${this.base}/${userId}/enrollments`).pipe(
+      map(arr => arr.map(e => ({ ...e, enrolledAt: e.enrolledAt })))
+    );
+  }
+
+  enroll(userId: string, courseId: string): Observable<Enrollment> {
+    return this.http.post<Enrollment>(`${this.base}/${userId}/enrollments`, { courseId });
+  }
+
+  unenroll(userId: string, courseId: string): Observable<any> {
+    return this.http.delete(`${this.base}/${userId}/enrollments/${courseId}`);
   }
 }

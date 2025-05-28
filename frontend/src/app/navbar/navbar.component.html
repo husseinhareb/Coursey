@@ -1,41 +1,33 @@
+<!-- src/app/navbar/navbar.component.html -->
 <nav class="navbar">
+  <div class="navbar-brand">
+    <a routerLink="/" class="brand">Coursey</a>
+  </div>
   <ul class="nav-list">
-    <li>
-      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
-        Home
-      </a>
-    </li>
-
-    <!-- shown only when NOT logged in -->
+    <!-- Public -->
     <li *ngIf="!auth.isLoggedIn">
-      <a routerLink="/register" routerLinkActive="active">
-        Sign Up
-      </a>
+      <a routerLink="/register" routerLinkActive="active">Sign Up</a>
     </li>
     <li *ngIf="!auth.isLoggedIn">
-      <a routerLink="/login" routerLinkActive="active">
-        Log In
-      </a>
+      <a routerLink="/login" routerLinkActive="active">Log In</a>
     </li>
 
-    <!-- shown only when logged in -->
+    <!-- Private -->
     <li *ngIf="auth.isLoggedIn">
-      <a routerLink="/users" routerLinkActive="active">
-        Users
-      </a>
+      <a routerLink="/" routerLinkActive="active">Home</a>
+    </li>
+    <li *ngIf="auth.isLoggedIn">
+      <a routerLink="/users" routerLinkActive="active">Users</a>
+    </li>
+    <li *ngIf="auth.isLoggedIn">
+      <a routerLink="/courses" routerLinkActive="active">Courses</a>
+    </li>
+    <li *ngIf="auth.isLoggedIn">
+      <a routerLink="/profile" routerLinkActive="active">Profile</a>
     </li>
     <li *ngIf="auth.isLoggedIn">
       <button (click)="logout()">Log Out</button>
     </li>
-    <li *ngIf="auth.isLoggedIn">
-      <a routerLink="/courses" routerLinkActive="active">
-        Courses
-      </a>
-    </li>
-        <li *ngIf="auth.isLoggedIn">
-      <a routerLink="/profile" routerLinkActive="active">
-        Profile
-      </a>
-    </li>
+
   </ul>
 </nav>

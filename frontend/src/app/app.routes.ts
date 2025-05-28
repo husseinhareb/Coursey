@@ -8,6 +8,7 @@ import { UsersComponent } from './users/users.component';
 import { CoursesComponent } from './courses/courses.component';
 import { CourseFormComponent } from './courses/course-form.component';
 import { ProfileComponent } from './profile/profile.component';
+import { ManageEnrollmentsComponent } from './users/manage-enrollments.component';
 export const routes: Routes = [
   // Public landing:
   { path: '', component: HomeComponent },
@@ -45,6 +46,11 @@ export const routes: Routes = [
   {
     path: 'profile',
     component: ProfileComponent,
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'users/:id/enrollments',
+    component: ManageEnrollmentsComponent,
     canActivate: [AuthGuard]
   },
   { path: '**', redirectTo: '' }
