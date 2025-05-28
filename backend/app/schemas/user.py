@@ -1,64 +1,103 @@
 # /app/schemas/user.py
 
 from pydantic import BaseModel, EmailStr, Field
-from typing import Optional
+from typing import List, Optional
 from datetime import datetime
 
 class LoginIn(BaseModel):
     email: EmailStr
     password: str
 
-class UserIn(BaseModel):
-    email: EmailStr
-    username: str
-    password: str
-    first_name: str
-    last_name: str
-    phone_number: Optional[str] = None
-    address: Optional[str] = None
-    profile_pic_path: Optional[str] = None
-
-class UserDB(BaseModel):
-    id: str = Field(..., alias="_id")
-    email: EmailStr
-    username: str
-    hashed_password: str
-    password_auto_generated: bool = False
-    first_name: str
-    last_name: str
-    phone_number: Optional[str] = None
-    address: Optional[str] = None
-    profile_pic_path: Optional[str] = None
-    created_at: datetime
-    updated_at: datetime
-    created_by: Optional[str] = None
-
     model_config = {
-        "validate_by_name": True,   # allow using field names (id) not just alias (_id)
-        "from_attributes": True,    # enable ORM-mode: read attrs on objects
-        "json_schema_extra": {
-            "examples": []
-        }
+        "validate_by_name": True
     }
 
-class UserOut(BaseModel):
-    id: str = Field(..., alias="_id")
-    email: EmailStr
-    username: str
-    first_name: str
-    last_name: str
-    phone_number: Optional[str] = None
-    address: Optional[str] = None
-    profile_pic_path: Optional[str] = None
-    created_at: datetime
-    updated_at: datetime
-    created_by: Optional[str] = None
+class Profile(BaseModel):
+    firstName:   str
+    lastName:    str
+    profilePic:  Optional[str] = None
+    phoneNumber: Optional[str] = None
+    address:     Optional[str] = None
 
     model_config = {
         "validate_by_name": True,
-        "from_attributes": True
+        "from_attributes":  True
+    }
+class SignupIn(BaseModel):
+    email:     EmailStr
+    password:  str
+    profile:   Profile
+    roles:     Optional[List[str]] = None
+
+    model_config = {"validate_by_name": True}
+    
+class Enrollment(BaseModel):
+    courseId:   str
+    enrolledAt: datetime
+
+    model_config = {
+        "validate_by_name": True,
+        "from_attributes":  True
+    }
+
+class Access(BaseModel):
+    courseId:   str
+    accessedAt: datetime
+
+    model_config = {
+        "validate_by_name": True,
+        "from_attributes":  True
+    }
+
+class Alert(BaseModel):
+    alertId:        str
+    createdAt:      datetime
+    acknowledgedAt: Optional[datetime] = None
+
+    model_config = {
+        "validate_by_name": True,
+        "from_attributes":  True
+    }
+
+class UserDB(BaseModel):
+    id:           str             = Field(..., alias="_id")
+    email:        EmailStr
+    username:     str
+    passwordHash: str
+    profile:      Profile
+    roles:        List[str]       = []
+    enrollments:  List[Enrollment] = []
+    accesses:     List[Access]     = []
+    alerts:       List[Alert]      = []
+    createdAt:    datetime
+    updatedAt:    datetime
+
+    model_config = {
+        "validate_by_name": True,
+        "from_attributes":  True
+    }
+
+class UserOut(BaseModel):
+    id:        str       = Field(..., alias="_id")
+    email:     EmailStr
+    username:  str
+    profile:   Profile
+    roles:     List[str]
+    enrollments: List[Enrollment]
+    accesses:    List[Access]
+    alerts:      List[Alert]
+    createdAt: datetime
+    updatedAt: datetime
+
+    model_config = {
+        "validate_by_name": True,
+        "from_attributes":  True
     }
 
 class Token(BaseModel):
     access_token: str
-    token_type: str = "bearer"
+    token_type:   str = "bearer"
+
+    model_config = {
+        "validate_by_name": True
+    }

@@ -1,33 +1,34 @@
+<!-- src/app/register/register.component.html -->
+
 <h2>Sign Up</h2>
 
 <form [formGroup]="signupForm" (ngSubmit)="onSubmit()">
+  <!-- Email -->
+  <label for="email">Email</label>
+  <input id="email" type="email" formControlName="email" />
+  <div *ngIf="signupForm.get('email')?.invalid && signupForm.get('email')?.touched" class="error">
+    A valid email is required.
+  </div>
+
   <!-- First Name -->
-  <label for="first_name">First Name:</label>
-  <input id="first_name" formControlName="first_name" type="text" />
-  <div *ngIf="signupForm.get('first_name')?.invalid && signupForm.get('first_name')?.touched">
+  <label for="firstName">First Name</label>
+  <input id="firstName" type="text" formControlName="firstName" />
+  <div *ngIf="signupForm.get('firstName')?.invalid && signupForm.get('firstName')?.touched" class="error">
     First name is required.
   </div>
 
   <!-- Last Name -->
-  <label for="last_name">Last Name:</label>
-  <input id="last_name" formControlName="last_name" type="text" />
-  <div *ngIf="signupForm.get('last_name')?.invalid && signupForm.get('last_name')?.touched">
+  <label for="lastName">Last Name</label>
+  <input id="lastName" type="text" formControlName="lastName" />
+  <div *ngIf="signupForm.get('lastName')?.invalid && signupForm.get('lastName')?.touched" class="error">
     Last name is required.
-  </div>
-
-  <!-- Email -->
-  <label for="email">Email:</label>
-  <input id="email" formControlName="email" type="email" />
-  <div *ngIf="signupForm.get('email')?.invalid && signupForm.get('email')?.touched">
-    A valid email is required.
   </div>
 
   <button type="submit" [disabled]="signupForm.invalid">Sign Up</button>
 </form>
 
 <div *ngIf="signupSuccess" class="success">
-  Signup successful! Your username &amp; password have been generated.  
-  You’ll receive them by email (or check your profile page).
+  Signup successful! Redirecting to login…
 </div>
 <div *ngIf="signupError" class="error">
   {{ signupError }}
