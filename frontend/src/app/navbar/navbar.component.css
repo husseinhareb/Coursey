@@ -1,0 +1,112 @@
+/* src/app/navbar/navbar.component.css */
+
+/* theme vars */
+:host {
+  --navbar-bg:         #fff;
+  --navbar-color:      #333;
+  --navbar-hover-bg:   #f5f5f5;
+  --navbar-border:     #e0e0e0;
+  --brand-color:       #007bff;
+  --brand-hover-color: #0056b3;
+  --button-padding:    0.5rem 1rem;
+  --spacing:           1rem;
+}
+
+/* container */
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--navbar-bg);
+  border-bottom: 1px solid var(--navbar-border);
+  padding: var(--spacing);
+}
+
+/* brand */
+.navbar-brand .brand {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--brand-color);
+  text-decoration: none;
+  transition: color .2s;
+}
+.navbar-brand .brand:hover {
+  color: var(--brand-hover-color);
+}
+
+/* nav list */
+.nav-list {
+  display: flex;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+/* spacer */
+.nav-list .flex-spacer {
+  flex: 1;
+}
+
+/* everything else gets a right margin */
+.nav-list li:not(.flex-spacer) {
+  margin-right: var(--spacing);
+}
+.nav-list li:last-child {
+  margin-right: 0;
+}
+
+/* links & buttons share the same padding, hover & active styles */
+.nav-list a,
+.nav-list button {
+  display: block;
+  padding: var(--button-padding);
+  color: var(--navbar-color);
+  text-decoration: none;
+  background: none;
+  border: none;
+  border-radius: 4px;
+  font: inherit;
+  cursor: pointer;
+  transition: background .2s, color .2s;
+}
+.nav-list a:hover,
+.nav-list button:hover,
+.nav-list a.active {
+  background: var(--navbar-hover-bg);
+}
+
+/* avatar */
+.nav-list .avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  background-color: var(--brand-color);
+  color: #fff;
+  font-weight: bold;
+  text-transform: uppercase;
+  transition: background .2s;
+}
+.nav-list .avatar:hover,
+.nav-list .avatar.active {
+  background-color: var(--brand-hover-color);
+}
+
+/* responsive stack on small screens */
+@media (max-width: 768px) {
+  .navbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .nav-list {
+    flex-direction: column;
+  }
+  .nav-list li {
+    margin: 0 0 0.5rem 0;
+  }
+  .nav-list li:last-child {
+    margin-bottom: 0;
+  }
+}

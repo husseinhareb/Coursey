@@ -53,5 +53,10 @@ export const routes: Routes = [
     component: ManageEnrollmentsComponent,
     canActivate: [AuthGuard]
   },
+    {
+    path: 'courses/:id',
+    component: CoursesComponent,
+    canActivate: [AuthGuard]
+  },
   { path: '**', redirectTo: '' }
 ];

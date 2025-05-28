@@ -1,0 +1,16 @@
+<!-- src/app/courses/course-detail.component.html -->
+
+<a routerLink="/courses">&larr; Back to Courses</a>
+
+<section *ngIf="loading">Loading course…</section>
+<section *ngIf="error" class="error">{{ error }}</section>
+
+<article *ngIf="course">
+  <h1>{{ course.title }}</h1>
+  <p><strong>Code:</strong> {{ course.code }}</p>
+  <div *ngIf="course.background" class="banner">
+    <img [src]="course.background" alt="Course background" />
+  </div>
+  <h2>Description</h2>
+  <p>{{ course.description }}</p>
+</article>

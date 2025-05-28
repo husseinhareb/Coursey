@@ -2,9 +2,9 @@
 
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Router } from '@angular/router';
-import { tap, map } from 'rxjs/operators';
-import { Observable } from 'rxjs';
+import { Router }     from '@angular/router';
+import { BehaviorSubject, of, Observable } from 'rxjs';
+import { tap, switchMap, catchError, map } from 'rxjs/operators';
 import { environment } from '../environments/environment';
 
 interface TokenResponse {
@@ -12,9 +12,6 @@ interface TokenResponse {
   token_type:   string;
 }
 
-/**
- * Shape of the signup payload matching the backend SignupIn schema.
- */
 export interface SignupData {
   email:     string;
   password:  string;
@@ -28,58 +25,95 @@ export interface SignupData {
   roles?: string[];
 }
 
+// shape of the “me” endpoint
+export interface Me {
+  id:          string;
+  email:       string;
+  username:    string;
+  profile: {
+    firstName:   string;
+    lastName:    string;
+    profilePic?: string;
+    phoneNumber?:string;
+    address?:    string;
+  };
+  roles:       string[];
+  enrollments: any[];
+  accesses:    any[];
+  alerts:      any[];
+  createdAt:   string;
+  updatedAt:   string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private tokenKey = 'token';
-  private apiBase  = environment.apiUrl;
+  private tokenKey    = 'token';
+  private apiBase     = environment.apiUrl;
 
-  constructor(private http: HttpClient, private router: Router) {}
+  // holds the “me” object
+  private userSubject = new BehaviorSubject<Me|null>(null);
+  public  user$       = this.userSubject.asObservable();
 
-  /**
-   * Log in with email & password. Stores JWT on success.
-   */
+  constructor(private http: HttpClient, private router: Router) {
+    // on startup, if token exists, load profile
+    if (this.token) {
+      this.loadProfile().subscribe();
+    }
+  }
+
+  /** synchronous snapshot of the current user */
+  get user(): Me|null {
+    return this.userSubject.value;
+  }
+
+  /** whether a JWT token is stored */
+  get isLoggedIn(): boolean {
+    return !!this.token;
+  }
+
+  /** raw JWT from localStorage */
+  get token(): string|null {
+    return localStorage.getItem(this.tokenKey);
+  }
+
+  /** fetch `/users/me` and publish into userSubject */
+  private loadProfile(): Observable<Me|null> {
+    return this.http.get<Me>(`${this.apiBase}/users/me`).pipe(
+      tap(me => this.userSubject.next(me)),
+      catchError(() => {
+        // if it fails (invalid token), log out
+        this.logout();
+        return of(null);
+      })
+    );
+  }
+
+  /** log in, store JWT, then load profile */
   login(email: string, password: string): Observable<boolean> {
     return this.http
       .post<TokenResponse>(`${this.apiBase}/auth/login`, { email, password })
       .pipe(
         tap(res => localStorage.setItem(this.tokenKey, res.access_token)),
-        map(() => true)
+        switchMap(() => this.loadProfile()),
+        map(me => !!me)
       );
   }
 
-  /**
-   * Sign up a new user. Expects a SignupData object that includes
-   * email, password, nested profile, and optional roles.
-   * Stores JWT on success.
-   */
+  /** sign up, store JWT, then load profile */
   signup(data: SignupData): Observable<boolean> {
     return this.http
       .post<TokenResponse>(`${this.apiBase}/auth/signup`, data)
       .pipe(
         tap(res => localStorage.setItem(this.tokenKey, res.access_token)),
-        map(() => true)
+        switchMap(() => this.loadProfile()),
+        map(me => !!me)
       );
   }
 
-  /**
-   * Remove JWT and navigate to login.
-   */
+  /** clear JWT + user, navigate to login */
   logout(): void {
     localStorage.removeItem(this.tokenKey);
+    this.userSubject.next(null);
     this.router.navigate(['/login']);
-  }
-
-  /**
-   * Retrieve stored JWT, if any.
-   */
-  get token(): string | null {
-    return localStorage.getItem(this.tokenKey);
-  }
-
-  /**
-   * Returns true if a JWT is present.
-   */
-  get isLoggedIn(): boolean {
-    return !!this.token;
   }
 }

@@ -12,7 +12,7 @@ import { HTTP_INTERCEPTORS } from '@angular/common/http';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, NavbarComponent],
+  imports: [RouterOutlet, NavbarComponent],
   providers: [
     {
       provide: HTTP_INTERCEPTORS,

@@ -18,7 +18,7 @@
   </thead>
   <tbody>
     <tr *ngFor="let c of courses">
-      <td>{{ c.title }}</td>
+      <td><a [routerLink]="['/courses', c.id]">{{ c.title }}</a></td>
       <td>{{ c.code }}</td>
       <td>{{ c.description }}</td>
       <td>{{ c.background || '-' }}</td>
