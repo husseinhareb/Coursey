@@ -1,27 +1,40 @@
 <nav class="navbar">
   <ul class="nav-list">
     <li>
-      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+      <a
+        routerLink="/"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+      >
         Home
       </a>
     </li>
-    <li>
+
+    <!-- shown only when NOT logged in -->
+    <li *ngIf="!auth.isLoggedIn">
       <a routerLink="/register" routerLinkActive="active">
         Sign Up
       </a>
     </li>
-    <li>
+    <li *ngIf="!auth.isLoggedIn">
       <a routerLink="/login" routerLinkActive="active">
-        Log in
+        Log In
       </a>
     </li>
-    <li>
+
+    <!-- shown only when logged in -->
+    <li *ngIf="auth.isLoggedIn">
       <a routerLink="/users" routerLinkActive="active">
         Users
       </a>
     </li>
-    <!-- add more links as needed: -->
-    <!-- <li><a routerLink="/login" routerLinkActive="active">Login</a></li> -->
-    <!-- <li><a routerLink="/about" routerLinkActive="active">About</a></li> -->
+    <li *ngIf="auth.isLoggedIn">
+      <button (click)="logout()">Log Out</button>
+    </li>
+        <li *ngIf="auth.isLoggedIn">
+      <a routerLink="/courses" routerLinkActive="active">
+        Courses
+      </a>
+    </li>
   </ul>
 </nav>

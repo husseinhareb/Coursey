@@ -5,6 +5,8 @@ import { RegisterComponent } from './register/register.component';
 import { LoginComponent } from './login/login.component';
 import { AuthGuard } from './auth/auth.guard';
 import { UsersComponent } from './users/users.component';
+import { CoursesComponent } from './courses/courses.component';
+import { CourseFormComponent } from './courses/course-form.component';
 export const routes: Routes = [
   // Public landing:
   { path: '', component: HomeComponent },
@@ -21,6 +23,21 @@ export const routes: Routes = [
   {
     path: 'users',
     component: UsersComponent,
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'courses',
+    component: CoursesComponent,
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'courses/add',
+    component: CourseFormComponent,
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'courses/:id/edit',
+    component: CourseFormComponent,
     canActivate: [AuthGuard]
   },
 

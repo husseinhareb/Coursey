@@ -1,0 +1,22 @@
+<!-- src/app/courses/course-form.component.html -->
+<h2>{{ isEdit ? 'Edit' : 'Add' }} Course</h2>
+
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+  <label>Title</label>
+  <input formControlName="title" />
+
+  <label>Code</label>
+  <input formControlName="code" />
+
+  <label>Description</label>
+  <textarea formControlName="description"></textarea>
+
+  <label>Background</label>
+  <input formControlName="background" />
+
+  <button type="submit" [disabled]="form.invalid">
+    {{ isEdit ? 'Save Changes' : 'Create Course' }}
+  </button>
+</form>
+
+<div *ngIf="error" class="error">{{ error }}</div>

@@ -1,20 +1,18 @@
 # /app/crud/user.py
 
-from typing import Optional
+from typing import Optional, List
 from datetime import datetime
+from bson import ObjectId
 
 from app.db.mongodb import users_collection
 from app.schemas.user import UserIn, UserDB
 
-
 async def create_user(user_in: UserIn, created_by: Optional[str] = None) -> Optional[UserDB]:
-    # prevent duplicate emails
     existing = await users_collection.find_one({"email": user_in.email})
     if existing:
         return None
 
     now = datetime.utcnow()
-    # local import to avoid circular dependency
     from app.services.auth import hash_password
 
     user_doc = {
@@ -37,7 +35,6 @@ async def create_user(user_in: UserIn, created_by: Optional[str] = None) -> Opti
     if not created:
         return None
 
-    # stringify ObjectId for Pydantic
     created["_id"] = str(created["_id"])
     return UserDB(**created)
 
@@ -47,7 +44,6 @@ async def authenticate_user(email: str, password: str) -> Optional[UserDB]:
     if not user:
         return None
 
-    # local import to avoid circular dependency
     from app.services.auth import verify_password
 
     if not verify_password(password, user["hashed_password"]):
@@ -55,3 +51,22 @@ async def authenticate_user(email: str, password: str) -> Optional[UserDB]:
 
     user["_id"] = str(user["_id"])
     return UserDB(**user)
+
+
+async def get_user_by_id(user_id: str) -> Optional[UserDB]:
+    """Fetch a single user by their ID."""
+    doc = await users_collection.find_one({"_id": ObjectId(user_id)})
+    if not doc:
+        return None
+    doc["_id"] = str(doc["_id"])
+    return UserDB(**doc)
+
+
+async def list_users() -> List[UserDB]:
+    """Fetch all users."""
+    out: List[UserDB] = []
+    cursor = users_collection.find()
+    async for doc in cursor:
+        doc["_id"] = str(doc["_id"])
+        out.append(UserDB(**doc))
+    return out

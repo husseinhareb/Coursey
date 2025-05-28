@@ -33,10 +33,13 @@ class UserDB(BaseModel):
     updated_at: datetime
     created_by: Optional[str] = None
 
-    class Config:
-        allow_population_by_field_name = True
-        json_encoders = { datetime: lambda dt: dt.isoformat() }
-        orm_mode = True
+    model_config = {
+        "validate_by_name": True,   # allow using field names (id) not just alias (_id)
+        "from_attributes": True,    # enable ORM-mode: read attrs on objects
+        "json_schema_extra": {
+            "examples": []
+        }
+    }
 
 class UserOut(BaseModel):
     id: str = Field(..., alias="_id")
@@ -51,10 +54,10 @@ class UserOut(BaseModel):
     updated_at: datetime
     created_by: Optional[str] = None
 
-    class Config:
-        allow_population_by_field_name = True
-        json_encoders = { datetime: lambda dt: dt.isoformat() }
-        orm_mode = True
+    model_config = {
+        "validate_by_name": True,
+        "from_attributes": True
+    }
 
 class Token(BaseModel):
     access_token: str

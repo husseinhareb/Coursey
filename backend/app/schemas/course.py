@@ -19,11 +19,17 @@ class CourseDB(CourseBase):
     updated_at: datetime
     created_by: str
 
-    class Config:
-        allow_population_by_field_name = True
-        orm_mode = True
-        json_encoders = { datetime: lambda dt: dt.isoformat() }
+    model_config = {
+        "validate_by_name": True,   # allow passing `id` instead of `_id`
+        "from_attributes": True,    # ORM mode
+        "json_schema_extra": {
+            "examples": []
+        }
+    }
 
 class CourseOut(CourseDB):
     """What is returned in API responses"""
-    pass
+    model_config = {
+        "validate_by_name": True,
+        "from_attributes": True
+    }

@@ -1,0 +1,31 @@
+<div class="courses-header">
+  <h2>Courses</h2>
+  <a routerLink="/courses/add" class="btn">+ Add Course</a>
+</div>
+
+<div *ngIf="loading">Loading…</div>
+<div *ngIf="error" class="error">{{ error }}</div>
+
+<table *ngIf="!loading && !error">
+  <thead>
+    <tr>
+      <th>Title</th>
+      <th>Code</th>
+      <th>Description</th>
+      <th>Background</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let c of courses">
+      <td>{{ c.title }}</td>
+      <td>{{ c.code }}</td>
+      <td>{{ c.description }}</td>
+      <td>{{ c.background || '-' }}</td>
+      <td>
+        <button (click)="edit(c.id)">Edit</button>
+        <button (click)="delete(c.id)">Delete</button>
+      </td>
+    </tr>
+  </tbody>
+</table>
