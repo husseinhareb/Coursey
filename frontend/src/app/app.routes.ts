@@ -7,6 +7,7 @@ import { AuthGuard } from './auth/auth.guard';
 import { UsersComponent } from './users/users.component';
 import { CoursesComponent } from './courses/courses.component';
 import { CourseFormComponent } from './courses/course-form.component';
+import { ProfileComponent } from './profile/profile.component';
 export const routes: Routes = [
   // Public landing:
   { path: '', component: HomeComponent },
@@ -41,5 +42,10 @@ export const routes: Routes = [
     canActivate: [AuthGuard]
   },
 
+  {
+    path: 'profile',
+    component: ProfileComponent,
+    canActivate: [AuthGuard]
+  },
   { path: '**', redirectTo: '' }
 ];

@@ -1,0 +1,25 @@
+<h2>My Profile</h2>
+
+<div *ngIf="loading">Loading profile…</div>
+<div *ngIf="error" class="error">{{ error }}</div>
+
+<form *ngIf="!loading" [formGroup]="form" (ngSubmit)="onSubmit()">
+  <label for="firstName">First Name</label>
+  <input id="firstName" formControlName="firstName" />
+
+  <label for="lastName">Last Name</label>
+  <input id="lastName" formControlName="lastName" />
+
+  <label for="profilePic">Profile Picture URL</label>
+  <input id="profilePic" formControlName="profilePic" />
+
+  <label for="phoneNumber">Phone Number</label>
+  <input id="phoneNumber" formControlName="phoneNumber" />
+
+  <label for="address">Address</label>
+  <input id="address" formControlName="address" />
+
+  <button type="submit" [disabled]="form.invalid">Save</button>
+</form>
+
+<div *ngIf="success" class="success">Profile updated successfully.</div>

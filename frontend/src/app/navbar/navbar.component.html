@@ -1,11 +1,7 @@
 <nav class="navbar">
   <ul class="nav-list">
     <li>
-      <a
-        routerLink="/"
-        routerLinkActive="active"
-        [routerLinkActiveOptions]="{ exact: true }"
-      >
+      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
         Home
       </a>
     </li>
@@ -31,9 +27,14 @@
     <li *ngIf="auth.isLoggedIn">
       <button (click)="logout()">Log Out</button>
     </li>
-        <li *ngIf="auth.isLoggedIn">
+    <li *ngIf="auth.isLoggedIn">
       <a routerLink="/courses" routerLinkActive="active">
         Courses
+      </a>
+    </li>
+        <li *ngIf="auth.isLoggedIn">
+      <a routerLink="/profile" routerLinkActive="active">
+        Profile
       </a>
     </li>
   </ul>
