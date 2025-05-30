@@ -1,25 +1,36 @@
 // src/app/app.routes.ts
+
 import { Routes } from '@angular/router';
-import { HomeComponent } from './home/home.component';
-import { RegisterComponent } from './register/register.component';
-import { LoginComponent } from './login/login.component';
-import { AuthGuard } from './auth/auth.guard';
-import { UsersComponent } from './users/users.component';
-import { CoursesComponent } from './courses/courses.component';
-import { CourseFormComponent } from './courses/course-form.component';
-import { ProfileComponent } from './profile/profile.component';
+
+import { HomeComponent }              from './home/home.component';
+import { RegisterComponent }          from './register/register.component';
+import { LoginComponent }             from './login/login.component';
+import { ProfileComponent }           from './profile/profile.component';
+
+import { UsersComponent }             from './users/users.component';
 import { ManageEnrollmentsComponent } from './users/manage-enrollments.component';
+
+import { CoursesComponent }           from './courses/courses.component';
+import { CourseDetailComponent }      from './courses/course-detail.component';
+import { CourseFormComponent }        from './courses/course-form.component';
+
+import { AuthGuard }                  from './auth/auth.guard';
+
 export const routes: Routes = [
-  // Public landing:
-  { path: '', component: HomeComponent },
-
+  // Public landing & auth
+  { path: '',         component: HomeComponent },
   { path: 'register', component: RegisterComponent },
-  { path: 'login', component: LoginComponent },
+  { path: 'login',    component: LoginComponent },
 
-  // Protected “home” for users after login:
+  // Protected area (requires login)
   {
     path: 'home',
     component: HomeComponent,
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'profile',
+    component: ProfileComponent,
     canActivate: [AuthGuard]
   },
   {
@@ -28,8 +39,14 @@ export const routes: Routes = [
     canActivate: [AuthGuard]
   },
   {
+    path: 'users/:id/enrollments',
+    component: ManageEnrollmentsComponent,
+    canActivate: [AuthGuard]
+  },
+  {
     path: 'courses',
     component: CoursesComponent,
+    pathMatch: 'full',   // only match exactly `/courses`
     canActivate: [AuthGuard]
   },
   {
@@ -42,21 +59,12 @@ export const routes: Routes = [
     component: CourseFormComponent,
     canActivate: [AuthGuard]
   },
-
   {
-    path: 'profile',
-    component: ProfileComponent,
-    canActivate: [AuthGuard]
-  },
-  {
-    path: 'users/:id/enrollments',
-    component: ManageEnrollmentsComponent,
-    canActivate: [AuthGuard]
-  },
-    {
     path: 'courses/:id',
-    component: CoursesComponent,
+    component: CourseDetailComponent,
     canActivate: [AuthGuard]
   },
+
+  // Fallback
   { path: '**', redirectTo: '' }
 ];

@@ -1,41 +1,46 @@
 // src/app/courses/course-form.component.ts
 
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit }            from '@angular/core';
+import { CommonModule }                  from '@angular/common';
 import {
   ReactiveFormsModule,
   FormBuilder,
   FormGroup,
   Validators
 } from '@angular/forms';
-import { RouterModule, ActivatedRoute, Router } from '@angular/router';
-
-import { CourseService, Course, CourseCreate } from '../services/course.service';
+import {
+  RouterModule,
+  ActivatedRoute,
+  Router
+} from '@angular/router';
+import { CourseService, CourseCreate }   from '../services/course.service';
 
 @Component({
   selector: 'app-course-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule],
-  templateUrl: './course-form.component.html'
+  imports: [ CommonModule, ReactiveFormsModule, RouterModule ],
+  templateUrl: './course-form.component.html',
+  styleUrls: ['./course-form.component.css']
 })
 export class CourseFormComponent implements OnInit {
-  form!: FormGroup;
+  form: FormGroup;
   isEdit = false;
-  private id!: string;
+  private id?: string;
+  loading = false;
   error: string | null = null;
 
   constructor(
-    private fb: FormBuilder,
-    private svc: CourseService,
-    private route: ActivatedRoute,
+    private fb:     FormBuilder,
+    private svc:    CourseService,
+    private route:  ActivatedRoute,
     private router: Router
   ) {
-    // initialize the form after fb is injected
+    // initialize here, after fb is available
     this.form = this.fb.group({
-      title:      ['', Validators.required],
-      code:       ['', Validators.required],
-      description:['', Validators.required],
-      background: ['']
+      title:       ['', Validators.required],
+      code:        ['', Validators.required],
+      description: ['', Validators.required],
+      background:  ['']
     });
   }
 
@@ -44,26 +49,43 @@ export class CourseFormComponent implements OnInit {
     if (id) {
       this.isEdit = true;
       this.id = id;
+      this.loading = true;
       this.svc.get(id).subscribe({
-        next: (c: Course) => this.form.patchValue(c),
-        error: () => this.error = 'Failed to load course'
+        next: course => {
+          // only patch the fields your form cares about
+          this.form.patchValue({
+            title:       course.title,
+            code:        course.code,
+            description: course.description,
+            background:  course.background || ''
+          });
+          this.loading = false;
+        },
+        error: () => {
+          this.error = 'Failed to load course';
+          this.loading = false;
+        }
       });
     }
   }
 
   onSubmit() {
     if (this.form.invalid) return;
+    this.loading = true;
 
-    // cast to your DTO so TS knows fields are non-null
+    // cast to CourseCreate so TS is happy
     const payload = this.form.value as CourseCreate;
 
-    const action = this.isEdit
-      ? this.svc.update(this.id, payload)
+    const obs = this.isEdit
+      ? this.svc.update(this.id!, payload)
       : this.svc.create(payload);
 
-    action.subscribe({
+    obs.subscribe({
       next: () => this.router.navigate(['/courses']),
-      error: err => this.error = err.error?.detail || 'Save failed'
+      error: err => {
+        this.error = err.error?.detail || 'Save failed';
+        this.loading = false;
+      }
     });
   }
 }

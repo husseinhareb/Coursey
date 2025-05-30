@@ -1,11 +1,9 @@
 // src/app/courses/course-detail.component.ts
 
-import { Component, OnInit } from '@angular/core';
-import { CommonModule }      from '@angular/common';
-import { ActivatedRoute }    from '@angular/router';
-import { RouterModule }      from '@angular/router';
-
-import { CourseService, Course } from '../services/course.service';
+import { Component, OnInit }      from '@angular/core';
+import { CommonModule }            from '@angular/common';
+import { RouterModule, ActivatedRoute } from '@angular/router';
+import { CourseService, Course }   from '../services/course.service';
 
 @Component({
   selector: 'app-course-detail',
@@ -16,22 +14,21 @@ import { CourseService, Course } from '../services/course.service';
 })
 export class CourseDetailComponent implements OnInit {
   course?: Course;
-  loading = true;
+  loading = false;
   error: string | null = null;
 
   constructor(
-    private route: ActivatedRoute,
-    private svc:   CourseService
+    private svc:   CourseService,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
     if (!id) {
       this.error = 'No course ID provided';
-      this.loading = false;
       return;
     }
-
+    this.loading = true;
     this.svc.get(id).subscribe({
       next: c => {
         this.course = c;

@@ -4,7 +4,15 @@
     <a routerLink="/" class="brand">Coursey</a>
   </div>
   <ul class="nav-list">
-    <!-- left‐side links -->
+    <!-- Public -->
+    <li *ngIf="!auth.isLoggedIn">
+      <a routerLink="/register" routerLinkActive="active">Sign Up</a>
+    </li>
+    <li *ngIf="!auth.isLoggedIn">
+      <a routerLink="/login" routerLinkActive="active">Log In</a>
+    </li>
+
+    <!-- Private -->
     <li *ngIf="auth.isLoggedIn">
       <a routerLink="/" routerLinkActive="active">Home</a>
     </li>
@@ -14,18 +22,12 @@
     <li *ngIf="auth.isLoggedIn">
       <a routerLink="/courses" routerLinkActive="active">Courses</a>
     </li>
-
-    <!-- spacer pushes everything after it to the right -->
-    <li class="flex-spacer"></li>
-
-    <!-- right‐side links -->
     <li *ngIf="auth.isLoggedIn">
-      <a routerLink="/profile" routerLinkActive="active" class="avatar">
-        {{ initials }}
-      </a>
+      <a routerLink="/profile" routerLinkActive="active">Profile</a>
     </li>
     <li *ngIf="auth.isLoggedIn">
       <button (click)="logout()">Log Out</button>
     </li>
+
   </ul>
 </nav>
