@@ -8,11 +8,11 @@ import { LoginComponent }             from './login/login.component';
 import { ProfileComponent }           from './profile/profile.component';
 
 import { UsersComponent }             from './users/users.component';
-import { ManageEnrollmentsComponent } from './users/manage-enrollments.component';
+import { ManageEnrollmentsComponent } from './manage-enrollments/manage-enrollments.component';
 
 import { CoursesComponent }           from './courses/courses.component';
-import { CourseDetailComponent }      from './courses/course-detail.component';
-import { CourseFormComponent }        from './courses/course-form.component';
+import { CourseDetailComponent }      from './course-detail/course-detail.component';
+import { CourseFormComponent }        from './course-form/course-form.component';
 
 import { AuthGuard }                  from './auth/auth.guard';
 
