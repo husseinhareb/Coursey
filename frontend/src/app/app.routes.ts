@@ -2,25 +2,26 @@
 
 import { Routes } from '@angular/router';
 
-import { HomeComponent }              from './home/home.component';
-import { RegisterComponent }          from './register/register.component';
-import { LoginComponent }             from './login/login.component';
-import { ProfileComponent }           from './profile/profile.component';
+import { HomeComponent } from './home/home.component';
+import { RegisterComponent } from './register/register.component';
+import { LoginComponent } from './login/login.component';
+import { ProfileComponent } from './profile/profile.component';
 
-import { UsersComponent }             from './users/users.component';
+import { UsersComponent } from './users/users.component';
 import { ManageEnrollmentsComponent } from './manage-enrollments/manage-enrollments.component';
 
-import { CoursesComponent }           from './courses/courses.component';
-import { CourseDetailComponent }      from './course-detail/course-detail.component';
-import { CourseFormComponent }        from './course-form/course-form.component';
+import { CoursesComponent } from './courses/courses.component';
+import { CourseDetailComponent } from './course-detail/course-detail.component';
+import { CourseFormComponent } from './course-form/course-form.component';
 
-import { AuthGuard }                  from './auth/auth.guard';
+
+import { AuthGuard } from './auth/auth.guard';
 
 export const routes: Routes = [
   // Public landing & auth
-  { path: '',         component: HomeComponent },
+  { path: '', component: HomeComponent },
   { path: 'register', component: RegisterComponent },
-  { path: 'login',    component: LoginComponent },
+  { path: 'login', component: LoginComponent },
 
   // Protected area (requires login)
   {
@@ -64,6 +65,7 @@ export const routes: Routes = [
     component: CourseDetailComponent,
     canActivate: [AuthGuard]
   },
+
 
   // Fallback
   { path: '**', redirectTo: '' }

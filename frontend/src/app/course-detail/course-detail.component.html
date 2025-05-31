@@ -1,16 +1,102 @@
-<!-- src/app/courses/course-detail.component.html -->
+<!-- src/app/course-detail/course-detail.component.html -->
 
-<a routerLink="/courses">&larr; Back to Courses</a>
+<!-- Show spinner / error for the course itself -->
+<div *ngIf="loadingCourse">Loading course…</div>
+<div *ngIf="courseError" class="error">{{ courseError }}</div>
 
-<section *ngIf="loading">Loading course…</section>
-<section *ngIf="error" class="error">{{ error }}</section>
-
-<article *ngIf="course">
-  <h1>{{ course.title }}</h1>
-  <p><strong>Code:</strong> {{ course.code }}</p>
-  <div *ngIf="course.background" class="banner">
-    <img [src]="course.background" alt="Course background" />
-  </div>
-  <h2>Description</h2>
+<div *ngIf="course">
+  <h2>{{ course.title }}</h2>
   <p>{{ course.description }}</p>
-</article>
+</div>
+
+<hr />
+
+<!-- Add / Edit Form Toggle -->
+<button (click)="toggleForm()">
+  {{ editing ? 'Edit Post' : '+ Add Post' }}
+</button>
+
+<!-- The form to create or update a post -->
+<div *ngIf="showForm" class="post-form">
+  <form [formGroup]="postForm" (ngSubmit)="savePost()">
+    <div>
+      <label>Title:</label>
+      <input formControlName="title" placeholder="Title" />
+    </div>
+    <div>
+      <label>Content:</label>
+      <textarea formControlName="content" placeholder="Content"></textarea>
+    </div>
+    <div>
+      <label>Type:</label>
+      <select formControlName="type">
+        <option value="lecture">Lecture</option>
+        <option value="reminder">Reminder</option>
+      </select>
+    </div>
+    <div>
+      <label>File ID (optional):</label>
+      <input formControlName="fileId" placeholder="File ID (optional)" />
+    </div>
+    <div>
+      <button type="submit" [disabled]="postForm.invalid">
+        {{ editing ? 'Update' : 'Create' }}
+      </button>
+      <button type="button" (click)="toggleForm()">Cancel</button>
+    </div>
+  </form>
+</div>
+
+<hr />
+
+<!-- Show loading / error for posts -->
+<div *ngIf="loadingPosts">Loading posts…</div>
+<div *ngIf="postsError" class="error">{{ postsError }}</div>
+
+<!-- Posts List -->
+<ul *ngIf="!loadingPosts && !postsError" class="posts-list">
+  <li *ngFor="let p of posts" class="post-item">
+    <!-- Title / Content / Type -->
+    <h3>
+      {{ p.ispinned ? '📌 ' : '' }}{{ p.title }}
+    </h3>
+    <p>{{ p.content }}</p>
+    <small>Type: {{ p.type }}</small><br />
+    <small>Position: {{ p.position }}</small>
+    <br/>
+    <small *ngIf="p.ispinned">
+      Pinned At: {{ p.pinnedAt | date:'short' }}
+    </small>
+
+    <!-- Pin / Unpin Button -->
+    <button (click)="togglePin(p)">
+      {{ p.ispinned ? 'Unpin' : 'Pin' }}
+    </button>
+
+    <!-- ▲ / ▼ arrows for non-pinned posts only -->
+    <button
+      *ngIf="!p.ispinned"
+      (click)="moveUp(p)"
+      [disabled]="p.position === 1"
+      title="Move up"
+    >
+      ▲
+    </button>
+    <button
+      *ngIf="!p.ispinned"
+      (click)="moveDown(p)"
+      [disabled]="p.position === unpinnedCount"
+      title="Move down"
+    >
+      ▼
+    </button>
+
+    <!-- Edit Button (prefill form) -->
+    <button (click)="toggleForm(p)">Edit</button>
+
+    <!-- Delete Button -->
+    <button (click)="deletePost(p)">Delete</button>
+
+    <hr />
+  </li>
+</ul>
