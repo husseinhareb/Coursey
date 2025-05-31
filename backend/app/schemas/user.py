@@ -40,6 +40,19 @@ class Enrollment(BaseModel):
         "from_attributes":  True
     }
 
+class EnrollmentUser(BaseModel):
+    """
+    A slim representation of “User” for the /courses/{id}/enrolled endpoint:
+    only includes: _id, email, first_name, last_name.
+    """
+    id:         str      = Field(..., alias="_id")
+    email:      EmailStr
+    first_name: str
+    last_name:  str
+
+    class Config:
+        validate_by_name = True
+        orm_mode = True
 class Access(BaseModel):
     courseId:   str
     accessedAt: datetime

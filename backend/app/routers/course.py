@@ -13,7 +13,11 @@ from app.crud.course import (
 )
 from app.services.auth import get_current_active_user
 from app.schemas.user import UserDB
+from app.crud.user import list_users_by_course
 
+
+from app.schemas.course import CourseOut
+from app.schemas.user import EnrollmentUser
 router = APIRouter(
     prefix="/courses",
     tags=["courses"],
@@ -64,3 +68,15 @@ async def api_delete_course(
     if not success:
         raise HTTPException(status_code=404, detail="Course not found")
     return {"deleted": True}
+
+
+@router.get("/{course_id}/enrolled", response_model=List[EnrollmentUser])
+async def api_list_enrolled_users(
+    course_id: str,
+    current_user: UserDB = Depends(get_current_active_user)
+):
+    """
+    Return a list of “EnrollmentUser” (id, email, first_name, last_name)
+    for everyone who is enrolled in the given course.
+    """
+    return await list_users_by_course(course_id)

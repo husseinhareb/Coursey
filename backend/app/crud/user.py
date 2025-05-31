@@ -7,6 +7,8 @@ from bson import ObjectId
 from app.db.mongodb import users_collection
 from app.schemas.user import UserDB, Profile, Enrollment, Access, Alert
 
+from app.schemas.user import UserOut
+from app.schemas.user import EnrollmentUser
 def _normalize_user_doc(doc: dict) -> UserDB:
     """Convert ObjectId fields to str and return a UserDB."""
     doc["_id"] = str(doc["_id"])
@@ -104,7 +106,8 @@ async def update_user(user_id: str, profile: Profile) -> Optional[UserDB]:
         {"$set": {"profile": profile.model_dump(), "updatedAt": now}}
     )
     if res.matched_count == 0:
-        return None
+        from app.schemas.course import CourseOut
+
     return await get_user_by_id(user_id)
 
 
@@ -140,3 +143,48 @@ async def remove_enrollment(user_id: str, course_id: str) -> bool:
         {"$pull": {"enrollments": {"courseId": ObjectId(course_id)}}}
     )
     return res.modified_count > 0
+
+async def list_users_by_course(course_id: str) -> List[EnrollmentUser]:
+    """
+    Find all users who have an entry in their `enrollments` array for this course.
+    Return only (_id, email, first_name, last_name) for each user.
+    """
+    oid = ObjectId(course_id)
+
+    # We only project the four fields we need.
+    cursor = users_collection.find(
+        {"enrollments.courseId": oid},
+        {
+            "_id": 1,
+            "email": 1,
+            "profile.firstName": 1,
+            "profile.lastName": 1
+        }
+    )
+
+    out: List[EnrollmentUser] = []
+    async for raw in cursor:
+        # Convert the ObjectId _id to a string
+        raw["_id"] = str(raw["_id"])
+
+        # Pull nested profile fields out into top-level keys:
+        #   - raw.get("profile",{}).get("firstName")
+        #   - raw.get("profile",{}).get("lastName")
+        first = None
+        last  = None
+        prof  = raw.get("profile") or {}
+        if isinstance(prof, dict):
+            # Note: after projection, prof might be { "firstName": "...", "lastName": "..." }
+            first = prof.get("firstName")
+            last  = prof.get("lastName")
+
+        # Assign them into the keys that EnrollmentUser expects:
+        raw["first_name"] = first or ""
+        raw["last_name"]  = last  or ""
+        # (We do not need the `profile` key anymore, so pop it out)
+        raw.pop("profile", None)
+
+        # Now feed exactly those keys into the Pydantic model:
+        out.append(EnrollmentUser(**raw))
+
+    return out

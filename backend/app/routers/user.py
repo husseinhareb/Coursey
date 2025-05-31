@@ -13,7 +13,7 @@ from app.crud.user import (
 )
 from app.schemas.user import UserOut, Profile, Enrollment
 from app.services.auth import get_current_active_user
-
+from app.crud.user import list_users_by_course  
 router = APIRouter(
     prefix="/users",
     tags=["users"],
