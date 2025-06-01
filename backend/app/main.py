@@ -2,9 +2,7 @@
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routers import auth, course, user
-from app.routers import auth, course, user, post
-
+from app.routers import auth, course, user, post, submission
 app = FastAPI()
 
 origins = [
@@ -23,3 +21,4 @@ app.include_router(auth.router)
 app.include_router(course.router)
 app.include_router(user.router)
 app.include_router(post.router)
+app.include_router(submission.router)

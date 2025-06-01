@@ -14,3 +14,4 @@ db = client.coursey
 users_collection   = db.get_collection("user")
 courses_collection = db.get_collection("course")
 posts_collection   = db.get_collection("post")
+submissions_collection = db.get_collection("submissions")

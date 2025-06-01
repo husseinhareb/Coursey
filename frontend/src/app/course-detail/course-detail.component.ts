@@ -12,14 +12,31 @@ import { ActivatedRoute }             from '@angular/router';
 import { CourseService, Course }         from '../services/course.service';
 import { PostService, Post, PostCreate } from '../services/post.service';
 
+// Import the two new child components:
+import { SubmissionFormComponent } from '../submissions/submission-form.component';
+import { SubmissionListComponent } from '../submissions/submission-list.component';
+
 @Component({
   selector: 'app-course-detail',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+
+  // We must list both child components (plus CommonModule, ReactiveFormsModule)
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    SubmissionFormComponent,
+    SubmissionListComponent
+  ],
+
   templateUrl: './course-detail.component.html',
   styleUrls: ['./course-detail.component.css']
 })
 export class CourseDetailComponent implements OnInit {
+  // -----------------------------
+  // “Add/Edit Post” state  (unchanged)
+  // -----------------------------
+
+  courseId!: string;
   private fb        = inject(FormBuilder);
   private route     = inject(ActivatedRoute);
   private courseSvc = inject(CourseService);
@@ -33,8 +50,9 @@ export class CourseDetailComponent implements OnInit {
   loadingPosts = false;
   postsError: string | null = null;
 
-  showForm = false;        // whether to show the create/edit form
-  editing?: Post;          // if defined, indicates we are editing that post
+  showForm = false;
+  editing?: Post;
+
   postForm = this.fb.group({
     title:   ['', Validators.required],
     content: ['', Validators.required],
@@ -42,7 +60,15 @@ export class CourseDetailComponent implements OnInit {
     fileId:  ['']
   });
 
-  private courseId!: string;
+  // -----------------------------
+  // “Submission” state (NEW)
+  // -----------------------------
+
+  /**  ID of the post whose “submit‐homework” form is currently open. */
+  showSubmissionFormForPostId: string | null = null;
+
+  /**  ID of the post whose “view submissions” list is currently open. */
+  showSubmissionListForPostId: string | null = null;
 
   ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
@@ -55,6 +81,7 @@ export class CourseDetailComponent implements OnInit {
     this.loadPosts();
   }
 
+  // ---- “Course” loading (unchanged) ----
   private loadCourse() {
     this.loadingCourse = true;
     this.courseSvc.get(this.courseId).subscribe({
@@ -69,7 +96,8 @@ export class CourseDetailComponent implements OnInit {
     });
   }
 
-  private loadPosts() {
+  // ---- “Post” loading (public so template can call it) ----
+  loadPosts() {
     this.loadingPosts = true;
     this.postSvc.list(this.courseId).subscribe({
       next: (ps: Post[]) => {
@@ -83,15 +111,13 @@ export class CourseDetailComponent implements OnInit {
     });
   }
 
-  /**
-   * Count how many unpinned posts there are.
-   * We only show ▲/▼ for unpinned posts within [1 .. unpinnedCount].
-   */
+  /** Number of unpinned posts (for ▲/▼ disabling) */
   get unpinnedCount(): number {
     return this.posts.filter(p => !p.ispinned).length;
   }
 
-  /** Toggle showing the “create/edit” form. If a `post` is passed, we patch-form to edit it. */
+  // ---- “Add / Edit Post” methods (unchanged except making them public) ----
+
   toggleForm(post?: Post) {
     this.showForm = !this.showForm;
     this.editing = post;
@@ -107,20 +133,15 @@ export class CourseDetailComponent implements OnInit {
     }
   }
 
-  /** Called when “Save” is clicked. Creates or updates. */
   savePost() {
-    if (this.postForm.invalid) {
-      return;
-    }
+    if (this.postForm.invalid) return;
     const payload = this.postForm.value as PostCreate;
-
     const obs = this.editing
       ? this.postSvc.update(this.courseId, this.editing._id, payload)
       : this.postSvc.create(this.courseId, payload);
 
     obs.subscribe({
       next: () => {
-        // Once saved, hide the form and reload posts.
         this.toggleForm();
         this.loadPosts();
       },
@@ -130,61 +151,77 @@ export class CourseDetailComponent implements OnInit {
     });
   }
 
-  /** Delete a post after user confirmation. */
   deletePost(p: Post) {
-    if (!confirm(`Delete post “${p.title}”?`)) {
-      return;
-    }
+    if (!confirm(`Delete post “${p.title}”?`)) return;
     this.postSvc.delete(this.courseId, p._id).subscribe({
       next: () => this.loadPosts(),
-      error: e => this.postsError = e.error?.detail || 'Delete failed'
+      error: e => (this.postsError = e.error?.detail || 'Delete failed')
     });
   }
 
-  /** Pin / Unpin. Pinned posts always float to the top. */
   togglePin(p: Post) {
     if (p.ispinned) {
-      // Unpin:
       this.postSvc.unpin(this.courseId, p._id).subscribe({
         next: () => this.loadPosts(),
-        error: e => this.postsError = e.error?.detail || 'Unpin failed'
+        error: e => (this.postsError = e.error?.detail || 'Unpin failed')
       });
     } else {
-      // Pin:
       this.postSvc.pin(this.courseId, p._id).subscribe({
         next: () => this.loadPosts(),
-        error: e => this.postsError = e.error?.detail || 'Pin failed'
+        error: e => (this.postsError = e.error?.detail || 'Pin failed')
       });
     }
   }
 
-  /**
-   * Move a non-pinned post UP one slot among unpinned posts.
-   * Backend route: PATCH /courses/:cid/posts/:pid/moveUp 
-   * (swap `position` with the item directly above).
-   */
   moveUp(p: Post) {
-    if (p.ispinned) {
-      return; // only unpinned posts can move
-    }
+    if (p.ispinned) return;
     this.postSvc.moveUp(this.courseId, p._id).subscribe({
       next: () => this.loadPosts(),
-      error: e => this.postsError = e.error?.detail || 'Move up failed'
+      error: e => (this.postsError = e.error?.detail || 'Move up failed')
     });
   }
 
-  /**
-   * Move a non-pinned post DOWN one slot among unpinned posts.
-   * Backend route: PATCH /courses/:cid/posts/:pid/moveDown 
-   * (swap `position` with the item directly below).
-   */
   moveDown(p: Post) {
-    if (p.ispinned) {
-      return;
-    }
+    if (p.ispinned) return;
     this.postSvc.moveDown(this.courseId, p._id).subscribe({
       next: () => this.loadPosts(),
-      error: e => this.postsError = e.error?.detail || 'Move down failed'
+      error: e => (this.postsError = e.error?.detail || 'Move down failed')
     });
+  }
+
+  // -----------------------------
+  // NEW: “Submission” toggle methods
+  // -----------------------------
+
+  /**
+   * Toggle the “Submit Homework” form under a given post.
+   * If that form is already open for p._id, close it; otherwise show it.
+   */
+  toggleSubmissionForm(p: Post) {
+    if (this.showSubmissionFormForPostId === p._id) {
+      this.showSubmissionFormForPostId = null;
+    } else {
+      this.showSubmissionFormForPostId = p._id;
+      // If we open the form, close the “view submissions” list:
+      if (this.showSubmissionListForPostId === p._id) {
+        this.showSubmissionListForPostId = null;
+      }
+    }
+  }
+
+  /**
+   * Toggle the “View Submissions” list under a given post.
+   * If already open for p._id, close it; otherwise show it.
+   */
+  toggleSubmissionList(p: Post) {
+    if (this.showSubmissionListForPostId === p._id) {
+      this.showSubmissionListForPostId = null;
+    } else {
+      this.showSubmissionListForPostId = p._id;
+      // If we open the list, close the “submit” form:
+      if (this.showSubmissionFormForPostId === p._id) {
+        this.showSubmissionFormForPostId = null;
+      }
+    }
   }
 }

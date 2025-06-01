@@ -1,6 +1,6 @@
 <!-- src/app/course-detail/course-detail.component.html -->
 
-<!-- Show spinner / error for the course itself -->
+<!-- 1) Course Info -->
 <div *ngIf="loadingCourse">Loading course…</div>
 <div *ngIf="courseError" class="error">{{ courseError }}</div>
 
@@ -11,12 +11,12 @@
 
 <hr />
 
-<!-- Add / Edit Form Toggle -->
+<!-- 2) Add / Edit Post Toggle -->
 <button (click)="toggleForm()">
   {{ editing ? 'Edit Post' : '+ Add Post' }}
 </button>
 
-<!-- The form to create or update a post -->
+<!-- 3) Create / Update Post Form -->
 <div *ngIf="showForm" class="post-form">
   <form [formGroup]="postForm" (ngSubmit)="savePost()">
     <div>
@@ -49,53 +49,73 @@
 
 <hr />
 
-<!-- Show loading / error for posts -->
+<!-- 4) Posts List -->
 <div *ngIf="loadingPosts">Loading posts…</div>
 <div *ngIf="postsError" class="error">{{ postsError }}</div>
 
-<!-- Posts List -->
 <ul *ngIf="!loadingPosts && !postsError" class="posts-list">
   <li *ngFor="let p of posts" class="post-item">
-    <!-- Title / Content / Type -->
     <h3>
       {{ p.ispinned ? '📌 ' : '' }}{{ p.title }}
     </h3>
     <p>{{ p.content }}</p>
     <small>Type: {{ p.type }}</small><br />
-    <small>Position: {{ p.position }}</small>
-    <br/>
+    <small>Position: {{ p.position }}</small><br/>
     <small *ngIf="p.ispinned">
       Pinned At: {{ p.pinnedAt | date:'short' }}
     </small>
+    <br/>
 
-    <!-- Pin / Unpin Button -->
+    <!-- 4a) Pin / Unpin -->
     <button (click)="togglePin(p)">
       {{ p.ispinned ? 'Unpin' : 'Pin' }}
     </button>
 
-    <!-- ▲ / ▼ arrows for non-pinned posts only -->
+    <!-- 4b) ▲ / ▼ (only for unpinned posts) -->
     <button
       *ngIf="!p.ispinned"
       (click)="moveUp(p)"
       [disabled]="p.position === 1"
       title="Move up"
-    >
-      ▲
-    </button>
+    >▲</button>
     <button
       *ngIf="!p.ispinned"
       (click)="moveDown(p)"
       [disabled]="p.position === unpinnedCount"
       title="Move down"
-    >
-      ▼
+    >▼</button>
+
+    <!-- 4c) Edit / Delete -->
+    <button (click)="toggleForm(p)">Edit</button>
+    <button (click)="deletePost(p)">Delete</button>
+
+    <hr />
+
+    <!-- 5) “Submit Homework” button -->
+    <button (click)="toggleSubmissionForm(p)">
+      {{ showSubmissionFormForPostId === p._id ? 'Cancel Submit' : 'Submit Homework' }}
     </button>
 
-    <!-- Edit Button (prefill form) -->
-    <button (click)="toggleForm(p)">Edit</button>
+    <!-- 5a) Render the SubmissionFormComponent when toggled -->
+    <app-submission-form
+      *ngIf="showSubmissionFormForPostId === p._id"
+      [courseId]="courseId"
+      [postId]="p._id"
+      (submitted)="loadPosts()"
+      (cancel)="toggleSubmissionForm(p)">
+    </app-submission-form>
 
-    <!-- Delete Button -->
-    <button (click)="deletePost(p)">Delete</button>
+    <!-- 6) “View Submissions” button -->
+    <button (click)="toggleSubmissionList(p)">
+      {{ showSubmissionListForPostId === p._id ? 'Hide Submissions' : 'View Submissions' }}
+    </button>
+
+    <!-- 6a) Render the SubmissionListComponent when toggled -->
+    <app-submission-list
+      *ngIf="showSubmissionListForPostId === p._id"
+      [courseId]="courseId"
+      [postId]="p._id">
+    </app-submission-list>
 
     <hr />
   </li>

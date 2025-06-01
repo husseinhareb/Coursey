@@ -16,6 +16,8 @@ import { CourseFormComponent } from './course-form/course-form.component';
 
 
 import { AuthGuard } from './auth/auth.guard';
+import { SubmissionFormComponent } from './submissions/submission.component';
+import { SubmissionListComponent } from './submissions/submission-list.component';
 
 export const routes: Routes = [
   // Public landing & auth
@@ -65,8 +67,16 @@ export const routes: Routes = [
     component: CourseDetailComponent,
     canActivate: [AuthGuard]
   },
-
-
+  {
+    path: 'courses/:id/posts/:pid/submit',
+    component: SubmissionFormComponent,
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'courses/:id/posts/:pid/submissions',
+    component: SubmissionListComponent,
+    canActivate: [AuthGuard]
+  },
   // Fallback
   { path: '**', redirectTo: '' }
 ];
