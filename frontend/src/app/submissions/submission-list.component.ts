@@ -1,5 +1,5 @@
 import { Component, Input, OnInit, inject } from '@angular/core';
-import { CommonModule }                    from '@angular/common';
+import { CommonModule } from '@angular/common';
 import {
   ReactiveFormsModule,
   FormBuilder,
@@ -115,7 +115,7 @@ export class SubmissionListComponent implements OnInit {
   @Input() postId!: string;
 
   private svc = inject(SubmissionService);
-  private fb  = inject(FormBuilder);
+  private fb = inject(FormBuilder);
 
   submissions: Submission[] = [];
   loading = false;
@@ -124,7 +124,7 @@ export class SubmissionListComponent implements OnInit {
   // Grading state:
   gradingSubmissionId: string | null = null;
   gradeForm: FormGroup = this.fb.group({
-    grade:   [null, [Validators.required, Validators.min(0), Validators.max(100)]],
+    grade: [null, [Validators.required, Validators.min(0), Validators.max(100)]],
     comment: ['', Validators.required]
   });
   gradingLoading = false;
@@ -167,7 +167,7 @@ export class SubmissionListComponent implements OnInit {
     this.gradingError = null;
 
     const payload: SubmissionGrade = {
-      grade:   this.gradeForm.value.grade!,
+      grade: this.gradeForm.value.grade!,
       comment: this.gradeForm.value.comment!
     };
 
@@ -187,5 +187,8 @@ export class SubmissionListComponent implements OnInit {
         this.gradingLoading = false;
       }
     });
+  }
+  getFileUrl(fileId: string): string {
+    return `/api/files/${fileId}`;
   }
 }

@@ -9,15 +9,18 @@ import { environment } from '../environments/environment';
  */
 export interface Submission {
   _id:          string;
+  course_id:    string;
+  post_id:      string;
   student_id:   string;
-  file_name:    string;
-  status:       'submitted' | 'graded' | 'late';  // example statuses
+  file_id:      string;
+  status:       string;
   grade?:       number;
   comment?:     string;
-  submittedAt:  string;   // ISO timestamp
-  gradedAt?:    string;   // ISO timestamp
+  created_at:   string;  // or Date, depending on your JSON parse
+  updated_at:   string;
+  first_name?:  string;
+  last_name?:   string;
 }
-
 /**
  * When creating a new submission, we only need to send the File.
  */

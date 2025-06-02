@@ -33,9 +33,9 @@
         <option value="homework">Homework</option>
       </select>
     </div>
-    <div>
-      <label>File ID (optional):</label>
-      <input formControlName="fileId" placeholder="File ID (optional)" />
+    <div *ngIf="postForm.get('type')?.value === 'lecture' || postForm.get('type')?.value === 'homework'">
+      <label>Attach File (optional):</label>
+      <input type="file" (change)="onFileSelected($event)" />
     </div>
     <div>
       <button type="submit" [disabled]="postForm.invalid">
@@ -65,7 +65,7 @@
     <small>Position: {{ p.position }}</small>
     <br />
     <small *ngIf="p.ispinned">
-      Pinned At: {{ p.pinnedAt | date:'short' }}
+      Pinned At: {{ p.pinnedAt | date: 'short' }}
     </small>
     <br />
 
@@ -118,15 +118,30 @@
         [courseId]="courseId"
         [postId]="p._id"
         (submitted)="onSubmissionCompleted()"
-        (cancel)="showSubmissionFormForPostId = null">
+        (cancel)="showSubmissionFormForPostId = null"
+      >
       </app-submission-form>
       
-      <!-- Show Submissions List -->
-      <app-submission-list
-        *ngIf="showSubmissionListForPostId === p._id"
-        [courseId]="courseId"
-        [postId]="p._id">
-      </app-submission-list>
+      <!-- Show Submissions List (displays first + last name) -->
+      <div *ngIf="showSubmissionListForPostId === p._id">
+        <ng-container *ngIf="submissionsMap[p._id]?.length; else noSubmissions">
+          <ul class="submission-list">
+            <li *ngFor="let s of submissionsMap[p._id]">
+              <strong>Student:</strong> {{ s.first_name }} {{ s.last_name }}
+              <br />
+              <strong>Submitted At:</strong> {{ s.created_at | date: 'short' }}
+              <br />
+              <strong>Status:</strong> {{ s.status }}
+              <span *ngIf="s.grade !== null">| <strong>Grade:</strong> {{ s.grade }}</span>
+              <br />
+              <em *ngIf="s.comment">“{{ s.comment }}”</em>
+            </li>
+          </ul>
+        </ng-container>
+        <ng-template #noSubmissions>
+          <p>No submissions yet.</p>
+        </ng-template>
+      </div>
     </div>
 
     <hr />

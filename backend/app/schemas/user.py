@@ -52,7 +52,7 @@ class EnrollmentUser(BaseModel):
 
     class Config:
         validate_by_name = True
-        orm_mode = True
+        form_attributes = True
 class Access(BaseModel):
     courseId:   str
     accessedAt: datetime

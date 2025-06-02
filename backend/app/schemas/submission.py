@@ -6,14 +6,12 @@ from datetime import datetime
 
 class SubmissionCreate(BaseModel):
     file_id: str
-
     model_config = {"validate_by_name": True}
 
 
 class SubmissionGrade(BaseModel):
     grade:   int
     comment: str
-
     model_config = {"validate_by_name": True}
 
 
@@ -37,5 +35,11 @@ class SubmissionDB(BaseModel):
 
 
 class SubmissionOut(SubmissionDB):
-    """All fields returned over the wire."""
-    pass
+    first_name: Optional[str] = None
+    last_name:  Optional[str] = None
+
+    file_name:  Optional[str] = None
+
+    model_config = {
+        "extra": "allow"
+    }

@@ -1,11 +1,20 @@
 # app/routers/submission.py
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
 from typing import List
-from app.schemas.submission import SubmissionCreate, SubmissionOut, SubmissionGrade
-from app.crud.submission import create_submission, list_submissions, grade_submission, delete_submission
+from datetime import datetime
+from bson import ObjectId
+
+from app.schemas.submission import SubmissionDB, SubmissionOut, SubmissionGrade, SubmissionCreate
 from app.services.auth import get_current_active_user
 from app.schemas.user import UserDB
+from app.db.mongodb import submissions_collection, fs
+from app.crud.submission import (
+    list_submissions,
+    create_submission as _create_submission,
+    grade_submission,
+    delete_submission as _delete_submission
+)
 
 router = APIRouter(
     prefix="/courses/{course_id}/posts/{post_id}/submissions",
@@ -17,11 +26,46 @@ router = APIRouter(
 async def api_create_submission(
     course_id: str,
     post_id:   str,
-    sub_in:    SubmissionCreate,
+    file:      UploadFile = File(...),
     current_user: UserDB = Depends(get_current_active_user)
 ):
-    # current_user.id is the student’s user ID
-    return await create_submission(course_id, post_id, current_user.id, sub_in)
+    contents = await file.read()
+    grid_in = fs.open_upload_stream(
+        filename=file.filename,
+        metadata={
+            "content_type": file.content_type,
+            "uploaded_by":   current_user.id,
+            "course_id":     course_id,
+            "post_id":       post_id,
+            "uploaded_at":   datetime.utcnow()
+        }
+    )
+    grid_in.write(contents)
+    grid_in.close()
+    file_obj_id = grid_in._id
+
+    now = datetime.utcnow()
+    doc = {
+        "course_id":  ObjectId(course_id),
+        "post_id":    ObjectId(post_id),
+        "student_id": ObjectId(current_user.id),
+        "file_id":    file_obj_id,
+        "status":     "submitted",
+        "grade":      None,
+        "comment":    None,
+        "created_at": now,
+        "updated_at": now
+    }
+    res = await submissions_collection.insert_one(doc)
+    created = await submissions_collection.find_one({"_id": res.inserted_id})
+
+    created["_id"]        = str(created["_id"])
+    created["course_id"]  = str(created["course_id"])
+    created["post_id"]    = str(created["post_id"])
+    created["student_id"] = str(created["student_id"])
+    created["file_id"]    = str(created["file_id"])
+    return SubmissionDB(**created)
+
 
 @router.get("/", response_model=List[SubmissionOut])
 async def api_list_submissions(
@@ -29,6 +73,7 @@ async def api_list_submissions(
     post_id:   str
 ):
     return await list_submissions(course_id, post_id)
+
 
 @router.patch("/{submission_id}", response_model=SubmissionOut)
 async def api_grade_submission(
@@ -39,9 +84,10 @@ async def api_grade_submission(
     current_user:   UserDB = Depends(get_current_active_user)
 ):
     graded = await grade_submission(course_id, post_id, submission_id, grade_in)
-    if not graded or graded.course_id != course_id:
+    if not graded:
         raise HTTPException(status_code=404, detail="Submission not found")
     return graded
+
 
 @router.delete("/{submission_id}", response_model=dict)
 async def api_delete_submission(
@@ -50,7 +96,7 @@ async def api_delete_submission(
     submission_id:  str,
     current_user:   UserDB = Depends(get_current_active_user)
 ):
-    ok = await delete_submission(submission_id)
+    ok = await _delete_submission(submission_id)
     if not ok:
         raise HTTPException(status_code=404, detail="Submission not found")
     return {"deleted": True}
