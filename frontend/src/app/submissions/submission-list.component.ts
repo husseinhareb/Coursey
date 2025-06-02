@@ -14,6 +14,7 @@ import {
   Submission,
   SubmissionGrade
 } from '../services/submission.service';
+import { environment } from '../environments/environment';
 
 @Component({
   selector: 'app-submission-list',
@@ -47,11 +48,17 @@ import {
             <td>{{ s.student_id }}</td>
             <td>
               <ng-container *ngIf="s.file_name && s.file_id; else noFile">
+                <!-- 
+                  Now href is the full backend URL. 
+                  Hovering will show: http://localhost:3000/files/<fileId>
+                -->
                 <a
-                  href="javascript:void(0)"
-                  (click)="openFile(s.file_id)"
-                  >{{ s.file_name }}</a
+                  [href]="getFileUrl(s.file_id)"
+                  target="_blank"
+                  rel="noopener"
                 >
+                  {{ s.file_name }}
+                </a>
               </ng-container>
               <ng-template #noFile>—</ng-template>
             </td>
@@ -178,11 +185,6 @@ export class SubmissionListComponent implements OnInit {
     });
   }
 
-  openFile(fileId: string) {
-    const url = this.getFileUrl(fileId);
-    window.open(url, '_blank');
-  }
-
   startGrading(submissionId: string) {
     this.gradingSubmissionId = submissionId;
     this.gradeForm.reset();
@@ -225,6 +227,6 @@ export class SubmissionListComponent implements OnInit {
   }
 
   getFileUrl(fileId: string): string {
-    return `/api/files/${fileId}`;
+    return `${environment.apiUrl}/files/${fileId}`;
   }
 }
