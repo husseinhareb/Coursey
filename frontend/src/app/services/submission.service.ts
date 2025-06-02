@@ -13,14 +13,16 @@ export interface Submission {
   post_id:      string;
   student_id:   string;
   file_id:      string;
+  file_name?:   string;  
   status:       string;
   grade?:       number;
   comment?:     string;
-  created_at:   string;  // or Date, depending on your JSON parse
+  created_at:   string;   
   updated_at:   string;
   first_name?:  string;
   last_name?:   string;
 }
+
 /**
  * When creating a new submission, we only need to send the File.
  */
@@ -73,7 +75,8 @@ export class SubmissionService {
   }
 
   /**
-   * Grade a submission: PATCH /courses/:courseId/posts/:postId/submissions/:submissionId/grade
+   * Grade a submission.
+   * PATCH /courses/:courseId/posts/:postId/submissions/:submissionId
    */
   grade(
     courseId: string,
@@ -82,7 +85,7 @@ export class SubmissionService {
     payload: SubmissionGrade
   ): Observable<Submission> {
     return this.http.patch<Submission>(
-      `${this.base}/${courseId}/posts/${postId}/submissions/${submissionId}/grade`,
+      `${this.base}/${courseId}/posts/${postId}/submissions/${submissionId}`,
       payload
     );
   }

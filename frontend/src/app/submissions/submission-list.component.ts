@@ -1,3 +1,5 @@
+// src/app/submissions/submission-list.component.ts
+
 import { Component, Input, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
@@ -24,7 +26,12 @@ import {
       <div *ngIf="loading">Loading submissions…</div>
       <div *ngIf="error" class="error">{{ error }}</div>
 
-      <table *ngIf="!loading && !error" border="1" cellpadding="4" cellspacing="0">
+      <table
+        *ngIf="!loading && !error"
+        border="1"
+        cellpadding="4"
+        cellspacing="0"
+      >
         <thead>
           <tr>
             <th>Student ID</th>
@@ -38,24 +45,35 @@ import {
         <tbody>
           <tr *ngFor="let s of submissions">
             <td>{{ s.student_id }}</td>
-            <td>{{ s.file_name }}</td>
-            <td>{{ s.status }}</td>
-            <td>{{ s.grade ?? '—' }}</td>
-            <td>{{ s.comment ?? '—' }}</td>
             <td>
-              <!-- Show grading form if not yet graded -->
-              <button *ngIf="s.status !== 'graded'" (click)="startGrading(s._id)">Grade</button>
+              <ng-container *ngIf="s.file_name && s.file_id; else noFile">
+                <a
+                  href="javascript:void(0)"
+                  (click)="openFile(s.file_id)"
+                  >{{ s.file_name }}</a
+                >
+              </ng-container>
+              <ng-template #noFile>—</ng-template>
+            </td>
+            <td>{{ s.status }}</td>
+            <td>{{ s.grade != null ? s.grade : '—' }}</td>
+            <td>{{ s.comment != null ? s.comment : '—' }}</td>
+            <td>
+              <button
+                *ngIf="s.status !== 'graded'"
+                (click)="startGrading(s._id)"
+              >
+                Grade
+              </button>
             </td>
           </tr>
 
-          <!-- If no submissions exist -->
           <tr *ngIf="submissions.length === 0">
             <td colspan="6">No submissions yet.</td>
           </tr>
         </tbody>
       </table>
 
-      <!-- Grading form: visible only when teacher clicks “Grade” on a row -->
       <div *ngIf="gradingSubmissionId" class="grading-form">
         <h5>Grade Submission</h5>
         <form [formGroup]="gradeForm" (ngSubmit)="submitGrade()">
@@ -76,7 +94,10 @@ import {
               placeholder="Feedback…"
             ></textarea>
           </div>
-          <button type="submit" [disabled]="gradeForm.invalid || gradingLoading">
+          <button
+            type="submit"
+            [disabled]="gradeForm.invalid || gradingLoading"
+          >
             {{ gradingLoading ? 'Saving…' : 'Save Grade' }}
           </button>
           <button type="button" (click)="cancelGrading()">Cancel</button>
@@ -103,10 +124,17 @@ import {
     table {
       width: 100%;
       margin-bottom: 1rem;
+      border-collapse: collapse;
     }
     th, td {
       padding: 0.5rem;
       text-align: left;
+      border: 1px solid #ccc;
+    }
+    a {
+      color: blue;
+      text-decoration: underline;
+      cursor: pointer;
     }
   `]
 })
@@ -150,6 +178,11 @@ export class SubmissionListComponent implements OnInit {
     });
   }
 
+  openFile(fileId: string) {
+    const url = this.getFileUrl(fileId);
+    window.open(url, '_blank');
+  }
+
   startGrading(submissionId: string) {
     this.gradingSubmissionId = submissionId;
     this.gradeForm.reset();
@@ -162,7 +195,9 @@ export class SubmissionListComponent implements OnInit {
   }
 
   submitGrade() {
-    if (!this.gradingSubmissionId || this.gradeForm.invalid) return;
+    if (!this.gradingSubmissionId || this.gradeForm.invalid) {
+      return;
+    }
     this.gradingLoading = true;
     this.gradingError = null;
 
@@ -188,6 +223,7 @@ export class SubmissionListComponent implements OnInit {
       }
     });
   }
+
   getFileUrl(fileId: string): string {
     return `/api/files/${fileId}`;
   }

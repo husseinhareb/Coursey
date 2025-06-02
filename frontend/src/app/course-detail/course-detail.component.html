@@ -1,5 +1,5 @@
 <!-- Show spinner / error for the course itself -->
-<div *ngIf="loadingCourse">Loading course…</div>
+<div *ngIf="loadingCourse" class="loading">Loading course…</div>
 <div *ngIf="courseError" class="error">{{ courseError }}</div>
 
 <div *ngIf="course">
@@ -18,26 +18,40 @@
 <div *ngIf="showForm" class="post-form">
   <form [formGroup]="postForm" (ngSubmit)="savePost()">
     <div>
-      <label>Title:</label>
-      <input formControlName="title" placeholder="Title" />
+      <label for="title">Title:</label>
+      <input id="title" formControlName="title" placeholder="Title" />
     </div>
     <div>
-      <label>Content:</label>
-      <textarea formControlName="content" placeholder="Content"></textarea>
+      <label for="content">Content:</label>
+      <textarea
+        id="content"
+        formControlName="content"
+        placeholder="Content"
+      ></textarea>
     </div>
     <div>
-      <label>Type:</label>
-      <select formControlName="type">
+      <label for="type">Type:</label>
+      <select id="type" formControlName="type">
         <option value="lecture">Lecture</option>
         <option value="reminder">Reminder</option>
         <option value="homework">Homework</option>
       </select>
     </div>
-    <div *ngIf="postForm.get('type')?.value === 'lecture' || postForm.get('type')?.value === 'homework'">
-      <label>Attach File (optional):</label>
-      <input type="file" (change)="onFileSelected($event)" />
+    <div
+      *ngIf="
+        postForm.get('type')?.value === 'lecture' ||
+        postForm.get('type')?.value === 'homework'
+      "
+    >
+      <label for="file">Attach File (optional):</label>
+      <input
+        id="file"
+        type="file"
+        (change)="onFileSelected($event)"
+        accept="*/*"
+      />
     </div>
-    <div>
+    <div class="form-buttons">
       <button type="submit" [disabled]="postForm.invalid">
         {{ editing ? 'Update' : 'Create' }}
       </button>
@@ -49,7 +63,7 @@
 <hr />
 
 <!-- Show loading / error for posts -->
-<div *ngIf="loadingPosts">Loading posts…</div>
+<div *ngIf="loadingPosts" class="loading">Loading posts…</div>
 <div *ngIf="postsError" class="error">{{ postsError }}</div>
 
 <!-- Posts List -->
@@ -60,14 +74,11 @@
       <span *ngIf="p.type === 'homework'" style="color: green;">(HW)</span>
     </h3>
     <p>{{ p.content }}</p>
-    <small>Type: {{ p.type }}</small>
-    <br />
-    <small>Position: {{ p.position }}</small>
-    <br />
+    <small>Type: {{ p.type }}</small><br />
+    <small>Position: {{ p.position }}</small><br />
     <small *ngIf="p.ispinned">
       Pinned At: {{ p.pinnedAt | date: 'short' }}
-    </small>
-    <br />
+    </small><br />
 
     <!-- Pin / Unpin Button -->
     <button (click)="togglePin(p)">
@@ -99,19 +110,32 @@
     <!-- HOMEWORK-SPECIFIC ACTIONS: Show only if type === 'homework' -->
     <div *ngIf="p.type === 'homework'" class="homework-actions">
       <br />
-      <strong>Homework Actions:</strong>
-      <br />
-      
+      <strong>Homework Actions:</strong><br />
+
       <!-- Submit Homework Button (for students) -->
-      <button (click)="toggleSubmissionForm(p._id)" class="submit-btn">
-        {{ showSubmissionFormForPostId === p._id ? 'Cancel Submit' : 'Submit Homework' }}
+      <button
+        (click)="toggleSubmissionForm(p._id)"
+        class="submit-btn"
+      >
+        {{
+          showSubmissionFormForPostId === p._id
+            ? 'Cancel Submit'
+            : 'Submit Homework'
+        }}
       </button>
-      
+
       <!-- View Submissions Button (for teachers/admins) -->
-      <button (click)="toggleSubmissionList(p._id)" class="view-submissions-btn">
-        {{ showSubmissionListForPostId === p._id ? 'Hide Submissions' : 'View All Submissions' }}
+      <button
+        (click)="toggleSubmissionList(p._id)"
+        class="view-submissions-btn"
+      >
+        {{
+          showSubmissionListForPostId === p._id
+            ? 'Hide Submissions'
+            : 'View All Submissions'
+        }}
       </button>
-      
+
       <!-- Show Submission Form -->
       <app-submission-form
         *ngIf="showSubmissionFormForPostId === p._id"
@@ -121,29 +145,21 @@
         (cancel)="showSubmissionFormForPostId = null"
       >
       </app-submission-form>
-      
-      <!-- Show Submissions List (displays first + last name) -->
-      <div *ngIf="showSubmissionListForPostId === p._id">
-        <ng-container *ngIf="submissionsMap[p._id]?.length; else noSubmissions">
-          <ul class="submission-list">
-            <li *ngFor="let s of submissionsMap[p._id]">
-              <strong>Student:</strong> {{ s.first_name }} {{ s.last_name }}
-              <br />
-              <strong>Submitted At:</strong> {{ s.created_at | date: 'short' }}
-              <br />
-              <strong>Status:</strong> {{ s.status }}
-              <span *ngIf="s.grade !== null">| <strong>Grade:</strong> {{ s.grade }}</span>
-              <br />
-              <em *ngIf="s.comment">“{{ s.comment }}”</em>
-            </li>
-          </ul>
-        </ng-container>
-        <ng-template #noSubmissions>
-          <p>No submissions yet.</p>
-        </ng-template>
+
+      <!-- Show Submissions List via standalone component -->
+      <div *ngIf="showSubmissionListForPostId === p._id" class="submissions-container">
+        <app-submission-list
+          [courseId]="courseId"
+          [postId]="p._id"
+        ></app-submission-list>
       </div>
     </div>
 
     <hr />
   </li>
 </ul>
+
+<!-- If no posts exist -->
+<div *ngIf="!loadingPosts && posts?.length === 0">
+  <p>No posts available.</p>
+</div>

@@ -1,24 +1,17 @@
+// src/app/course-detail/course-detail.component.ts
+
 import { Component, OnInit, inject } from '@angular/core';
-import { CommonModule }               from '@angular/common';
+import { CommonModule } from '@angular/common';
 import {
   ReactiveFormsModule,
   FormBuilder,
+  FormGroup,
   Validators
 } from '@angular/forms';
-import { ActivatedRoute }             from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 
-import {
-  CourseService,
-  Course
-} from '../services/course.service';
-
-import {
-  PostService,
-  Post,
-  PostCreate
-} from '../services/post.service';
-
-// Import the two submission sub‐components:
+import { CourseService, Course } from '../services/course.service';
+import { PostService, Post, PostCreate } from '../services/post.service';
 import { SubmissionFormComponent } from '../submissions/submission-form.component';
 import { SubmissionListComponent } from '../submissions/submission-list.component';
 
@@ -53,7 +46,7 @@ export class CourseDetailComponent implements OnInit {
   /** Create/Edit post form toggles */
   showForm = false;        // whether to show the create/edit post form
   editing?: Post;          // if defined, we are editing that Post
-  postForm = this.fb.group({
+  postForm: FormGroup = this.fb.group({
     title:   ['', Validators.required],
     content: ['', Validators.required],
     type:    ['', Validators.required],  // "lecture" | "reminder" | "homework"
@@ -158,7 +151,7 @@ export class CourseDetailComponent implements OnInit {
     }
     this.postSvc.delete(this.courseId, p._id).subscribe({
       next: () => this.loadPosts(),
-      error: e => this.postsError = e.error?.detail || 'Delete failed'
+      error: e => (this.postsError = e.error?.detail || 'Delete failed')
     });
   }
 
@@ -210,7 +203,29 @@ export class CourseDetailComponent implements OnInit {
   /** Called when a submission has just been completed: hide the form & refresh list */
   onSubmissionCompleted() {
     this.showSubmissionFormForPostId = null;
-    // (The child <app-submission-list> will auto‐refresh itself on its own ngOnInit,
-    // but you could also force a reload by calling fetch or toggling showSubmissionListForPostId.)
+    // The <app-submission-list> child auto-reloads its data, so no further action needed.
+  }
+
+  /**
+   * Called when the file input changes. Implement your own upload logic here.
+   * For now, this stub simply clears the existing fileId placeholder.
+   */
+  onFileSelected(event: Event): void {
+    const inputEl = event.target as HTMLInputElement;
+    if (!inputEl.files || inputEl.files.length === 0) {
+      return;
+    }
+    const file = inputEl.files[0];
+    // TODO: Upload `file` to your backend, then patch `postForm` with the returned fileId.
+    // Example (pseudo-code):
+    //
+    // this.someFileService.upload(file).subscribe({
+    //   next: (res: { fileId: string }) => {
+    //     this.postForm.patchValue({ fileId: res.fileId });
+    //   },
+    //   error: err => {
+    //     console.error('Upload failed', err);
+    //   }
+    // });
   }
 }
