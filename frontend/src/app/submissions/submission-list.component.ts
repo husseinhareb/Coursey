@@ -1,10 +1,17 @@
-// src/app/submissions/submission-list.component.ts
-
 import { Component, Input, OnInit, inject } from '@angular/core';
 import { CommonModule }                    from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import {
+  ReactiveFormsModule,
+  FormBuilder,
+  FormGroup,
+  Validators
+} from '@angular/forms';
 
-import { SubmissionService, Submission, SubmissionGrade } from '../services/submission.service';
+import {
+  SubmissionService,
+  Submission,
+  SubmissionGrade
+} from '../services/submission.service';
 
 @Component({
   selector: 'app-submission-list',
@@ -21,7 +28,7 @@ import { SubmissionService, Submission, SubmissionGrade } from '../services/subm
         <thead>
           <tr>
             <th>Student ID</th>
-            <th>File ID</th>
+            <th>File Name</th>
             <th>Status</th>
             <th>Grade</th>
             <th>Comment</th>
@@ -31,7 +38,7 @@ import { SubmissionService, Submission, SubmissionGrade } from '../services/subm
         <tbody>
           <tr *ngFor="let s of submissions">
             <td>{{ s.student_id }}</td>
-            <td>{{ s.file_id }}</td>
+            <td>{{ s.file_name }}</td>
             <td>{{ s.status }}</td>
             <td>{{ s.grade ?? '—' }}</td>
             <td>{{ s.comment ?? '—' }}</td>
@@ -63,7 +70,11 @@ import { SubmissionService, Submission, SubmissionGrade } from '../services/subm
           </div>
           <div>
             <label for="comment">Comment:</label>
-            <textarea id="comment" formControlName="comment" placeholder="Feedback…"></textarea>
+            <textarea
+              id="comment"
+              formControlName="comment"
+              placeholder="Feedback…"
+            ></textarea>
           </div>
           <button type="submit" [disabled]="gradeForm.invalid || gradingLoading">
             {{ gradingLoading ? 'Saving…' : 'Save Grade' }}
@@ -141,7 +152,7 @@ export class SubmissionListComponent implements OnInit {
 
   startGrading(submissionId: string) {
     this.gradingSubmissionId = submissionId;
-    this.grad eForm.reset();
+    this.gradeForm.reset();
     this.gradingError = null;
   }
 

@@ -1,9 +1,6 @@
-// src/app/submissions/submission-form.component.ts
-
 import { Component, Input, Output, EventEmitter, inject } from '@angular/core';
 import { CommonModule }     from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
-
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { SubmissionService, SubmissionCreate } from '../services/submission.service';
 
 @Component({
@@ -15,13 +12,20 @@ import { SubmissionService, SubmissionCreate } from '../services/submission.serv
       <h4>Submit Homework</h4>
       <form [formGroup]="form" (ngSubmit)="onSubmit()">
         <div>
-          <label for="fileId">File ID / URL:</label>
-          <input id="fileId" formControlName="file_id" placeholder="e.g. file123" />
+          <label for="fileInput">Upload File:</label>
+          <input
+            id="fileInput"
+            type="file"
+            (change)="onFileSelected($event)"
+            accept="*/*"
+          />
         </div>
-        <button type="submit" [disabled]="form.invalid || loading">
-          {{ loading ? 'Submitting…' : 'Submit' }}
-        </button>
-        <button type="button" (click)="cancel.emit()">Cancel</button>
+        <div style="margin-top: 0.5rem;">
+          <button type="submit" [disabled]="form.invalid || loading">
+            {{ loading ? 'Submitting…' : 'Submit' }}
+          </button>
+          <button type="button" (click)="cancel.emit()">Cancel</button>
+        </div>
       </form>
       <div *ngIf="error" class="error">{{ error }}</div>
     </div>
@@ -44,23 +48,34 @@ export class SubmissionFormComponent {
   @Output() submitted = new EventEmitter<void>();
   @Output() cancel    = new EventEmitter<void>();
 
-  private fb   = inject(FormBuilder);
-  private svc  = inject(SubmissionService);
+  private fb  = inject(FormBuilder);
+  private svc = inject(SubmissionService);
 
-  form = this.fb.group({
-    file_id: ['', Validators.required]
+  // Instead of a text field, we hold the actual File in a FormControl
+  form: FormGroup = this.fb.group({
+    file: [null, Validators.required]  // Will hold a File object
   });
+
   loading = false;
   error: string | null = null;
+
+  /** Called when user picks a file from the <input type="file"> */
+  onFileSelected(evt: Event) {
+    this.error = null;
+    const input = evt.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      const file = input.files[0];
+      this.form.get('file')!.setValue(file);
+    }
+  }
 
   onSubmit() {
     if (this.form.invalid) return;
     this.loading = true;
 
-    // Explicitly extract `file_id` so TS knows it’s a string
-    const payload: SubmissionCreate = {
-      file_id: this.form.get('file_id')!.value
-    };
+    // Extract the File from the FormGroup
+    const file: File = this.form.get('file')!.value as File;
+    const payload: SubmissionCreate = { file };
 
     this.svc.create(this.courseId, this.postId, payload).subscribe({
       next: () => {

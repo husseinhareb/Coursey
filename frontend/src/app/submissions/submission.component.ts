@@ -1,8 +1,8 @@
 // src/app/submissions/submission.component.ts
 
 import { Component, Input, Output, EventEmitter, inject } from '@angular/core';
-import { CommonModule }     from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule } from '@angular/forms';
 
 import { SubmissionService, SubmissionCreate } from '../services/submission.service';
 
@@ -13,15 +13,23 @@ import { SubmissionService, SubmissionCreate } from '../services/submission.serv
   template: `
     <div class="submission-form">
       <h4>Submit Homework</h4>
-      <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <form (ngSubmit)="onSubmit()">
         <div>
-          <label for="fileId">File ID / URL:</label>
-          <input id="fileId" formControlName="file_id" placeholder="e.g. file123" />
+          <label for="file">Choose file to upload:</label>
+          <input
+            id="file"
+            type="file"
+            (change)="onFileSelected($event)"
+            required
+          />
         </div>
-        <button type="submit" [disabled]="form.invalid || loading">
-          {{ loading ? 'Submitting…' : 'Submit' }}
-        </button>
-        <button type="button" (click)="cancel.emit()">Cancel</button>
+
+        <div style="margin-top: 0.5rem;">
+          <button type="submit" [disabled]="!selectedFile || loading">
+            {{ loading ? 'Submitting…' : 'Submit' }}
+          </button>
+          <button type="button" (click)="cancel.emit()">Cancel</button>
+        </div>
       </form>
       <div *ngIf="error" class="error">{{ error }}</div>
     </div>
@@ -31,40 +39,62 @@ import { SubmissionService, SubmissionCreate } from '../services/submission.serv
       border: 1px solid #ccc;
       padding: 1rem;
       margin-bottom: 1rem;
+      background: #fafafa;
+    }
+    .submission-form h4 {
+      margin-top: 0;
     }
     .error {
       color: red;
       margin-top: 0.5rem;
     }
+    label {
+      display: block;
+      margin-bottom: 0.25rem;
+    }
+    input[type="file"] {
+      display: block;
+      margin-bottom: 0.5rem;
+    }
   `]
 })
 export class SubmissionFormComponent {
-  @Input()   courseId!: string;
-  @Input()   postId!: string;
-  @Output()  submitted  = new EventEmitter<void>();
-  @Output()  cancel     = new EventEmitter<void>();
+  @Input() courseId!: string;
+  @Input() postId!: string;
+  @Output() submitted = new EventEmitter<void>();
+  @Output() cancel = new EventEmitter<void>();
 
-  private fb  = inject(FormBuilder);
   private svc = inject(SubmissionService);
 
-  form = this.fb.group({
-    file_id: ['', Validators.required]
-  });
+  selectedFile: File | null = null;
   loading = false;
   error: string | null = null;
 
-  onSubmit() {
-    if (this.form.invalid) return;
-    this.loading = true;
+  onFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      this.selectedFile = input.files[0];
+      this.error = null;
+    }
+  }
 
-    // Explicitly read file_id as a string
+  onSubmit() {
+    if (!this.selectedFile) {
+      this.error = 'Please select a file before submitting.';
+      return;
+    }
+
+    this.loading = true;
+    this.error = null;
+
     const payload: SubmissionCreate = {
-      file_id: this.form.value.file_id!  // assert non-null
+      file: this.selectedFile
     };
 
     this.svc.create(this.courseId, this.postId, payload).subscribe({
       next: () => {
         this.loading = false;
+        this.selectedFile = null;
         this.submitted.emit();
       },
       error: err => {
