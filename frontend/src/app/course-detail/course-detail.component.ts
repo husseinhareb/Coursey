@@ -1,5 +1,3 @@
-// src/app/course-detail/course-detail.component.ts
-
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
@@ -11,7 +9,12 @@ import {
 import { ActivatedRoute } from '@angular/router';
 
 import { CourseService, Course } from '../services/course.service';
-import { PostService, Post, PostCreate } from '../services/post.service';
+import {
+  PostService,
+  Post,
+  PostCreate,
+  PostUpdate
+} from '../services/post.service';
 import { SubmissionFormComponent } from '../submissions/submission-form.component';
 import { SubmissionListComponent } from '../submissions/submission-list.component';
 
@@ -46,12 +49,7 @@ export class CourseDetailComponent implements OnInit {
   /** Create/Edit post form toggles */
   showForm = false;        // whether to show the create/edit post form
   editing?: Post;          // if defined, we are editing that Post
-  postForm: FormGroup = this.fb.group({
-    title:   ['', Validators.required],
-    content: ['', Validators.required],
-    type:    ['', Validators.required],  // "lecture" | "reminder" | "homework"
-    fileId:  ['']
-  });
+  postForm: FormGroup;
 
   /** Which homework‐post (by _id) currently has the “Submit Homework” form open */
   showSubmissionFormForPostId: string | null = null;
@@ -60,6 +58,17 @@ export class CourseDetailComponent implements OnInit {
 
   /** Expose courseId to the template (must be public) */
   public courseId!: string;
+
+  constructor() {
+    // Initialize form with all controls; due_date has no validators by default
+    this.postForm = this.fb.group({
+      title:    ['', Validators.required],
+      content:  ['', Validators.required],
+      type:     ['', Validators.required], // "lecture" | "reminder" | "homework"
+      fileId:   [''],
+      due_date: ['']
+    });
+  }
 
   ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
@@ -70,17 +79,28 @@ export class CourseDetailComponent implements OnInit {
     this.courseId = id;
     this.loadCourse();
     this.loadPosts();
+
+    // Whenever "type" changes, make "due_date" required if type === 'homework'
+    this.postForm.get('type')!.valueChanges.subscribe((type) => {
+      const dueCtrl = this.postForm.get('due_date');
+      if (type === 'homework') {
+        dueCtrl!.setValidators([Validators.required]);
+      } else {
+        dueCtrl!.clearValidators();
+      }
+      dueCtrl!.updateValueAndValidity();
+    });
   }
 
   /** Load course metadata */
   private loadCourse() {
     this.loadingCourse = true;
     this.courseSvc.get(this.courseId).subscribe({
-      next: c => {
+      next: (c) => {
         this.course = c;
         this.loadingCourse = false;
       },
-      error: e => {
+      error: (e) => {
         this.courseError = e.error?.detail || 'Failed to load course';
         this.loadingCourse = false;
       }
@@ -95,28 +115,36 @@ export class CourseDetailComponent implements OnInit {
         this.posts = ps;
         this.loadingPosts = false;
       },
-      error: e => {
+      error: (e) => {
         this.postsError = e.error?.detail || 'Failed to load posts';
         this.loadingPosts = false;
       }
     });
   }
 
-  /** Count how many un‐pinned posts there are (for enabling/disabling arrows) */
+  /** Count how many un‐pinned posts there are (for arrows) */
   get unpinnedCount(): number {
     return this.posts.filter(p => !p.ispinned).length;
   }
 
-  /** Toggle showing the create/edit form. If `post` is passed, we are in “edit” mode */
+  /**
+   * Toggle showing the create/edit form. 
+   * If `post` is passed, we are in “edit” mode.
+   */
   toggleForm(post?: Post) {
     this.showForm = !this.showForm;
-    this.editing = post;
+    this.editing = post || undefined;
+
     if (post) {
+      // Patch the form with existing values, including due_date in the right format
       this.postForm.patchValue({
-        title:   post.title,
-        content: post.content,
-        type:    post.type,
-        fileId:  post.file_id || ''
+        title:    post.title,
+        content:  post.content,
+        type:     post.type,
+        fileId:   post.file_id || '',
+        due_date: post.due_date 
+          ? this.formatForInput(post.due_date) 
+          : ''
       });
     } else {
       this.postForm.reset();
@@ -128,17 +156,37 @@ export class CourseDetailComponent implements OnInit {
     if (this.postForm.invalid) {
       return;
     }
-    const payload = this.postForm.value as PostCreate;
+
+    // Build the payload from form values
+    const raw = this.postForm.value as {
+      title: string;
+      content: string;
+      type: string;
+      fileId: string | null;
+      due_date: string;
+    };
+
+    // Convert form value to PostCreate / PostUpdate
+    const payload: PostCreate | PostUpdate = {
+      title:   raw.title,
+      content: raw.content,
+      type:    raw.type,
+      file_id: raw.fileId || undefined,
+      due_date: raw.due_date 
+        ? new Date(raw.due_date).toISOString() 
+        : undefined
+    };
+
     const obs = this.editing
-      ? this.postSvc.update(this.courseId, this.editing._id, payload)
-      : this.postSvc.create(this.courseId, payload);
+      ? this.postSvc.update(this.courseId, this.editing._id, payload as PostUpdate)
+      : this.postSvc.create(this.courseId, payload as PostCreate);
 
     obs.subscribe({
       next: () => {
         this.toggleForm();
         this.loadPosts();
       },
-      error: e => {
+      error: (e) => {
         this.postsError = e.error?.detail || 'Save failed';
       }
     });
@@ -151,7 +199,7 @@ export class CourseDetailComponent implements OnInit {
     }
     this.postSvc.delete(this.courseId, p._id).subscribe({
       next: () => this.loadPosts(),
-      error: e => (this.postsError = e.error?.detail || 'Delete failed')
+      error: (e) => (this.postsError = e.error?.detail || 'Delete failed')
     });
   }
 
@@ -160,12 +208,12 @@ export class CourseDetailComponent implements OnInit {
     if (p.ispinned) {
       this.postSvc.unpin(this.courseId, p._id).subscribe({
         next: () => this.loadPosts(),
-        error: e => (this.postsError = e.error?.detail || 'Unpin failed')
+        error: (e) => (this.postsError = e.error?.detail || 'Unpin failed')
       });
     } else {
       this.postSvc.pin(this.courseId, p._id).subscribe({
         next: () => this.loadPosts(),
-        error: e => (this.postsError = e.error?.detail || 'Pin failed')
+        error: (e) => (this.postsError = e.error?.detail || 'Pin failed')
       });
     }
   }
@@ -175,7 +223,7 @@ export class CourseDetailComponent implements OnInit {
     if (p.ispinned) return;
     this.postSvc.moveUp(this.courseId, p._id).subscribe({
       next: () => this.loadPosts(),
-      error: e => (this.postsError = e.error?.detail || 'Move up failed')
+      error: (e) => (this.postsError = e.error?.detail || 'Move up failed')
     });
   }
 
@@ -184,7 +232,7 @@ export class CourseDetailComponent implements OnInit {
     if (p.ispinned) return;
     this.postSvc.moveDown(this.courseId, p._id).subscribe({
       next: () => this.loadPosts(),
-      error: e => (this.postsError = e.error?.detail || 'Move down failed')
+      error: (e) => (this.postsError = e.error?.detail || 'Move down failed')
     });
   }
 
@@ -203,12 +251,12 @@ export class CourseDetailComponent implements OnInit {
   /** Called when a submission has just been completed: hide the form & refresh list */
   onSubmissionCompleted() {
     this.showSubmissionFormForPostId = null;
-    // The <app-submission-list> child auto-reloads its data, so no further action needed.
+    // The <app-submission-list> child auto-reloads its data.
   }
 
   /**
    * Called when the file input changes. Implement your own upload logic here.
-   * For now, this stub simply clears the existing fileId placeholder.
+   * (This stub simply clears any existing fileId placeholder.)
    */
   onFileSelected(event: Event): void {
     const inputEl = event.target as HTMLInputElement;
@@ -216,16 +264,24 @@ export class CourseDetailComponent implements OnInit {
       return;
     }
     const file = inputEl.files[0];
-    // TODO: Upload `file` to your backend, then patch `postForm` with the returned fileId.
-    // Example (pseudo-code):
-    //
-    // this.someFileService.upload(file).subscribe({
-    //   next: (res: { fileId: string }) => {
-    //     this.postForm.patchValue({ fileId: res.fileId });
-    //   },
-    //   error: err => {
-    //     console.error('Upload failed', err);
-    //   }
-    // });
+    // TODO: actually upload `file` to backend, then patch `postForm` with returned file_id.
+    // For now, we just clear out any previous placeholder:
+    this.postForm.patchValue({ fileId: '' });
+  }
+
+  /**
+   * Utility: convert an ISO string (or `Post.due_date`) into a
+   * `YYYY-MM-DDTHH:mm` string for the <input type="datetime-local">.
+   */
+  private formatForInput(isoString: string): string {
+    const dt = new Date(isoString);
+    // Pad month/day/hours/minutes with leading zeros
+    const pad = (n: number) => n.toString().padStart(2, '0');
+    const yyyy = dt.getFullYear();
+    const mm   = pad(dt.getMonth() + 1);
+    const dd   = pad(dt.getDate());
+    const hh   = pad(dt.getHours());
+    const min  = pad(dt.getMinutes());
+    return `${yyyy}-${mm}-${dd}T${hh}:${min}`;
   }
 }

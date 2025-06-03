@@ -4,22 +4,47 @@ from typing import List, Optional
 from datetime import datetime
 from bson import ObjectId
 
-from app.db.mongodb import submissions_collection, users_collection, fs
-from app.schemas.submission import SubmissionCreate, SubmissionDB, SubmissionGrade, SubmissionOut
+from app.db.mongodb import submissions_collection, users_collection, posts_collection, fs
+from app.schemas.submission import (
+    SubmissionCreate,
+    SubmissionDB,
+    SubmissionGrade,
+    SubmissionOut
+)
 
 async def create_submission(
     course_id: str,
     post_id:   str,
-    student_id:str,
+    student_id: str,
     sub_in:    SubmissionCreate
 ) -> SubmissionDB:
+    """
+    1) Fetch the post to read its due_date.
+    2) Compare now vs. due_date; set status = "late" if now > due_date, else "submitted".
+    3) Insert a new submission doc with that status.
+    """
     now = datetime.utcnow()
+
+    # 1) Lookup parent post's due_date
+    post_doc = await posts_collection.find_one({"_id": ObjectId(post_id)})
+    if not post_doc:
+        # If the post does not exist (shouldn't happen in practice), default to "submitted"
+        status_value = "submitted"
+    else:
+        due = post_doc.get("due_date")
+        if due and isinstance(due, datetime) and now > due:
+            status_value = "late"
+        else:
+            status_value = "submitted"
+
+    # 2) Upload file to GridFS
+    file_id = ObjectId(sub_in.file_id)  # we assume sub_in.file_id is the GridFS file_id
     doc = {
         "course_id":  ObjectId(course_id),
         "post_id":    ObjectId(post_id),
         "student_id": ObjectId(student_id),
-        "file_id":    ObjectId(sub_in.file_id),
-        "status":     "submitted",
+        "file_id":    file_id,
+        "status":     status_value,
         "grade":      None,
         "comment":    None,
         "created_at": now,
@@ -28,7 +53,7 @@ async def create_submission(
     res = await submissions_collection.insert_one(doc)
     created = await submissions_collection.find_one({"_id": res.inserted_id})
 
-    # Convert ObjectId → str
+    # 3) Convert ObjectId → str so Pydantic can parse
     created["_id"]        = str(created["_id"])
     created["course_id"]  = str(created["course_id"])
     created["post_id"]    = str(created["post_id"])
@@ -41,6 +66,10 @@ async def list_submissions(
     course_id: str,
     post_id:   str
 ) -> List[SubmissionOut]:
+    """
+    Returns all submissions for a given course_id/post_id.
+    Each SubmissionOut includes first_name, last_name, file_name, status, grade, comment, etc.
+    """
     cursor = submissions_collection.find({
         "course_id": ObjectId(course_id),
         "post_id":   ObjectId(post_id)
@@ -55,11 +84,9 @@ async def list_submissions(
         doc["student_id"] = str(doc["student_id"])
         doc["file_id"]    = str(doc["file_id"])
 
-        # 2) Lookup the student's name (first_name / last_name)
+        # 2) Lookup the student's name
         try:
-            user_obj = await users_collection.find_one({
-                "_id": ObjectId(doc["student_id"])
-            })
+            user_obj = await users_collection.find_one({"_id": ObjectId(doc["student_id"])})
         except:
             user_obj = None
 
@@ -80,22 +107,25 @@ async def list_submissions(
         else:
             doc["file_name"] = None
 
-        # 4) Build and append a SubmissionOut
         out.append(SubmissionOut(**doc))
-
     return out
 
 
 async def grade_submission(
-    course_id:      str,
-    post_id:        str,
-    submission_id:  str,
-    grade_in:       SubmissionGrade
+    course_id:     str,
+    post_id:       str,
+    submission_id: str,
+    grade_in:      SubmissionGrade
 ) -> Optional[SubmissionOut]:
+    """
+    When grading:
+    - Always set status = "graded"
+    - Update grade, comment, updated_at
+    """
     now = datetime.utcnow()
     res = await submissions_collection.update_one(
-        {"_id": ObjectId(submission_id)},
-        {"$set": {
+        { "_id": ObjectId(submission_id) },
+        { "$set": {
             "grade":      grade_in.grade,
             "comment":    grade_in.comment,
             "status":     "graded",
@@ -118,9 +148,7 @@ async def grade_submission(
 
     # Re‐lookup user name
     try:
-        user_obj = await users_collection.find_one({
-            "_id": ObjectId(doc["student_id"])
-        })
+        user_obj = await users_collection.find_one({"_id": ObjectId(doc["student_id"])})
     except:
         user_obj = None
 
@@ -145,5 +173,5 @@ async def grade_submission(
 
 
 async def delete_submission(submission_id: str) -> bool:
-    res = await submissions_collection.delete_one({"_id": ObjectId(submission_id)})
+    res = await submissions_collection.delete_one({ "_id": ObjectId(submission_id) })
     return (res.deleted_count == 1)

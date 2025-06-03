@@ -1,4 +1,3 @@
-<!-- Show spinner / error for the course itself -->
 <div *ngIf="loadingCourse" class="loading">Loading course…</div>
 <div *ngIf="courseError" class="error">{{ courseError }}</div>
 
@@ -9,18 +8,27 @@
 
 <hr />
 
-<!-- Add / Edit Post Form Toggle -->
 <button (click)="toggleForm()">
   {{ editing ? 'Edit Post' : '+ Add Post' }}
 </button>
 
-<!-- The form to create or update a post -->
 <div *ngIf="showForm" class="post-form">
   <form [formGroup]="postForm" (ngSubmit)="savePost()">
     <div>
       <label for="title">Title:</label>
-      <input id="title" formControlName="title" placeholder="Title" />
+      <input
+        id="title"
+        formControlName="title"
+        placeholder="Title"
+      />
+      <div
+        *ngIf="postForm.get('title')?.touched && postForm.get('title')?.invalid"
+        class="error"
+      >
+        Title is required.
+      </div>
     </div>
+
     <div>
       <label for="content">Content:</label>
       <textarea
@@ -28,15 +36,31 @@
         formControlName="content"
         placeholder="Content"
       ></textarea>
+      <div
+        *ngIf="postForm.get('content')?.touched && postForm.get('content')?.invalid"
+        class="error"
+      >
+        Content is required.
+      </div>
     </div>
+
     <div>
       <label for="type">Type:</label>
       <select id="type" formControlName="type">
+        <option value="">-- Select type --</option>
         <option value="lecture">Lecture</option>
         <option value="reminder">Reminder</option>
         <option value="homework">Homework</option>
       </select>
+      <div
+        *ngIf="postForm.get('type')?.touched && postForm.get('type')?.invalid"
+        class="error"
+      >
+        Type is required.
+      </div>
     </div>
+
+    <!-- Attach file if Lecture or Homework -->
     <div
       *ngIf="
         postForm.get('type')?.value === 'lecture' ||
@@ -51,6 +75,26 @@
         accept="*/*"
       />
     </div>
+
+    <!-- Only show due_date if this is a Homework-type post -->
+    <div *ngIf="postForm.get('type')?.value === 'homework'">
+      <label for="due">Due Date:</label>
+      <input
+        id="due"
+        type="datetime-local"
+        formControlName="due_date"
+      />
+      <div
+        *ngIf="
+          postForm.get('due_date')?.touched &&
+          postForm.get('due_date')?.invalid
+        "
+        class="error"
+      >
+        Due date is required for homework.
+      </div>
+    </div>
+
     <div class="form-buttons">
       <button type="submit" [disabled]="postForm.invalid">
         {{ editing ? 'Update' : 'Create' }}
@@ -62,11 +106,9 @@
 
 <hr />
 
-<!-- Show loading / error for posts -->
 <div *ngIf="loadingPosts" class="loading">Loading posts…</div>
 <div *ngIf="postsError" class="error">{{ postsError }}</div>
 
-<!-- Posts List -->
 <ul *ngIf="!loadingPosts && !postsError" class="posts-list">
   <li *ngFor="let p of posts" class="post-item">
     <h3>
@@ -79,6 +121,11 @@
     <small *ngIf="p.ispinned">
       Pinned At: {{ p.pinnedAt | date: 'short' }}
     </small><br />
+
+    <!-- If this is a Homework post, show the due_date -->
+    <div *ngIf="p.type === 'homework'">
+      <small>Due Date: {{ p.due_date | date: 'short' }}</small><br />
+    </div>
 
     <!-- Pin / Unpin Button -->
     <button (click)="togglePin(p)">
@@ -107,16 +154,13 @@
     <button (click)="toggleForm(p)">Edit</button>
     <button (click)="deletePost(p)">Delete</button>
 
-    <!-- HOMEWORK-SPECIFIC ACTIONS: Show only if type === 'homework' -->
+    <!-- HOMEWORK‐SPECIFIC ACTIONS -->
     <div *ngIf="p.type === 'homework'" class="homework-actions">
       <br />
       <strong>Homework Actions:</strong><br />
 
-      <!-- Submit Homework Button (for students) -->
-      <button
-        (click)="toggleSubmissionForm(p._id)"
-        class="submit-btn"
-      >
+      <!-- 1) Student: toggle “Submit Homework” -->
+      <button (click)="toggleSubmissionForm(p._id)" class="submit-btn">
         {{
           showSubmissionFormForPostId === p._id
             ? 'Cancel Submit'
@@ -124,11 +168,8 @@
         }}
       </button>
 
-      <!-- View Submissions Button (for teachers/admins) -->
-      <button
-        (click)="toggleSubmissionList(p._id)"
-        class="view-submissions-btn"
-      >
+      <!-- 2) Teacher/Admin: toggle “View All Submissions” -->
+      <button (click)="toggleSubmissionList(p._id)" class="view-submissions-btn">
         {{
           showSubmissionListForPostId === p._id
             ? 'Hide Submissions'
@@ -136,18 +177,21 @@
         }}
       </button>
 
-      <!-- Show Submission Form -->
-      <app-submission-form
-        *ngIf="showSubmissionFormForPostId === p._id"
-        [courseId]="courseId"
-        [postId]="p._id"
-        (submitted)="onSubmissionCompleted()"
-        (cancel)="showSubmissionFormForPostId = null"
-      >
-      </app-submission-form>
+      <!-- 3) Show Submission Form (for students) -->
+      <div *ngIf="showSubmissionFormForPostId === p._id">
+        <app-submission-form
+          [courseId]="courseId"
+          [postId]="p._id"
+          (submitted)="onSubmissionCompleted()"
+          (cancel)="showSubmissionFormForPostId = null"
+        ></app-submission-form>
+      </div>
 
-      <!-- Show Submissions List via standalone component -->
-      <div *ngIf="showSubmissionListForPostId === p._id" class="submissions-container">
+      <!-- 4) Show Submission List (for teachers) -->
+      <div
+        *ngIf="showSubmissionListForPostId === p._id"
+        class="submissions-container"
+      >
         <app-submission-list
           [courseId]="courseId"
           [postId]="p._id"
@@ -159,7 +203,6 @@
   </li>
 </ul>
 
-<!-- If no posts exist -->
 <div *ngIf="!loadingPosts && posts?.length === 0">
   <p>No posts available.</p>
 </div>

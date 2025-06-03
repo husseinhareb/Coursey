@@ -6,9 +6,6 @@ import { Observable, forkJoin, of, switchMap, map } from 'rxjs';
 import { environment } from '../environments/environment';
 import { UserService } from './user.service';
 
-/**
- * Note: we renamed first_name → firstName and last_name → lastName
- */
 export interface Submission {
   _id:          string;
   course_id:    string;
@@ -16,13 +13,13 @@ export interface Submission {
   student_id:   string;
   file_id:      string;
   file_name?:   string;
-  status:       string;
+  status:       'submitted' | 'late' | 'graded' | string;
   grade?:       number;
   comment?:     string;
   created_at:   string;
   updated_at:   string;
-  firstName?:   string;  // ← camelCase
-  lastName?:    string;  // ← camelCase
+  firstName?:   string;
+  lastName?:    string;
 }
 
 export interface SubmissionCreate {
@@ -33,6 +30,14 @@ export interface SubmissionGrade {
   grade:   number;
   comment: string;
 }
+
+/**
+ * We also accept a partial payload that may only contain "status".
+ * So we can type it as a union of SubmissionGrade or an object with status.
+ */
+export type SubmissionPatch = 
+  | { status: 'submitted' | 'late' | 'graded' }
+  | SubmissionGrade;
 
 @Injectable({ providedIn: 'root' })
 export class SubmissionService {
@@ -51,13 +56,11 @@ export class SubmissionService {
     return this.http
       .get<Submission[]>(`${this.base}/${courseId}/posts/${postId}/submissions`)
       .pipe(
-        switchMap((submissions) => {
-          if (!submissions.length) {
+        switchMap((subs: Submission[]) => {
+          if (!subs.length) {
             return of([] as Submission[]);
           }
-
-          // For each submission, fetch the user and copy profile.firstName/lastName into the Submission
-          const enriched$ = submissions.map(s =>
+          const enriched$ = subs.map(s =>
             this.userSvc.getById(s.student_id).pipe(
               map(user => ({
                 ...s,
@@ -66,7 +69,6 @@ export class SubmissionService {
               }))
             )
           );
-
           return forkJoin(enriched$);
         })
       );
@@ -82,6 +84,23 @@ export class SubmissionService {
     return this.http.post<Submission>(
       `${this.base}/${courseId}/posts/${postId}/submissions`,
       formData
+    );
+  }
+
+  /**
+   * PATCH /courses/:courseId/posts/:postId/submissions/:submissionId
+   * - If you send { grade, comment }, backend sets status="graded".
+   * - If you send { status: "late" } or { status: "submitted" }, backend updates status only.
+   */
+  updateStatus(
+    courseId: string,
+    postId: string,
+    submissionId: string,
+    payload: { status: 'submitted' | 'late' | 'graded' }
+  ): Observable<Submission> {
+    return this.http.patch<Submission>(
+      `${this.base}/${courseId}/posts/${postId}/submissions/${submissionId}`,
+      payload
     );
   }
 

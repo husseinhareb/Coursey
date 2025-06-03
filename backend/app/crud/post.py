@@ -12,22 +12,18 @@ async def create_post(course_id: str, author_id: str, post_in: PostCreate) -> Po
     Insert a new post. 
     Assigns position = (max existing position in that course) + 1,
     ispinned = False, pinnedAt = None.
+    Includes due_date if provided.
     """
     now = datetime.utcnow()
-    # 1) Find the current max position among ALL posts (including pinned),
-    #    but typically only unpinned posts have meaningful positions.
-    #    We’ll treat pinned posts as having no effect on the “position” group of unpinned,
-    #    so we restrict to ispinned=False for the aggregation.
+    # Determine max position among unpinned posts
     agg_pipeline = [
         {"$match": {"course_id": ObjectId(course_id), "ispinned": False}},
         {"$group": {"_id": None, "maxPos": {"$max": "$position"}}}
     ]
     agg = await posts_collection.aggregate(agg_pipeline).to_list(length=1)
-    max_pos = 0
-    if agg and agg[0].get("maxPos") is not None:
-        max_pos = agg[0]["maxPos"]
+    max_pos = agg[0]["maxPos"] if agg and agg[0].get("maxPos") is not None else 0
 
-    # 2) Build the new document
+    # Build the new document
     doc = {
         "course_id":  ObjectId(course_id),
         "author_id":  ObjectId(author_id),
@@ -35,79 +31,86 @@ async def create_post(course_id: str, author_id: str, post_in: PostCreate) -> Po
         "content":    post_in.content,
         "type":       post_in.type,
         "file_id":    ObjectId(post_in.file_id) if post_in.file_id else None,
+        "due_date":   post_in.due_date if post_in.due_date else None,  # ← include due_date
         "position":   max_pos + 1,
         "ispinned":   False,
         "pinnedAt":   None,
         "created_at": now,
-        "updated_at": now,
+        "updated_at": now
     }
 
-    # 3) Insert and then fetch the newly created document
+    # Insert and fetch the created document
     res = await posts_collection.insert_one(doc)
     created = await posts_collection.find_one({"_id": res.inserted_id})
     if not created:
-        return None  # Should not happen.
+        return None
 
-    # 4) Convert ObjectId fields → str before passing to Pydantic
+    # Convert ObjectId → str before handing to Pydantic
     created["_id"]        = str(created["_id"])
     created["course_id"]  = str(created["course_id"])
     created["author_id"]  = str(created["author_id"])
     if created.get("file_id"):
         created["file_id"] = str(created["file_id"])
+    # due_date remains as datetime or None
+
     return PostDB(**created)
 
 
 async def list_posts(course_id: str) -> List[PostDB]:
     """
     Return all posts for a course, with pinned posts first (ordered by pinnedAt DESC),
-    then unpinned posts ordered by position ASC.
+    then unpinned posts ordered by position ASC. Includes due_date.
     """
     cursor = posts_collection.find({"course_id": ObjectId(course_id)})
-    posts: List[dict] = []
+    posts: List[PostDB] = []
     async for doc in cursor:
-        # Convert every ObjectId → str
-        doc["_id"]       = str(doc["_id"])
-        doc["course_id"] = str(doc["course_id"])
-        doc["author_id"] = str(doc["author_id"])
+        doc["_id"]        = str(doc["_id"])
+        doc["course_id"]  = str(doc["course_id"])
+        doc["author_id"]  = str(doc["author_id"])
         if doc.get("file_id"):
             doc["file_id"] = str(doc["file_id"])
+        # due_date is already a datetime or None
         posts.append(PostDB(**doc))
 
-    # Sort in two phases:
     pinned_posts   = [p for p in posts if p.ispinned]
     unpinned_posts = [p for p in posts if not p.ispinned]
 
-    # 1) pinned: sort by pinnedAt DESC (most recently pinned first)
     pinned_posts.sort(key=lambda p: p.pinnedAt or datetime.min, reverse=True)
-
-    # 2) unpinned: sort by position ASC
     unpinned_posts.sort(key=lambda p: p.position)
 
     return pinned_posts + unpinned_posts
 
 
 async def get_post(post_id: str) -> Optional[PostDB]:
+    """
+    Return a single post document—includes due_date if set.
+    """
     doc = await posts_collection.find_one({"_id": ObjectId(post_id)})
     if not doc:
         return None
 
-    # Convert ObjectId fields → str
-    doc["_id"]       = str(doc["_id"])
-    doc["course_id"] = str(doc["course_id"])
-    doc["author_id"] = str(doc["author_id"])
+    # Fixed: read from "_id", not "_1d"
+    doc["_id"]        = str(doc["_id"])
+    doc["course_id"]  = str(doc["course_id"])
+    doc["author_id"]  = str(doc["author_id"])
     if doc.get("file_id"):
         doc["file_id"] = str(doc["file_id"])
+    # due_date remains as datetime or None
 
     return PostDB(**doc)
 
 
 async def update_post(post_id: str, post_in: PostUpdate) -> Optional[PostDB]:
+    """
+    Update title/content/type/file_id/due_date.  Does not touch ispinned or position.
+    """
     now = datetime.utcnow()
 
     update_fields = {
         "title":      post_in.title,
         "content":    post_in.content,
         "type":       post_in.type,
+        "due_date":   post_in.due_date if post_in.due_date else None,  # ← include due_date
         "updated_at": now
     }
     if post_in.file_id is not None:
@@ -127,24 +130,12 @@ async def update_post(post_id: str, post_in: PostUpdate) -> Optional[PostDB]:
 
 async def delete_post(post_id: str) -> bool:
     res = await posts_collection.delete_one({"_id": ObjectId(post_id)})
-    if res.deleted_count != 1:
-        return False
-
-    # After deletion, “compress” all unpinned posts’ positions:
-    #    Let old_position = the deleted post’s position.
-    #    For every unpinned post with position > old_position, do position = position - 1.
-    # (This step is optional but recommended so that you never have gaps in position numbering.)
-    #
-    # We need the position of the deleted post to do that. Suppose the caller already fetched
-    # that position earlier; if not, we can’t compress here (for simplicity, we’ll skip
-    # automatic re‐compression; you can implement it if desired).
-    return True
+    return (res.deleted_count == 1)
 
 
 async def pin_post(post_id: str) -> Optional[PostDB]:
     """
     Pin this post: set ispinned=True, pinnedAt=now.
-    We rely on pinnedAt for ordering, so we do not alter `position` here.
     """
     now = datetime.utcnow()
     res = await posts_collection.update_one(
@@ -158,10 +149,9 @@ async def pin_post(post_id: str) -> Optional[PostDB]:
     if not doc:
         return None
 
-    # Convert ObjectId → str
-    doc["_id"]       = str(doc["_id"])
-    doc["course_id"] = str(doc["course_id"])
-    doc["author_id"] = str(doc["author_id"])
+    doc["_id"]        = str(doc["_id"])
+    doc["course_id"]  = str(doc["course_id"])
+    doc["author_id"]  = str(doc["author_id"])
     if doc.get("file_id"):
         doc["file_id"] = str(doc["file_id"])
     return PostDB(**doc)
@@ -169,18 +159,14 @@ async def pin_post(post_id: str) -> Optional[PostDB]:
 
 async def unpin_post(post_id: str) -> Optional[PostDB]:
     """
-    Unpin: set ispinned=False, pinnedAt=None, and reassign this post’s `position`
-    to the bottom of unpinned posts (i.e. max existing position + 1).
+    Unpin and assign a new position at the bottom of unpinned posts.
     """
-    # 1) Find the current max position among unpinned posts:
     pipeline = [
         {"$match": {"ispinned": False}},
         {"$group": {"_id": None, "maxPos": {"$max": "$position"}}}
     ]
     agg = await posts_collection.aggregate(pipeline).to_list(length=1)
-    max_pos = 0
-    if agg and agg[0].get("maxPos") is not None:
-        max_pos = agg[0]["maxPos"]
+    max_pos = agg[0]["maxPos"] if agg and agg[0].get("maxPos") is not None else 0
 
     now = datetime.utcnow()
     res = await posts_collection.update_one(
@@ -199,10 +185,9 @@ async def unpin_post(post_id: str) -> Optional[PostDB]:
     if not doc:
         return None
 
-    # Convert ObjectId → str
-    doc["_id"]       = str(doc["_id"])
-    doc["course_id"] = str(doc["course_id"])
-    doc["author_id"] = str(doc["author_id"])
+    doc["_id"]        = str(doc["_id"])
+    doc["course_id"]  = str(doc["course_id"])
+    doc["author_id"]  = str(doc["author_id"])
     if doc.get("file_id"):
         doc["file_id"] = str(doc["file_id"])
     return PostDB(**doc)
@@ -210,7 +195,7 @@ async def unpin_post(post_id: str) -> Optional[PostDB]:
 
 async def move_up(post_id: str) -> Optional[PostDB]:
     """
-    Swap this unpinned post’s position with the unpinned post just above (position−1).
+    Swap this unpinned post’s position with the post just above.
     """
     doc = await posts_collection.find_one({"_id": ObjectId(post_id)})
     if not doc or doc.get("ispinned", False):
@@ -218,31 +203,26 @@ async def move_up(post_id: str) -> Optional[PostDB]:
 
     current_pos = doc["position"]
     if current_pos <= 1:
-        # Already at top among unpinned
-        # Convert the found doc → PostDB and return
-        doc["_id"]       = str(doc["_id"])
-        doc["course_id"] = str(doc["course_id"])
-        doc["author_id"] = str(doc["author_id"])
+        doc["_id"]        = str(doc["_id"])
+        doc["course_id"]  = str(doc["course_id"])
+        doc["author_id"]  = str(doc["author_id"])
         if doc.get("file_id"):
             doc["file_id"] = str(doc["file_id"])
         return PostDB(**doc)
-    
-    # Find the unpinned post whose position = current_pos - 1
+
     other_doc = await posts_collection.find_one({
         "course_id": doc["course_id"],
         "ispinned": False,
         "position": current_pos - 1
     })
     if not other_doc:
-        # Nothing to swap with; just return original
-        doc["_id"]       = str(doc["_id"])
-        doc["course_id"] = str(doc["course_id"])
-        doc["author_id"] = str(doc["author_id"])
+        doc["_id"]        = str(doc["_id"])
+        doc["course_id"]  = str(doc["course_id"])
+        doc["author_id"]  = str(doc["author_id"])
         if doc.get("file_id"):
             doc["file_id"] = str(doc["file_id"])
         return PostDB(**doc)
 
-    # Swap positions
     now = datetime.utcnow()
     await posts_collection.update_one(
         {"_id": ObjectId(post_id)},
@@ -253,12 +233,10 @@ async def move_up(post_id: str) -> Optional[PostDB]:
         {"$set": {"position": current_pos, "updated_at": now}}
     )
 
-    # Fetch the newly updated doc
     updated = await posts_collection.find_one({"_id": ObjectId(post_id)})
     if not updated:
         return None
 
-    # Convert back → strings
     updated["_id"]       = str(updated["_id"])
     updated["course_id"] = str(updated["course_id"])
     updated["author_id"] = str(updated["author_id"])
@@ -269,29 +247,26 @@ async def move_up(post_id: str) -> Optional[PostDB]:
 
 async def move_down(post_id: str) -> Optional[PostDB]:
     """
-    Swap this unpinned post’s position with the unpinned post just below (position+1).
+    Swap this unpinned post’s position with the post just below.
     """
     doc = await posts_collection.find_one({"_id": ObjectId(post_id)})
     if not doc or doc.get("ispinned", False):
         return None
 
     current_pos = doc["position"]
-    # Find the unpinned post with position = current_pos + 1
     other_doc = await posts_collection.find_one({
         "course_id": doc["course_id"],
         "ispinned": False,
         "position": current_pos + 1
     })
     if not other_doc:
-        # Already at bottom of unpinned; return original
-        doc["_id"]       = str(doc["_id"])
-        doc["course_id"] = str(doc["course_id"])
-        doc["author_id"] = str(doc["author_id"])
+        doc["_id"]        = str(doc["_id"])
+        doc["course_id"]  = str(doc["course_id"])
+        doc["author_id"]  = str(doc["author_id"])
         if doc.get("file_id"):
             doc["file_id"] = str(doc["file_id"])
         return PostDB(**doc)
 
-    # Swap positions
     now = datetime.utcnow()
     await posts_collection.update_one(
         {"_id": ObjectId(post_id)},
@@ -302,12 +277,10 @@ async def move_down(post_id: str) -> Optional[PostDB]:
         {"$set": {"position": current_pos, "updated_at": now}}
     )
 
-    # Fetch the updated document
     updated = await posts_collection.find_one({"_id": ObjectId(post_id)})
     if not updated:
         return None
 
-    # Convert → strings
     updated["_id"]       = str(updated["_id"])
     updated["course_id"] = str(updated["course_id"])
     updated["author_id"] = str(updated["author_id"])

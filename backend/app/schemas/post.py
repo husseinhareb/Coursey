@@ -7,15 +7,16 @@ from datetime import datetime
 class PostBase(BaseModel):
     title:    str
     content:  str
-    type:     str            # e.g. "lecture" | "reminder"
+    type:     str            # "lecture" | "reminder" | "homework"
     file_id:  Optional[str]  = None
+    due_date: Optional[datetime] = None  # <-- New!
 
 class PostCreate(PostBase):
-    """All fields needed to create a post."""
+    """All fields needed to create a post; now includes optional due_date."""
     pass
 
 class PostUpdate(PostBase):
-    """All fields allowed when updating a post."""
+    """All fields allowed when updating a post; now includes optional due_date."""
     pass
 
 class PostDB(PostBase):
@@ -35,5 +36,5 @@ class PostDB(PostBase):
     }
 
 class PostOut(PostDB):
-    """What we return over the wire."""
+    """What we return to the client; includes due_date via inheritance."""
     pass

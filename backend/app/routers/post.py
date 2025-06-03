@@ -23,24 +23,24 @@ async def api_list_posts(course_id: str):
 
 @router.post("/", response_model=PostOut)
 async def api_create_post(
-    course_id: str,
-    post_in: PostCreate,
+    course_id:    str,
+    post_in:      PostCreate,
     current_user: UserDB = Depends(get_current_active_user)
 ):
     return await create_post(course_id, current_user.id, post_in)
 
 @router.get("/{post_id}", response_model=PostOut)
 async def api_get_post(course_id: str, post_id: str):
-    found = await get_post(post_id)
-    if not found or found.course_id != course_id:
+    post = await get_post(post_id)
+    if not post or post.course_id != course_id:
         raise HTTPException(status_code=404, detail="Post not found")
-    return found
+    return post
 
 @router.put("/{post_id}", response_model=PostOut)
 async def api_update_post(
-    course_id: str,
-    post_id: str,
-    post_in: PostUpdate,
+    course_id:    str,
+    post_id:      str,
+    post_in:      PostUpdate,
     current_user: UserDB = Depends(get_current_active_user)
 ):
     updated = await update_post(post_id, post_in)
@@ -50,8 +50,8 @@ async def api_update_post(
 
 @router.delete("/{post_id}", response_model=dict)
 async def api_delete_post(
-    course_id: str,
-    post_id: str,
+    course_id:    str,
+    post_id:      str,
     current_user: UserDB = Depends(get_current_active_user)
 ):
     ok = await delete_post(post_id)
@@ -61,8 +61,8 @@ async def api_delete_post(
 
 @router.patch("/{post_id}/pin", response_model=PostOut)
 async def api_pin_post(
-    course_id: str,
-    post_id: str,
+    course_id:    str,
+    post_id:      str,
     current_user: UserDB = Depends(get_current_active_user)
 ):
     pinned = await pin_post(post_id)
@@ -72,8 +72,8 @@ async def api_pin_post(
 
 @router.patch("/{post_id}/unpin", response_model=PostOut)
 async def api_unpin_post(
-    course_id: str,
-    post_id: str,
+    course_id:    str,
+    post_id:      str,
     current_user: UserDB = Depends(get_current_active_user)
 ):
     unp = await unpin_post(post_id)
@@ -83,8 +83,8 @@ async def api_unpin_post(
 
 @router.patch("/{post_id}/moveUp", response_model=PostOut)
 async def api_move_up(
-    course_id: str,
-    post_id: str,
+    course_id:    str,
+    post_id:      str,
     current_user: UserDB = Depends(get_current_active_user)
 ):
     moved = await move_up(post_id)
@@ -94,8 +94,8 @@ async def api_move_up(
 
 @router.patch("/{post_id}/moveDown", response_model=PostOut)
 async def api_move_down(
-    course_id: str,
-    post_id: str,
+    course_id:    str,
+    post_id:      str,
     current_user: UserDB = Depends(get_current_active_user)
 ):
     moved = await move_down(post_id)
