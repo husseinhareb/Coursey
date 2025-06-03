@@ -20,6 +20,9 @@ from app.crud.submission import (
     delete_submission as _delete_submission
 )
 
+from app.schemas.activity import ActivityLogCreate
+from app.crud.activity import create_activity_log
+
 router = APIRouter(
     prefix="/courses/{course_id}/posts/{post_id}/submissions",
     tags=["submissions"],
@@ -36,6 +39,7 @@ async def api_create_submission(
     """
     1) Read the post's due_date from posts_collection.
     2) Insert a new submission with status = "submitted" if now <= due_date, else "late".
+    3) Log the "submit_homework" activity.
     """
     now = datetime.utcnow()
 
@@ -65,6 +69,7 @@ async def api_create_submission(
     grid_in.close()
     file_obj_id = grid_in._id
 
+    # Insert submission document
     doc = {
         "course_id":  ObjectId(course_id),
         "post_id":    ObjectId(post_id),
@@ -79,21 +84,57 @@ async def api_create_submission(
     res = await submissions_collection.insert_one(doc)
     created = await submissions_collection.find_one({"_id": res.inserted_id})
 
+    if not created:
+        raise HTTPException(status_code=500, detail="Failed to create submission")
+
     # Convert ObjectId → str
     created["_id"]        = str(created["_id"])
     created["course_id"]  = str(created["course_id"])
     created["post_id"]    = str(created["post_id"])
     created["student_id"] = str(created["student_id"])
     created["file_id"]    = str(created["file_id"])
-    return SubmissionDB(**created)
+
+    submission_out = SubmissionDB(**created)
+
+    # Log activity: submit_homework
+    log = ActivityLogCreate(
+        user_id=current_user.id,
+        action="submit_homework",
+        timestamp=now,
+        metadata={
+            "course_id": course_id,
+            "post_id": post_id,
+            "submission_id": submission_out.id,
+            "status": initial_status
+        }
+    )
+    await create_activity_log(log)
+
+    return submission_out
 
 
 @router.get("/", response_model=List[SubmissionOut])
 async def api_list_submissions(
     course_id: str,
-    post_id:   str
+    post_id:   str,
+    current_user:   UserDB = Depends(get_current_active_user)
 ):
-    return await list_submissions(course_id, post_id)
+    """
+    Return all submissions for a given course_id/post_id.
+    Also log "list_submissions" activity.
+    """
+    submissions = await list_submissions(course_id, post_id)
+
+    # Log activity: list_submissions
+    log = ActivityLogCreate(
+        user_id=current_user.id,
+        action="list_submissions",
+        timestamp=datetime.utcnow(),
+        metadata={"course_id": course_id, "post_id": post_id, "count": len(submissions)}
+    )
+    await create_activity_log(log)
+
+    return submissions
 
 
 @router.patch(
@@ -111,7 +152,7 @@ async def api_update_submission(
     Supports two scenarios:
     1) { "status": "submitted"|"late" } → update only status (and updated_at).
     2) { "grade": int, "comment": str } → set status="graded", grade, comment, updated_at.
-    Always return the updated SubmissionOut.
+    Always return the updated SubmissionOut, and log the appropriate activity.
     """
     # 1) Fetch existing submission
     doc = await submissions_collection.find_one({"_id": ObjectId(submission_id)})
@@ -120,6 +161,7 @@ async def api_update_submission(
 
     now = datetime.utcnow()
     update_data: dict = {}
+    activity_action = None
 
     # 2) Determine which fields to update
     if "status" in payload:
@@ -131,15 +173,17 @@ async def api_update_submission(
             raise HTTPException(status_code=400, detail="Cannot change status after grading")
         update_data["status"] = new_status
         update_data["updated_at"] = now
+        activity_action = "update_submission_status"
 
     elif ("grade" in payload) and ("comment" in payload):
         # Grade + comment path → set status = "graded"
         grade_value = payload["grade"]
         comment_value = payload["comment"]
-        update_data["grade"] = grade_value
+        update_data["grade"]   = grade_value
         update_data["comment"] = comment_value
-        update_data["status"] = "graded"
+        update_data["status"]  = "graded"
         update_data["updated_at"] = now
+        activity_action = "grade_submission"
 
     else:
         raise HTTPException(status_code=400, detail="Must supply either 'status' or both 'grade' and 'comment'")
@@ -169,6 +213,7 @@ async def api_update_submission(
         user_obj = await users_collection.find_one({"_id": ObjectId(updated_doc["student_id"])})
     except:
         user_obj = None
+
     if user_obj:
         updated_doc["first_name"] = user_obj.get("first_name")
         updated_doc["last_name"]  = user_obj.get("last_name")
@@ -186,8 +231,30 @@ async def api_update_submission(
     else:
         updated_doc["file_name"] = None
 
-    # 7) Return the populated SubmissionOut
-    return SubmissionOut(**updated_doc)
+    submission_out = SubmissionOut(**updated_doc)
+
+    # 7) Log the activity
+    if activity_action:
+        log_metadata = {
+            "course_id": course_id,
+            "post_id": post_id,
+            "submission_id": submission_id
+        }
+        if activity_action == "update_submission_status":
+            log_metadata["new_status"] = update_data.get("status")
+        elif activity_action == "grade_submission":
+            log_metadata["grade"]   = update_data.get("grade")
+            log_metadata["comment"] = update_data.get("comment")
+
+        log = ActivityLogCreate(
+            user_id=current_user.id,
+            action=activity_action,
+            timestamp=now,
+            metadata=log_metadata
+        )
+        await create_activity_log(log)
+
+    return submission_out
 
 
 @router.delete("/{submission_id}", response_model=dict)
@@ -197,7 +264,24 @@ async def api_delete_submission(
     submission_id:  str,
     current_user:   UserDB = Depends(get_current_active_user)
 ):
+    """
+    Delete a submission and log "delete_submission" activity.
+    """
     ok = await _delete_submission(submission_id)
     if not ok:
         raise HTTPException(status_code=404, detail="Submission not found")
+
+    # Log activity: delete_submission
+    log = ActivityLogCreate(
+        user_id=current_user.id,
+        action="delete_submission",
+        timestamp=datetime.utcnow(),
+        metadata={
+            "course_id": course_id,
+            "post_id": post_id,
+            "submission_id": submission_id
+        }
+    )
+    await create_activity_log(log)
+
     return {"deleted": True}
