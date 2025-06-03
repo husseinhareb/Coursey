@@ -1,33 +1,33 @@
 // src/app/services/user.service.ts
 
 import { Injectable } from '@angular/core';
-import { HttpClient }    from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
-import { environment }   from '../environments/environment';
+import { environment } from '../environments/environment';
 
 export interface Profile {
-  firstName:   string;
-  lastName:    string;
+  firstName: string;
+  lastName: string;
   profilePic?: string;
-  phoneNumber?:string;
-  address?:    string;
+  phoneNumber?: string;
+  address?: string;
 }
 
 export interface User {
-  id:           string;
-  email:        string;
-  username:     string;
-  profile:      Profile;
-  roles:        string[];
-  enrollments:  any[];
-  accesses:     any[];
-  alerts:       any[];
-  createdAt:    string;
-  updatedAt:    string;
+  id: string;
+  email: string;
+  username: string;
+  profile: Profile;
+  roles: string[];
+  enrollments: any[];
+  accesses: any[];
+  alerts: any[];
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface Enrollment {
-  courseId:   string;
+  courseId: string;
   enrolledAt: string; // ISO
 }
 
@@ -35,7 +35,7 @@ export interface Enrollment {
 export class UserService {
   private base = `${environment.apiUrl}/users`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   /** fetch /users/me, normalize _id → id */
   getMe(): Observable<User> {
@@ -58,7 +58,7 @@ export class UserService {
     );
   }
 
-    listEnrollments(userId: string): Observable<Enrollment[]> {
+  listEnrollments(userId: string): Observable<Enrollment[]> {
     return this.http.get<Enrollment[]>(`${this.base}/${userId}/enrollments`).pipe(
       map(arr => arr.map(e => ({ ...e, enrolledAt: e.enrolledAt })))
     );
@@ -70,5 +70,8 @@ export class UserService {
 
   unenroll(userId: string, courseId: string): Observable<any> {
     return this.http.delete(`${this.base}/${userId}/enrollments/${courseId}`);
+  }
+  getById(userId: string): Observable<User> {
+    return this.http.get<User>(`${this.base}/${userId}`);
   }
 }

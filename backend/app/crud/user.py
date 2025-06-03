@@ -9,23 +9,28 @@ from app.schemas.user import UserDB, Profile, Enrollment, Access, Alert
 
 from app.schemas.user import UserOut
 from app.schemas.user import EnrollmentUser
+
+
 def _normalize_user_doc(doc: dict) -> UserDB:
     """Convert ObjectId fields to str and return a UserDB."""
     doc["_id"] = str(doc["_id"])
-    doc["roles"]       = [str(r) for r in doc.get("roles", [])]
+
+    # If roles were stored as plain strings, str(r) will just keep them unchanged.
+    doc["roles"] = [str(r) for r in doc.get("roles", [])]
+
     doc["enrollments"] = [
         {"courseId": str(e["courseId"]), "enrolledAt": e["enrolledAt"]}
         for e in doc.get("enrollments", [])
     ]
-    doc["accesses"]    = [
+    doc["accesses"] = [
         {"courseId": str(a["courseId"]), "accessedAt": a["accessedAt"]}
         for a in doc.get("accesses", [])
     ]
-    doc["alerts"]      = [
+    doc["alerts"] = [
         {
-          "alertId":       str(al["alertId"]),
-          "createdAt":     al["createdAt"],
-          "acknowledgedAt": al.get("acknowledgedAt")
+            "alertId": str(al["alertId"]),
+            "createdAt": al["createdAt"],
+            "acknowledgedAt": al.get("acknowledgedAt")
         }
         for al in doc.get("alerts", [])
     ]
@@ -53,7 +58,8 @@ async def create_user(
         "username":     username,
         "passwordHash": hash_password(raw_password),
         "profile":      profile.model_dump(),
-        "roles":        [ObjectId(r) for r in (roles or [])],
+        # ← Store incoming role‐strings directly
+        "roles":        roles or [],
         "enrollments":  [],
         "accesses":     [],
         "alerts":       [],
@@ -106,8 +112,7 @@ async def update_user(user_id: str, profile: Profile) -> Optional[UserDB]:
         {"$set": {"profile": profile.model_dump(), "updatedAt": now}}
     )
     if res.matched_count == 0:
-        from app.schemas.course import CourseOut
-
+        return None
     return await get_user_by_id(user_id)
 
 
@@ -144,6 +149,7 @@ async def remove_enrollment(user_id: str, course_id: str) -> bool:
     )
     return res.modified_count > 0
 
+
 async def list_users_by_course(course_id: str) -> List[EnrollmentUser]:
     """
     Find all users who have an entry in their `enrollments` array for this course.
@@ -164,27 +170,13 @@ async def list_users_by_course(course_id: str) -> List[EnrollmentUser]:
 
     out: List[EnrollmentUser] = []
     async for raw in cursor:
-        # Convert the ObjectId _id to a string
         raw["_id"] = str(raw["_id"])
-
-        # Pull nested profile fields out into top-level keys:
-        #   - raw.get("profile",{}).get("firstName")
-        #   - raw.get("profile",{}).get("lastName")
-        first = None
-        last  = None
-        prof  = raw.get("profile") or {}
-        if isinstance(prof, dict):
-            # Note: after projection, prof might be { "firstName": "...", "lastName": "..." }
-            first = prof.get("firstName")
-            last  = prof.get("lastName")
-
-        # Assign them into the keys that EnrollmentUser expects:
+        prof = raw.get("profile") or {}
+        first = prof.get("firstName") if isinstance(prof, dict) else ""
+        last  = prof.get("lastName")  if isinstance(prof, dict) else ""
         raw["first_name"] = first or ""
         raw["last_name"]  = last  or ""
-        # (We do not need the `profile` key anymore, so pop it out)
         raw.pop("profile", None)
-
-        # Now feed exactly those keys into the Pydantic model:
         out.append(EnrollmentUser(**raw))
 
     return out

@@ -27,15 +27,10 @@ import { environment } from '../environments/environment';
       <div *ngIf="loading">Loading submissions…</div>
       <div *ngIf="error" class="error">{{ error }}</div>
 
-      <table
-        *ngIf="!loading && !error"
-        border="1"
-        cellpadding="4"
-        cellspacing="0"
-      >
+      <table *ngIf="!loading && !error" border="1" cellpadding="4" cellspacing="0">
         <thead>
           <tr>
-            <th>Student ID</th>
+            <th>Student Name</th>
             <th>File Name</th>
             <th>Status</th>
             <th>Grade</th>
@@ -45,18 +40,12 @@ import { environment } from '../environments/environment';
         </thead>
         <tbody>
           <tr *ngFor="let s of submissions">
-            <td>{{ s.student_id }}</td>
+            <td>
+              {{ s.firstName || '—' }} {{ s.lastName || '' }}
+            </td>
             <td>
               <ng-container *ngIf="s.file_name && s.file_id; else noFile">
-                <!-- 
-                  Now href is the full backend URL. 
-                  Hovering will show: http://localhost:3000/files/<fileId>
-                -->
-                <a
-                  [href]="getFileUrl(s.file_id)"
-                  target="_blank"
-                  rel="noopener"
-                >
+                <a [href]="getFileUrl(s.file_id)" target="_blank" rel="noopener">
                   {{ s.file_name }}
                 </a>
               </ng-container>
@@ -66,10 +55,7 @@ import { environment } from '../environments/environment';
             <td>{{ s.grade != null ? s.grade : '—' }}</td>
             <td>{{ s.comment != null ? s.comment : '—' }}</td>
             <td>
-              <button
-                *ngIf="s.status !== 'graded'"
-                (click)="startGrading(s._id)"
-              >
+              <button *ngIf="s.status !== 'graded'" (click)="startGrading(s._id)">
                 Grade
               </button>
             </td>

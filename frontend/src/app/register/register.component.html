@@ -1,29 +1,64 @@
-<!-- src/app/register/register.component.html -->
-
 <h2>Sign Up</h2>
 
 <form [formGroup]="signupForm" (ngSubmit)="onSubmit()">
   <!-- Email -->
   <label for="email">Email</label>
   <input id="email" type="email" formControlName="email" />
-  <div *ngIf="signupForm.get('email')?.invalid && signupForm.get('email')?.touched" class="error">
+  <div
+    *ngIf="
+      signupForm.get('email')?.invalid &&
+      signupForm.get('email')?.touched
+    "
+    class="error"
+  >
     A valid email is required.
   </div>
 
   <!-- First Name -->
   <label for="firstName">First Name</label>
   <input id="firstName" type="text" formControlName="firstName" />
-  <div *ngIf="signupForm.get('firstName')?.invalid && signupForm.get('firstName')?.touched" class="error">
+  <div
+    *ngIf="
+      signupForm.get('firstName')?.invalid &&
+      signupForm.get('firstName')?.touched
+    "
+    class="error"
+  >
     First name is required.
   </div>
 
   <!-- Last Name -->
   <label for="lastName">Last Name</label>
   <input id="lastName" type="text" formControlName="lastName" />
-  <div *ngIf="signupForm.get('lastName')?.invalid && signupForm.get('lastName')?.touched" class="error">
+  <div
+    *ngIf="
+      signupForm.get('lastName')?.invalid &&
+      signupForm.get('lastName')?.touched
+    "
+    class="error"
+  >
     Last name is required.
   </div>
 
+  <!-- Role Dropdown -->
+  <label for="role">Role</label>
+  <select id="role" formControlName="role">
+    <option value="" disabled>Select a role</option>
+    <option value="student">Student</option>
+    <option value="professor">Professor</option>
+    <option value="admin">Admin</option>
+  </select>
+  <div
+    *ngIf="
+      signupForm.get('role')?.invalid &&
+      signupForm.get('role')?.touched
+    "
+    class="error"
+  >
+    You must select one role.
+  </div>
+
+  <!-- Submit Button -->
   <button type="submit" [disabled]="signupForm.invalid">Sign Up</button>
 </form>
 

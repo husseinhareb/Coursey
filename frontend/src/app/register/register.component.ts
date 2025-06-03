@@ -1,5 +1,3 @@
-// src/app/register/register.component.ts
-
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
@@ -31,29 +29,37 @@ export class RegisterComponent {
     this.signupForm = this.fb.group({
       email:     ['', [Validators.required, Validators.email]],
       firstName: ['', Validators.required],
-      lastName:  ['', Validators.required]
+      lastName:  ['', Validators.required],
+      // New control: role (must be one of the three)
+      role:      ['', Validators.required]
     });
   }
 
   onSubmit() {
-    if (this.signupForm.invalid) return;
+    if (this.signupForm.invalid) {
+      // Mark all controls as touched so errors appear
+      this.signupForm.markAllAsTouched();
+      return;
+    }
 
-    const { email, firstName, lastName } = this.signupForm.value;
+    const { email, firstName, lastName, role } = this.signupForm.value;
 
-    // auto‐generate a password
+    // auto‐generate a password (example logic)
     const password = `${firstName}${lastName}${firstName.length}${lastName}`;
 
+    // We send roles as an array with exactly one role string
     const payload: SignupData = {
       email,
       password,
       profile: { firstName, lastName },
-      roles: []
+      roles: [role]
     };
 
     this.auth.signup(payload).subscribe({
       next: () => {
         this.signupSuccess = true;
         this.signupError = null;
+        // After 1.5s, redirect to login
         setTimeout(() => this.router.navigate(['/login']), 1500);
       },
       error: err => {

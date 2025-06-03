@@ -1,11 +1,13 @@
+// src/app/services/submission.service.ts
+
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, forkJoin, of, switchMap, map } from 'rxjs';
 import { environment } from '../environments/environment';
+import { UserService } from './user.service';
 
 /**
- * What the server returns for each submission.
- * Adjust fields if your backend sends back different property names.
+ * Note: we renamed first_name → firstName and last_name → lastName
  */
 export interface Submission {
   _id:          string;
@@ -13,26 +15,20 @@ export interface Submission {
   post_id:      string;
   student_id:   string;
   file_id:      string;
-  file_name?:   string;  
+  file_name?:   string;
   status:       string;
   grade?:       number;
   comment?:     string;
-  created_at:   string;   
+  created_at:   string;
   updated_at:   string;
-  first_name?:  string;
-  last_name?:   string;
+  firstName?:   string;  // ← camelCase
+  lastName?:    string;  // ← camelCase
 }
 
-/**
- * When creating a new submission, we only need to send the File.
- */
 export interface SubmissionCreate {
   file: File;
 }
 
-/**
- * When grading, we send a grade + comment.
- */
 export interface SubmissionGrade {
   grade:   number;
   comment: string;
@@ -40,26 +36,42 @@ export interface SubmissionGrade {
 
 @Injectable({ providedIn: 'root' })
 export class SubmissionService {
-  /** Base URL: /courses/{courseId}/posts/{postId}/submissions */
   private base = `${environment.apiUrl}/courses`;
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private userSvc: UserService
+  ) {}
 
   /**
-   * List all submissions for a given courseId & postId (homework).
-   * GET  /courses/:courseId/posts/:postId/submissions
+   * List all submissions for a given courseId & postId (homework),
+   * then fetch each student’s name via UserService.
    */
   list(courseId: string, postId: string): Observable<Submission[]> {
-    return this.http.get<Submission[]>(
-      `${this.base}/${courseId}/posts/${postId}/submissions`
-    );
+    return this.http
+      .get<Submission[]>(`${this.base}/${courseId}/posts/${postId}/submissions`)
+      .pipe(
+        switchMap((submissions) => {
+          if (!submissions.length) {
+            return of([] as Submission[]);
+          }
+
+          // For each submission, fetch the user and copy profile.firstName/lastName into the Submission
+          const enriched$ = submissions.map(s =>
+            this.userSvc.getById(s.student_id).pipe(
+              map(user => ({
+                ...s,
+                firstName: user.profile.firstName,
+                lastName:  user.profile.lastName,
+              }))
+            )
+          );
+
+          return forkJoin(enriched$);
+        })
+      );
   }
 
-  /**
-   * Create a new submission by uploading a file.
-   * POST /courses/:courseId/posts/:postId/submissions
-   * Must send multipart/form-data with the file under the field name “file”.
-   */
   create(
     courseId: string,
     postId: string,
@@ -67,17 +79,12 @@ export class SubmissionService {
   ): Observable<Submission> {
     const formData = new FormData();
     formData.append('file', payload.file);
-
     return this.http.post<Submission>(
       `${this.base}/${courseId}/posts/${postId}/submissions`,
       formData
     );
   }
 
-  /**
-   * Grade a submission.
-   * PATCH /courses/:courseId/posts/:postId/submissions/:submissionId
-   */
   grade(
     courseId: string,
     postId: string,
