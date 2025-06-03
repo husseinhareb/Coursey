@@ -26,6 +26,7 @@ export class CourseService {
 
   constructor(private http: HttpClient) {}
 
+  /** GET /courses → map each “_id” to “id” */
   list(): Observable<Course[]> {
     return this.http.get<any[]>(`${this.base}/`).pipe(
       map(arr =>
@@ -40,6 +41,7 @@ export class CourseService {
     );
   }
 
+  /** GET /courses/:id → map “_id” to “id” */
   get(id: string): Observable<Course> {
     return this.http.get<any>(`${this.base}/${id}`).pipe(
       map(c => ({
@@ -52,6 +54,7 @@ export class CourseService {
     );
   }
 
+  /** POST /courses → returns new course with “id” */
   create(payload: CourseCreate): Observable<Course> {
     return this.http.post<any>(`${this.base}/`, payload).pipe(
       map(c => ({
@@ -64,6 +67,7 @@ export class CourseService {
     );
   }
 
+  /** PUT /courses/:id → returns updated course with “id” */
   update(id: string, payload: CourseCreate): Observable<Course> {
     return this.http.put<any>(`${this.base}/${id}`, payload).pipe(
       map(c => ({
@@ -76,7 +80,8 @@ export class CourseService {
     );
   }
 
-  delete(id: string): Observable<{deleted: boolean}> {
-    return this.http.delete<{deleted: boolean}>(`${this.base}/${id}`);
+  /** DELETE /courses/:id → returns { deleted: boolean } */
+  delete(id: string): Observable<{ deleted: boolean }> {
+    return this.http.delete<{ deleted: boolean }>(`${this.base}/${id}`);
   }
 }
