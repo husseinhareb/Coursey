@@ -1,0 +1,42 @@
+.activity-log-container {
+  margin: 1rem;
+  font-family: Arial, sans-serif;
+}
+
+.loading {
+  font-style: italic;
+  color: #666;
+}
+
+.error {
+  color: red;
+  margin: 0.5rem 0;
+}
+
+.activity-log-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 0.5rem;
+}
+
+.activity-log-table th,
+.activity-log-table td {
+  border: 1px solid #ddd;
+  padding: 0.5rem;
+  text-align: left;
+}
+
+.activity-log-table th {
+  background-color: #f2f2f2;
+}
+
+.details-list {
+  margin: 0;
+  padding-left: 1rem;
+  list-style-type: disc;
+}
+
+.no-logs {
+  margin-top: 1rem;
+  color: #333;
+}

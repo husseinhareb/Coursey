@@ -14,7 +14,7 @@
 
     <!-- Private -->
     <li *ngIf="auth.isLoggedIn">
-      <a routerLink="/" routerLinkActive="active">Home</a>
+      <a routerLink="/home" routerLinkActive="active">Home</a>
     </li>
     <li *ngIf="auth.isLoggedIn">
       <a routerLink="/users" routerLinkActive="active">Users</a>
@@ -23,11 +23,13 @@
       <a routerLink="/courses" routerLinkActive="active">Courses</a>
     </li>
     <li *ngIf="auth.isLoggedIn">
+      <a routerLink="/activity-logs" routerLinkActive="active">Activity Logs</a>
+    </li>
+    <li *ngIf="auth.isLoggedIn">
       <a routerLink="/profile" routerLinkActive="active">Profile</a>
     </li>
     <li *ngIf="auth.isLoggedIn">
       <button (click)="logout()">Log Out</button>
     </li>
-
   </ul>
 </nav>

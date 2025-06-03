@@ -14,10 +14,11 @@ import { CoursesComponent } from './courses/courses.component';
 import { CourseDetailComponent } from './course-detail/course-detail.component';
 import { CourseFormComponent } from './course-form/course-form.component';
 
-
 import { AuthGuard } from './auth/auth.guard';
 import { SubmissionFormComponent } from './submissions/submission.component';
 import { SubmissionListComponent } from './submissions/submission-list.component';
+
+import { ActivityLogListComponent } from './activity-log-list/activity-log-list.component'; // ← import
 
 export const routes: Routes = [
   // Public landing & auth
@@ -49,7 +50,7 @@ export const routes: Routes = [
   {
     path: 'courses',
     component: CoursesComponent,
-    pathMatch: 'full',   // only match exactly `/courses`
+    pathMatch: 'full',
     canActivate: [AuthGuard]
   },
   {
@@ -77,6 +78,13 @@ export const routes: Routes = [
     component: SubmissionListComponent,
     canActivate: [AuthGuard]
   },
+
+  {
+    path: 'activity-logs',
+    component: ActivityLogListComponent,
+    canActivate: [AuthGuard]
+  },
+
   // Fallback
   { path: '**', redirectTo: '' }
 ];

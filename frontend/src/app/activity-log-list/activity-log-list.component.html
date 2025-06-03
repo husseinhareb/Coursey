@@ -1,0 +1,33 @@
+<div class="activity-log-container">
+  <h3>Historique d’activité</h3>
+
+  <div *ngIf="loading" class="loading">Chargement des logs…</div>
+  <div *ngIf="error" class="error">{{ error }}</div>
+
+  <table *ngIf="!loading && !error" class="activity-log-table">
+    <thead>
+      <tr>
+        <th>Date & heure</th>
+        <th>Utilisateur</th>
+        <th>Action</th>
+        <th>Détails</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let log of logs">
+        <td>{{ log.timestamp | date: 'short' }}</td>
+        <td>{{ log.userName }}</td>
+        <td>{{ log.actionLabel }}</td>
+        <td>
+          <ul class="details-list">
+            <li *ngFor="let d of log.details">{{ d }}</li>
+          </ul>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div *ngIf="!loading && logs.length === 0" class="no-logs">
+    Aucune activité à afficher.
+  </div>
+</div>
