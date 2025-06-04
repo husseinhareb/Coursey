@@ -71,7 +71,18 @@ export class UserService {
   unenroll(userId: string, courseId: string): Observable<any> {
     return this.http.delete(`${this.base}/${userId}/enrollments/${courseId}`);
   }
-  getById(userId: string): Observable<User> {
-    return this.http.get<User>(`${this.base}/${userId}`);
+    getById(userId: string): Observable<User> {
+    return this.http
+      .get<any>(`${this.base}/${userId}`)
+      .pipe(
+        map(u => {
+          // Si le back-end renvoie “_id”, on le recopie dans le champ “id” attendu par Angular
+          // (tout en conservant _id au besoin).
+          return {
+            ...u,
+            id: u._id ?? u.id  // si le JSON n’a pas _id mais déjà “id”, on garde “id”
+          } as User;
+        })
+      );
   }
 }
