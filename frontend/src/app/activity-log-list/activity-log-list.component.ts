@@ -3,9 +3,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DatePipe, NgIf, NgForOf } from '@angular/common';
-import { forkJoin, Observable, of } from 'rxjs';
-import { switchMap, map, catchError, tap } from 'rxjs/operators';
-
+import { Observable, of, forkJoin } from 'rxjs';
+import { tap, switchMap, catchError, finalize } from 'rxjs/operators';
 import { ActivityLogService, ActivityLogDB } from '../services/activity-log.service';
 import { UserService, User } from '../services/user.service';
 import { CourseService, Course } from '../services/course.service';
@@ -17,6 +16,14 @@ interface RawActivityLog {
   action: string;
   timestamp: string; // ISO
   metadata?: { [key: string]: any };
+}
+
+
+interface CombinedData {
+  rawLogs: RawActivityLog[];
+  users: (User | null)[];
+  courses: (Course | null)[];
+  posts: (Post | null)[];
 }
 
 interface EnrichedLog {
@@ -67,12 +74,13 @@ export class ActivityLogListComponent implements OnInit {
     this.loadLogs();
   }
 
+
   private loadLogs(): void {
     this.loading = true;
     this.error = null;
 
     this.activityLogSvc.getAll().pipe(
-      switchMap((rawLogs: ActivityLogDB[]) => {
+      switchMap((rawLogs: ActivityLogDB[]): Observable<CombinedData> => {
         const logs: RawActivityLog[] = rawLogs as any;
 
         if (!logs.length) {
@@ -84,22 +92,22 @@ export class ActivityLogListComponent implements OnInit {
           });
         }
 
-        // 1) Extraire les IDs d’utilisateur, de cours, de post
         const userIds: string[] = Array.from(new Set(logs.map(l => l.user_id)));
+        const courseIds: string[] = Array.from(
+          new Set(
+            logs
+              .map(l => l.metadata?.['course_id'])
+              .filter(id => !!id) as string[]
+          )
+        );
+        const postIds: string[] = Array.from(
+          new Set(
+            logs
+              .map(l => l.metadata?.['post_id'])
+              .filter(id => !!id) as string[]
+          )
+        );
 
-        const courseIds: string[] = Array.from(new Set(
-          logs
-            .map(l => l.metadata?.['course_id'])
-            .filter(id => !!id) as string[]
-        ));
-
-        const postIds: string[] = Array.from(new Set(
-          logs
-            .map(l => l.metadata?.['post_id'])
-            .filter(id => !!id) as string[]
-        ));
-
-        // 2) Construire un mapping postId → courseId (pour récupérer chaque post)
         const postToCourse = new Map<string, string>();
         logs.forEach(l => {
           const pid = l.metadata?.['post_id'];
@@ -109,36 +117,40 @@ export class ActivityLogListComponent implements OnInit {
           }
         });
 
-        // 3) ForkJoin pour récupérer tous les Users
-        const users$: Observable<(User | null)[]> = forkJoin(
-          userIds.map(id =>
-            this.userSvc.getById(id).pipe(
-              catchError(() => of(null))
+        const users$: Observable<(User | null)[]> = userIds.length
+          ? forkJoin(
+            userIds.map(id =>
+              this.userSvc.getById(id).pipe(
+                catchError(() => of(null))
+              )
             )
           )
-        );
+          : of([] as (User | null)[]);
 
-
-        // 4) ForkJoin pour récupérer tous les Cours
-        const courses$: Observable<(Course | null)[]> = forkJoin(
-          courseIds.map(id =>
-            this.courseSvc.get(id).pipe(
-              catchError(() => of(null))
+        const courses$: Observable<(Course | null)[]> = courseIds.length
+          ? forkJoin(
+            courseIds.map(id =>
+              this.courseSvc.get(id).pipe(
+                catchError(() => of(null))
+              )
             )
           )
-        );
+          : of([] as (Course | null)[]);
 
-        // 5) ForkJoin pour récupérer tous les Posts
-        const posts$: Observable<(Post | null)[]> = forkJoin(
-          postIds.map(pid => {
-            const cid = postToCourse.get(pid)!;
-            return this.postSvc.get(cid, pid).pipe(
-              catchError(() => of(null))
-            );
-          })
-        );
+        const posts$: Observable<(Post | null)[]> = postIds.length
+          ? forkJoin(
+            postIds.map(pid => {
+              const cid = postToCourse.get(pid);
+              if (!cid) {
+                return of(null as Post | null);
+              }
+              return this.postSvc.get(cid, pid).pipe(
+                catchError(() => of(null))
+              );
+            })
+          )
+          : of([] as (Post | null)[]);
 
-        // 6) Combiner tout ça
         return forkJoin({
           rawLogs: of(logs),
           users: users$,
@@ -146,9 +158,21 @@ export class ActivityLogListComponent implements OnInit {
           posts: posts$
         });
       }),
-      map(data => {
+      catchError(() => {
+        return of({
+          rawLogs: [] as RawActivityLog[],
+          users: [] as (User | null)[],
+          courses: [] as (Course | null)[],
+          posts: [] as (Post | null)[]
+        });
+      }),
+      finalize(() => {
+        this.loading = false;
+      })
+    ).subscribe({
+      next: (data: CombinedData) => {
         const { rawLogs, users, courses, posts } = data;
-        // Créer des Maps id → entité pour lookups rapides
+
         const userMap = new Map<string, User>();
         users.forEach((u: User | null) => {
           if (u) {
@@ -170,24 +194,21 @@ export class ActivityLogListComponent implements OnInit {
           }
         });
 
-        // 7) Transformer chaque RawActivityLog en EnrichedLog
-        return rawLogs.map(
-          (l: RawActivityLog) => this.toEnrichedLog(l, userMap, courseMap, postMap)
+        const enriched: EnrichedLog[] = rawLogs.map((l: RawActivityLog) =>
+          this.toEnrichedLog(l, userMap, courseMap, postMap)
         );
-      })
-    )
-      .subscribe({
-        next: (enriched: EnrichedLog[]) => {
-          this.logs = enriched.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
-          this.loading = false;
-        },
-        error: err => {
-          console.error(err);
-          this.error = 'Impossible de charger les logs d’activité.';
-          this.loading = false;
-        }
-      });
+
+        this.logs = enriched.sort(
+          (a, b) => b.timestamp.getTime() - a.timestamp.getTime()
+        );
+      },
+      error: () => {
+        this.error = 'Impossible de charger les logs d’activité.';
+      }
+    });
   }
+
+
 
   private toEnrichedLog(
     raw: RawActivityLog,
