@@ -1,3 +1,5 @@
+# app/routers/forum.py
+
 from fastapi import APIRouter, Depends, HTTPException
 from typing import List
 from datetime import datetime
@@ -14,6 +16,9 @@ from app.services.auth import get_current_active_user
 from app.schemas.user import UserDB
 
 from app.db.mongodb import forums_collection, messages_collection
+
+from app.schemas.activity import ActivityLogCreate
+from app.crud.activity import create_activity_log
 
 router = APIRouter(
     prefix="/courses/{course_id}/forums",
@@ -55,6 +60,15 @@ async def create_thread(
     created["course_id"] = str(created["course_id"])
     created["author_id"] = str(created["author_id"])
 
+    # Log "create_thread" activity
+    log = ActivityLogCreate(
+        user_id=current_user.id,
+        action="create_thread",
+        timestamp=datetime.utcnow(),
+        metadata={"course_id": course_id, "thread_id": created["_id"]}
+    )
+    await create_activity_log(log)
+
     return ForumThreadOut(**created)
 
 
@@ -62,7 +76,10 @@ async def create_thread(
 # 2) List all threads for a given course
 #
 @router.get("/", response_model=List[ForumThreadOut])
-async def list_threads(course_id: str):
+async def list_threads(
+    course_id: str,
+    current_user: UserDB = Depends(get_current_active_user)
+):
     try:
         course_obj = ObjectId(course_id)
     except:
@@ -75,8 +92,19 @@ async def list_threads(course_id: str):
         doc["course_id"] = str(doc["course_id"])
         doc["author_id"] = str(doc["author_id"])
         out.append(ForumThreadOut(**doc))
+
     # sort by updated_at descending
     out.sort(key=lambda t: t.updated_at, reverse=True)
+
+    # Log "list_threads" activity
+    log = ActivityLogCreate(
+        user_id=current_user.id,
+        action="list_threads",
+        timestamp=datetime.utcnow(),
+        metadata={"course_id": course_id, "count": len(out)}
+    )
+    await create_activity_log(log)
+
     return out
 
 
@@ -84,7 +112,11 @@ async def list_threads(course_id: str):
 # 3) Get one thread, including its messages
 #
 @router.get("/{thread_id}", response_model=ForumThreadDetail)
-async def get_thread_detail(course_id: str, thread_id: str):
+async def get_thread_detail(
+    course_id: str,
+    thread_id: str,
+    current_user: UserDB = Depends(get_current_active_user)
+):
     # Validate IDs
     try:
         course_obj = ObjectId(course_id)
@@ -110,6 +142,15 @@ async def get_thread_detail(course_id: str, thread_id: str):
         msg["thread_id"] = str(msg["thread_id"])
         msg["author_id"] = str(msg["author_id"])
         messages_out.append(ForumMessageOut(**msg).dict())
+
+    # Log "view_thread" activity
+    log = ActivityLogCreate(
+        user_id=current_user.id,
+        action="view_thread",
+        timestamp=datetime.utcnow(),
+        metadata={"course_id": course_id, "thread_id": thread_id, "messages": len(messages_out)}
+    )
+    await create_activity_log(log)
 
     return ForumThreadDetail(**{**thread_doc, "messages": messages_out})
 
@@ -152,4 +193,20 @@ async def create_message(
     created["_id"]       = str(created["_id"])
     created["thread_id"] = str(created["thread_id"])
     created["author_id"] = str(created["author_id"])
+
+    # Also update thread's updated_at
+    await forums_collection.update_one(
+        {"_id": thread_obj},
+        {"$set": {"updated_at": now}}
+    )
+
+    # Log "create_message" activity
+    log = ActivityLogCreate(
+        user_id=current_user.id,
+        action="create_message",
+        timestamp=datetime.utcnow(),
+        metadata={"course_id": course_id, "thread_id": thread_id, "message_id": created["_id"]}
+    )
+    await create_activity_log(log)
+
     return ForumMessageOut(**created)
