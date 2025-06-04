@@ -1,6 +1,4 @@
-// src/app/forum/forum-list.component.ts
-
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule }      from '@angular/common';
 import {
   ReactiveFormsModule,
@@ -8,14 +6,14 @@ import {
   FormGroup,
   Validators
 } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 
 import { ForumService, ForumTopic, NewTopic } from '../services/forum.service';
 
 @Component({
   selector: 'app-forum-list',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule],
   template: `
     <div class="forum-list">
       <h3>Forums / Sujets</h3>
@@ -27,8 +25,11 @@ import { ForumService, ForumTopic, NewTopic } from '../services/forum.service';
       <div *ngIf="showNewTopicForm" class="new-topic-form">
         <form [formGroup]="newTopicForm" (ngSubmit)="createTopic()">
           <div>
-            <label for="title">Titre du sujet:</label>
+            <label for="title">Titre du sujet :</label>
             <input id="title" formControlName="title" placeholder="Titre" />
+            <div *ngIf="newTopicForm.get('title')?.touched && newTopicForm.get('title')?.invalid" class="error">
+              Le titre est requis.
+            </div>
           </div>
           <button type="submit" [disabled]="newTopicForm.invalid">
             Créer
@@ -45,7 +46,7 @@ import { ForumService, ForumTopic, NewTopic } from '../services/forum.service';
           <br />
           <small>
             Créé par {{ topic.author_id }} 
-            le {{ topic.created_at | date: 'short' }} 
+            le {{ topic.created_at | date:'short' }} 
             • {{ topic.messages.length }} message(s)
           </small>
         </li>
@@ -64,8 +65,7 @@ import { ForumService, ForumTopic, NewTopic } from '../services/forum.service';
   `]
 })
 export class ForumListComponent implements OnInit {
-  @Input() courseId!: string;
-
+  courseId!: string;              // now read from route, not Input
   topics: ForumTopic[] = [];
   loading = false;
   error: string | null = null;
@@ -85,12 +85,20 @@ export class ForumListComponent implements OnInit {
   }
 
   ngOnInit() {
+    // Read courseId from the route parameter "id"
+    const id = this.route.snapshot.paramMap.get('id');
+    if (!id) {
+      this.error = 'Identifiant de cours manquant';
+      return;
+    }
+    this.courseId = id;
     this.loadTopics();
   }
 
   loadTopics() {
     this.loading = true;
     this.error = null;
+
     this.forumSvc.listTopics(this.courseId).subscribe({
       next: (arr) => {
         this.topics = arr;
@@ -109,6 +117,7 @@ export class ForumListComponent implements OnInit {
 
   createTopic() {
     if (this.newTopicForm.invalid) return;
+
     const payload: NewTopic = {
       title: this.newTopicForm.value.title
     };
@@ -125,7 +134,10 @@ export class ForumListComponent implements OnInit {
   }
 
   goToTopic(topicId: string) {
-    // Navigate to the thread’s route
-    this.router.navigate([topicId], { relativeTo: this.route });
+    // Navigate to /courses/{courseId}/forums/{topicId}
+    this.router.navigate(
+      ['/courses', this.courseId, 'forums', topicId],
+      { relativeTo: this.route }
+    );
   }
 }

@@ -1,6 +1,4 @@
-// src/app/forum/forum-thread.component.ts
-
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule }      from '@angular/common';
 import {
   ReactiveFormsModule,
@@ -48,6 +46,9 @@ import { ForumService, ForumTopic, ForumMessage } from '../services/forum.servic
           <h4>Ajouter une réponse</h4>
           <form [formGroup]="messageForm" (ngSubmit)="postMessage()">
             <textarea formControlName="content" rows="3" placeholder="Votre message…"></textarea>
+            <div *ngIf="messageForm.get('content')?.touched && messageForm.get('content')?.invalid" class="error">
+              Le contenu est requis.
+            </div>
             <br />
             <button type="submit" [disabled]="messageForm.invalid || posting">
               {{ posting ? 'Envoi…' : 'Envoyer' }}
@@ -67,9 +68,9 @@ import { ForumService, ForumTopic, ForumMessage } from '../services/forum.servic
   `]
 })
 export class ForumThreadComponent implements OnInit {
-  @Input() courseId!: string;
-
+  courseId!: string;
   topicId!: string;
+
   topic?: ForumTopic;
   loadingTopic = false;
   errorTopic: string | null = null;
@@ -89,13 +90,23 @@ export class ForumThreadComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.topicId = this.route.snapshot.paramMap.get('threadId')!;
+    // Read both courseId and threadId from the URL
+    const cId = this.route.snapshot.paramMap.get('id');
+    const tId = this.route.snapshot.paramMap.get('threadId');
+
+    if (!cId || !tId) {
+      this.errorTopic = 'Identifiants manquants';
+      return;
+    }
+    this.courseId = cId;
+    this.topicId = tId;
     this.loadTopic();
   }
 
   loadTopic() {
     this.loadingTopic = true;
     this.errorTopic = null;
+
     this.forumSvc.getTopic(this.courseId, this.topicId).subscribe({
       next: (t) => {
         this.topic = t;
@@ -110,26 +121,16 @@ export class ForumThreadComponent implements OnInit {
 
   postMessage() {
     if (this.messageForm.invalid) return;
+
     this.posting = true;
     this.errorMessage = null;
     const content = this.messageForm.value.content;
+
     this.forumSvc.addMessage(this.courseId, this.topicId, content).subscribe({
       next: () => {
         this.messageForm.reset();
-        this.loadingTopic = true;
-        // Re-reload the topic (including the new message)
-        this.forumSvc.getTopic(this.courseId, this.topicId).subscribe({
-          next: (t) => {
-            this.topic = t;
-            this.loadingTopic = false;
-            this.posting = false;
-          },
-          error: (err) => {
-            this.errorTopic = err.error?.detail || 'Impossible de rafraîchir le sujet';
-            this.loadingTopic = false;
-            this.posting = false;
-          }
-        });
+        this.loadTopic();  // reload to fetch the new message
+        this.posting = false;
       },
       error: (err) => {
         this.errorMessage = err.error?.detail || 'Échec de l’envoi du message';
