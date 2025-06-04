@@ -15,7 +15,11 @@ users_collection         = db.get_collection("user")
 courses_collection       = db.get_collection("course")
 posts_collection         = db.get_collection("post")
 submissions_collection   = db.get_collection("submissions")
-activity_logs_collection = db.get_collection("activity_logs") 
+activity_logs_collection = db.get_collection("activity_logs")
+
+# Forum‐related collections
+threads_collection       = db.get_collection("threads")
+messages_collection      = db.get_collection("messages")
 
 # GridFS bucket for storing uploaded files
 fs = AsyncIOMotorGridFSBucket(db)

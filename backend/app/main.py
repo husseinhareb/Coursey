@@ -2,11 +2,14 @@
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routers import auth, course, user, post, submission, files
+
+from app.routers import auth, course, user, post, submission, files, forum
+from app.routers.activity import router as activity_router
+
 app = FastAPI()
 
 origins = [
-    "http://localhost:4200",  
+    "http://localhost:4200",
 ]
 
 app.add_middleware(
@@ -23,3 +26,5 @@ app.include_router(user.router)
 app.include_router(post.router)
 app.include_router(submission.router)
 app.include_router(files.router)
+app.include_router(forum.router)
+app.include_router(activity_router)

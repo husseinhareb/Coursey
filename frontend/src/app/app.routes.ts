@@ -18,10 +18,13 @@ import { AuthGuard } from './auth/auth.guard';
 import { SubmissionFormComponent } from './submissions/submission.component';
 import { SubmissionListComponent } from './submissions/submission-list.component';
 
-import { ActivityLogListComponent } from './activity-log-list/activity-log-list.component'; // ← import
+import { ActivityLogListComponent } from './activity-log-list/activity-log-list.component';
+
+import { ForumListComponent }    from './forum/forum-list.component';
+import { ForumThreadComponent }  from './forum/forum-thread.component';
 
 export const routes: Routes = [
-  // Public landing & auth
+  // Public landing & authentication
   { path: '', component: HomeComponent },
   { path: 'register', component: RegisterComponent },
   { path: 'login', component: LoginComponent },
@@ -76,6 +79,17 @@ export const routes: Routes = [
   {
     path: 'courses/:id/posts/:pid/submissions',
     component: SubmissionListComponent,
+    canActivate: [AuthGuard]
+  },
+
+  {
+    path: 'courses/:id/forums',
+    component: ForumListComponent,
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'courses/:id/forums/:topicId',
+    component: ForumThreadComponent,
     canActivate: [AuthGuard]
   },
 
