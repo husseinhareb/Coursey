@@ -1,21 +1,26 @@
 <!-- src/app/users/manage-enrollments.component.html -->
 
 <h2>Manage Enrollments</h2>
+
 <div *ngIf="loading">Loading…</div>
 <div *ngIf="error" class="error">{{ error }}</div>
 
-<table *ngIf="!loading">
+<div *ngIf="!loading && isTargetAdmin" class="warning">
+  Cannot enroll an admin in any courses.
+</div>
+
+<table *ngIf="!loading && !isTargetAdmin">
   <thead>
     <tr>
       <th>Course</th>
-      <th>Enrolled?</th>
+      <th>Enrolled</th>
     </tr>
   </thead>
   <tbody>
     <tr *ngFor="let c of courses">
       <td>{{ c.title }}</td>
       <td>
-        <!-- assign #cb, then pass cb.checked (a boolean) -->
+        <!-- disable checkbox for admins -->
         <input
           type="checkbox"
           #cb

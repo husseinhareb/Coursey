@@ -1,9 +1,9 @@
 // src/app/users/manage-enrollments.component.ts
 
-import { Component, OnInit } from '@angular/core';
-import { CommonModule }      from '@angular/common';
-import { ActivatedRoute }    from '@angular/router';
-import { CourseService, Course } from '../services/course.service';
+import { Component, OnInit }      from '@angular/core';
+import { CommonModule }            from '@angular/common';
+import { ActivatedRoute }          from '@angular/router';
+import { CourseService, Course }   from '../services/course.service';
 import { UserService, Enrollment } from '../services/user.service';
 
 @Component({
@@ -18,29 +18,62 @@ export class ManageEnrollmentsComponent implements OnInit {
   enrollments = new Set<string>();
   loading = true;
   error: string | null = null;
+  isTargetAdmin = false;
 
   constructor(
-    private route: ActivatedRoute,
+    private route:    ActivatedRoute,
     private courseSvc: CourseService,
-    private userSvc: UserService
+    private userSvc:   UserService
   ) {}
 
   ngOnInit() {
     this.userId = this.route.snapshot.params['id'];
-    // load both lists in parallel
-    this.courseSvc.list().subscribe({
-      next: cs => {
-        this.courses = cs;
-        this.userSvc.listEnrollments(this.userId).subscribe(enrs => {
-          enrs.forEach(e => this.enrollments.add(e.courseId));
+
+    // 1) Vérifier si l'utilisateur cible est admin
+    this.userSvc.getById(this.userId).subscribe({
+      next: user => {
+        const rolesLower = user.roles.map(r => r.toLowerCase());
+        this.isTargetAdmin = rolesLower.includes('admin');
+
+        if (this.isTargetAdmin) {
+          // On arrête ici : pas besoin de charger courses ni enrollments
           this.loading = false;
+          return;
+        }
+
+        // 2) Charger la liste des cours, puis les enrollments
+        this.courseSvc.list().subscribe({
+          next: cs => {
+            this.courses = cs;
+            this.userSvc.listEnrollments(this.userId).subscribe({
+              next: enrs => {
+                enrs.forEach(e => this.enrollments.add(e.courseId));
+                this.loading = false;
+              },
+              error: () => {
+                this.error = 'Failed to load user enrollments';
+                this.loading = false;
+              }
+            });
+          },
+          error: () => {
+            this.error = 'Failed to load courses';
+            this.loading = false;
+          }
         });
       },
-      error: err => { this.error = 'Load failed'; this.loading = false; }
+      error: () => {
+        this.error = 'Failed to load user data';
+        this.loading = false;
+      }
     });
   }
 
   toggle(courseId: string, checked: boolean) {
+    if (this.isTargetAdmin) {
+      return;
+    }
+
     if (checked) {
       this.userSvc.enroll(this.userId, courseId).subscribe({
         next: () => this.enrollments.add(courseId),
