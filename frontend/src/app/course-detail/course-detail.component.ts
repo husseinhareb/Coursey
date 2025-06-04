@@ -1,20 +1,19 @@
+// src/app/course-detail/course-detail.component.ts
+
 import { Component, OnInit, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule }     from '@angular/common';
 import {
   ReactiveFormsModule,
   FormBuilder,
   FormGroup,
   Validators
 } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+
+import { RouterModule }     from '@angular/router';   // ← import RouterModule
+import { ActivatedRoute }   from '@angular/router';
 
 import { CourseService, Course } from '../services/course.service';
-import {
-  PostService,
-  Post,
-  PostCreate,
-  PostUpdate
-} from '../services/post.service';
+import { PostService, Post }     from '../services/post.service';
 import { SubmissionFormComponent } from '../submissions/submission-form.component';
 import { SubmissionListComponent } from '../submissions/submission-list.component';
 
@@ -24,6 +23,7 @@ import { SubmissionListComponent } from '../submissions/submission-list.componen
   imports: [
     CommonModule,
     ReactiveFormsModule,
+    RouterModule,               // ← add RouterModule
     SubmissionFormComponent,
     SubmissionListComponent
   ],
@@ -49,26 +49,21 @@ export class CourseDetailComponent implements OnInit {
   /** Create/Edit post form toggles */
   showForm = false;        // whether to show the create/edit post form
   editing?: Post;          // if defined, we are editing that Post
-  postForm: FormGroup;
+  postForm: FormGroup = this.fb.group({
+    title:    ['', Validators.required],
+    content:  ['', Validators.required],
+    type:     ['', Validators.required],  // "lecture" | "reminder" | "homework"
+    fileId:   [''],
+    due_date: ['']  // ← FormControl for due_date
+  });
 
-  /** Which homework‐post (by _id) currently has the “Submit Homework” form open */
+  /** Which homework-post (by _id) currently has the “Submit Homework” form open */
   showSubmissionFormForPostId: string | null = null;
-  /** Which homework‐post (by _id) currently has the “View Submissions” list open */
+  /** Which homework-post (by _id) currently has the “View Submissions” list open */
   showSubmissionListForPostId: string | null = null;
 
   /** Expose courseId to the template (must be public) */
   public courseId!: string;
-
-  constructor() {
-    // Initialize form with all controls; due_date has no validators by default
-    this.postForm = this.fb.group({
-      title:    ['', Validators.required],
-      content:  ['', Validators.required],
-      type:     ['', Validators.required], // "lecture" | "reminder" | "homework"
-      fileId:   [''],
-      due_date: ['']
-    });
-  }
 
   ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
@@ -79,28 +74,17 @@ export class CourseDetailComponent implements OnInit {
     this.courseId = id;
     this.loadCourse();
     this.loadPosts();
-
-    // Whenever "type" changes, make "due_date" required if type === 'homework'
-    this.postForm.get('type')!.valueChanges.subscribe((type) => {
-      const dueCtrl = this.postForm.get('due_date');
-      if (type === 'homework') {
-        dueCtrl!.setValidators([Validators.required]);
-      } else {
-        dueCtrl!.clearValidators();
-      }
-      dueCtrl!.updateValueAndValidity();
-    });
   }
 
   /** Load course metadata */
   private loadCourse() {
     this.loadingCourse = true;
     this.courseSvc.get(this.courseId).subscribe({
-      next: (c) => {
+      next: c => {
         this.course = c;
         this.loadingCourse = false;
       },
-      error: (e) => {
+      error: e => {
         this.courseError = e.error?.detail || 'Failed to load course';
         this.loadingCourse = false;
       }
@@ -115,14 +99,14 @@ export class CourseDetailComponent implements OnInit {
         this.posts = ps;
         this.loadingPosts = false;
       },
-      error: (e) => {
+      error: e => {
         this.postsError = e.error?.detail || 'Failed to load posts';
         this.loadingPosts = false;
       }
     });
   }
 
-  /** Count how many un‐pinned posts there are (for arrows) */
+  /** Count how many un-pinned posts there are (for arrows) */
   get unpinnedCount(): number {
     return this.posts.filter(p => !p.ispinned).length;
   }
@@ -136,7 +120,7 @@ export class CourseDetailComponent implements OnInit {
     this.editing = post || undefined;
 
     if (post) {
-      // Patch the form with existing values, including due_date in the right format
+      // Patch the form with existing values, including due_date
       this.postForm.patchValue({
         title:    post.title,
         content:  post.content,
@@ -144,14 +128,14 @@ export class CourseDetailComponent implements OnInit {
         fileId:   post.file_id || '',
         due_date: post.due_date 
           ? this.formatForInput(post.due_date) 
-          : ''
+          : '' 
       });
     } else {
       this.postForm.reset();
     }
   }
 
-  /** Called when “Save” is clicked in the post‐form */
+  /** Called when “Save” is clicked in the post-form */
   savePost() {
     if (this.postForm.invalid) {
       return;
@@ -162,31 +146,29 @@ export class CourseDetailComponent implements OnInit {
       title: string;
       content: string;
       type: string;
-      fileId: string | null;
+      fileId: string;
       due_date: string;
     };
 
     // Convert form value to PostCreate / PostUpdate
-    const payload: PostCreate | PostUpdate = {
-      title:   raw.title,
-      content: raw.content,
-      type:    raw.type,
-      file_id: raw.fileId || undefined,
-      due_date: raw.due_date 
-        ? new Date(raw.due_date).toISOString() 
-        : undefined
+    const payload: any = {
+      title:    raw.title,
+      content:  raw.content,
+      type:     raw.type,
+      file_id:  raw.fileId || undefined,
+      due_date: raw.due_date ? new Date(raw.due_date).toISOString() : undefined
     };
 
     const obs = this.editing
-      ? this.postSvc.update(this.courseId, this.editing._id, payload as PostUpdate)
-      : this.postSvc.create(this.courseId, payload as PostCreate);
+      ? this.postSvc.update(this.courseId, this.editing._id, payload)
+      : this.postSvc.create(this.courseId, payload);
 
     obs.subscribe({
       next: () => {
         this.toggleForm();
         this.loadPosts();
       },
-      error: (e) => {
+      error: e => {
         this.postsError = e.error?.detail || 'Save failed';
       }
     });
@@ -199,7 +181,7 @@ export class CourseDetailComponent implements OnInit {
     }
     this.postSvc.delete(this.courseId, p._id).subscribe({
       next: () => this.loadPosts(),
-      error: (e) => (this.postsError = e.error?.detail || 'Delete failed')
+      error: e => (this.postsError = e.error?.detail || 'Delete failed')
     });
   }
 
@@ -208,31 +190,31 @@ export class CourseDetailComponent implements OnInit {
     if (p.ispinned) {
       this.postSvc.unpin(this.courseId, p._id).subscribe({
         next: () => this.loadPosts(),
-        error: (e) => (this.postsError = e.error?.detail || 'Unpin failed')
+        error: e => (this.postsError = e.error?.detail || 'Unpin failed')
       });
     } else {
       this.postSvc.pin(this.courseId, p._id).subscribe({
         next: () => this.loadPosts(),
-        error: (e) => (this.postsError = e.error?.detail || 'Pin failed')
+        error: e => (this.postsError = e.error?.detail || 'Pin failed')
       });
     }
   }
 
-  /** Move a non‐pinned post UP one slot among unpinned posts */
+  /** Move a non-pinned post UP one slot among unpinned posts */
   moveUp(p: Post) {
     if (p.ispinned) return;
     this.postSvc.moveUp(this.courseId, p._id).subscribe({
       next: () => this.loadPosts(),
-      error: (e) => (this.postsError = e.error?.detail || 'Move up failed')
+      error: e => (this.postsError = e.error?.detail || 'Move up failed')
     });
   }
 
-  /** Move a non‐pinned post DOWN one slot among unpinned posts */
+  /** Move a non-pinned post DOWN one slot among unpinned posts */
   moveDown(p: Post) {
     if (p.ispinned) return;
     this.postSvc.moveDown(this.courseId, p._id).subscribe({
       next: () => this.loadPosts(),
-      error: (e) => (this.postsError = e.error?.detail || 'Move down failed')
+      error: e => (this.postsError = e.error?.detail || 'Move down failed')
     });
   }
 
@@ -264,8 +246,7 @@ export class CourseDetailComponent implements OnInit {
       return;
     }
     const file = inputEl.files[0];
-    // TODO: actually upload `file` to backend, then patch `postForm` with returned file_id.
-    // For now, we just clear out any previous placeholder:
+    // TODO: upload `file` to backend and patch `postForm.patchValue({ fileId: returnedId })`.
     this.postForm.patchValue({ fileId: '' });
   }
 

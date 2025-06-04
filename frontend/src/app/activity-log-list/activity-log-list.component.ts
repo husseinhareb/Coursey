@@ -86,7 +86,6 @@ export class ActivityLogListComponent implements OnInit {
 
         // 1) Extraire les IDs d’utilisateur, de cours, de post
         const userIds: string[] = Array.from(new Set(logs.map(l => l.user_id)));
-        console.log('Will fetch these user IDs:', userIds);
 
         const courseIds: string[] = Array.from(new Set(
           logs
@@ -114,7 +113,6 @@ export class ActivityLogListComponent implements OnInit {
         const users$: Observable<(User | null)[]> = forkJoin(
           userIds.map(id =>
             this.userSvc.getById(id).pipe(
-              tap(rawUser => console.log('rawUser for', id, '→', rawUser)),
               catchError(() => of(null))
             )
           )
@@ -199,7 +197,6 @@ export class ActivityLogListComponent implements OnInit {
   ): EnrichedLog {
     // 1) Récupérer le User
     const userObj = userMap.get(raw.user_id) || null;
-    console.log("user objectsssss",userObj);
     // 2) Construire userName = "Prénom Nom"
     const userName = userObj
       ? `${userObj.profile.firstName} ${userObj.profile.lastName}`.trim()

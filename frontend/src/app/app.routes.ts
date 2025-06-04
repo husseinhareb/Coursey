@@ -20,11 +20,11 @@ import { SubmissionListComponent } from './submissions/submission-list.component
 
 import { ActivityLogListComponent } from './activity-log-list/activity-log-list.component';
 
-import { ForumListComponent }    from './forum/forum-list.component';
-import { ForumThreadComponent }  from './forum/forum-thread.component';
+import { ForumListComponent }   from './forum/forum-list.component';
+import { ForumThreadComponent } from './forum/forum-thread.component';
 
 export const routes: Routes = [
-  // Public landing & authentication
+  // Public landing & auth
   { path: '', component: HomeComponent },
   { path: 'register', component: RegisterComponent },
   { path: 'login', component: LoginComponent },
@@ -82,13 +82,14 @@ export const routes: Routes = [
     canActivate: [AuthGuard]
   },
 
+  // ▶︎ Course-specific forum routes (plural "forums")
   {
     path: 'courses/:id/forums',
     component: ForumListComponent,
     canActivate: [AuthGuard]
   },
   {
-    path: 'courses/:id/forums/:topicId',
+    path: 'courses/:id/forums/:threadId',
     component: ForumThreadComponent,
     canActivate: [AuthGuard]
   },

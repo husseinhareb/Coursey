@@ -6,6 +6,14 @@
 <div *ngIf="course">
   <h2>{{ course.title }}</h2>
   <p>{{ course.description }}</p>
+
+  <!-- ───── Button to go to this course’s forum ───── -->
+  <button
+    class="forum-link"
+    [routerLink]="['/courses', courseId, 'forums']"
+  >
+    View Course Forum
+  </button>
 </div>
 
 <hr />

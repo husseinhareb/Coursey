@@ -1,6 +1,13 @@
+// src/app/forum/forum-list.component.ts
+
 import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule }      from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import {
+  ReactiveFormsModule,
+  FormBuilder,
+  FormGroup,
+  Validators
+} from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 
 import { ForumService, ForumTopic, NewTopic } from '../services/forum.service';
@@ -118,7 +125,7 @@ export class ForumListComponent implements OnInit {
   }
 
   goToTopic(topicId: string) {
-    // Navigue vers la route du thread
+    // Navigate to the thread’s route
     this.router.navigate([topicId], { relativeTo: this.route });
   }
 }

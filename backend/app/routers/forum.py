@@ -1,14 +1,13 @@
+# /app/routers/forum.py
+
 from fastapi import APIRouter, Depends, HTTPException
 from typing import List
 from datetime import datetime
 from bson import ObjectId
 
 from app.schemas.forum import (
-    ForumThreadCreate,
-    ForumThreadOut,
-    ForumThreadDetail,
-    ForumMessageCreate,
-    ForumMessageOut
+    ForumMessageCreate, ForumMessageOut,
+    ForumThreadCreate, ForumThreadOut, ForumThreadDetail
 )
 from app.services.auth import get_current_active_user
 from app.schemas.user import UserDB
@@ -20,18 +19,22 @@ router = APIRouter(
     dependencies=[Depends(get_current_active_user)]
 )
 
-#
-# 1) Create a new forum thread under a given course
-#
+
 @router.post("/", response_model=ForumThreadOut)
 async def create_thread(
     course_id: str,
     thread_in: ForumThreadCreate,
     current_user: UserDB = Depends(get_current_active_user)
 ):
+    # Validate course_id is a valid ObjectId
+    try:
+        course_oid = ObjectId(course_id)
+    except:
+        raise HTTPException(status_code=400, detail="Invalid course ID")
+
     now = datetime.utcnow()
     doc = {
-        "course_id":   ObjectId(course_id),
+        "course_id":   course_oid,
         "title":       thread_in.title,
         "author_id":   ObjectId(current_user.id),
         "created_at":  now,
@@ -49,12 +52,14 @@ async def create_thread(
     return ForumThreadOut(**created)
 
 
-#
-# 2) List all threads for a given course
-#
 @router.get("/", response_model=List[ForumThreadOut])
 async def list_threads(course_id: str):
-    cursor = threads_collection.find({"course_id": ObjectId(course_id)})
+    try:
+        course_oid = ObjectId(course_id)
+    except:
+        raise HTTPException(status_code=400, detail="Invalid course ID")
+
+    cursor = threads_collection.find({"course_id": course_oid})
     out = []
     async for doc in cursor:
         doc["_id"]       = str(doc["_id"])
@@ -64,14 +69,22 @@ async def list_threads(course_id: str):
     return out
 
 
-#
-# 3) Get one thread, including its messages
-#
 @router.get("/{thread_id}", response_model=ForumThreadDetail)
 async def get_thread_detail(course_id: str, thread_id: str):
-    # Fetch the thread itself
-    thread_doc = await threads_collection.find_one({"_id": ObjectId(thread_id)})
-    if not thread_doc or str(thread_doc["course_id"]) != course_id:
+    # Validate IDs
+    try:
+        course_oid = ObjectId(course_id)
+        thread_oid = ObjectId(thread_id)
+    except:
+        raise HTTPException(status_code=400, detail="Invalid ID format")
+
+    # 1) Fetch the thread itself
+    thread_doc = await threads_collection.find_one({"_id": thread_oid})
+    if (
+        not thread_doc
+        or "course_id" not in thread_doc
+        or str(thread_doc["course_id"]) != course_id
+    ):
         raise HTTPException(status_code=404, detail="Thread not found")
 
     # Convert thread ObjectId → str
@@ -79,8 +92,8 @@ async def get_thread_detail(course_id: str, thread_id: str):
     thread_doc["course_id"] = str(thread_doc["course_id"])
     thread_doc["author_id"] = str(thread_doc["author_id"])
 
-    # Now fetch all messages under that thread
-    cursor = messages_collection.find({"thread_id": ObjectId(thread_id)})
+    # 2) Fetch all messages under that thread
+    cursor = messages_collection.find({"thread_id": thread_oid})
     messages_out = []
     async for msg in cursor:
         msg["_id"]       = str(msg["_id"])
@@ -91,9 +104,6 @@ async def get_thread_detail(course_id: str, thread_id: str):
     return ForumThreadDetail(**{**thread_doc, "messages": messages_out})
 
 
-#
-# 4) Post a new message under a specific thread
-#
 @router.post("/{thread_id}/messages", response_model=ForumMessageOut)
 async def create_message(
     course_id: str,
@@ -101,18 +111,29 @@ async def create_message(
     msg_in: ForumMessageCreate,
     current_user: UserDB = Depends(get_current_active_user)
 ):
+    # Validate IDs
+    try:
+        course_oid = ObjectId(course_id)
+        thread_oid = ObjectId(thread_id)
+    except:
+        raise HTTPException(status_code=400, detail="Invalid ID format")
+
     # Verify thread belongs to this course
-    thread_doc = await threads_collection.find_one({"_id": ObjectId(thread_id)})
-    if not thread_doc or str(thread_doc["course_id"]) != course_id:
+    thread_doc = await threads_collection.find_one({"_id": thread_oid})
+    if (
+        not thread_doc
+        or "course_id" not in thread_doc
+        or str(thread_doc["course_id"]) != course_id
+    ):
         raise HTTPException(status_code=404, detail="Thread not found")
 
     now = datetime.utcnow()
     msg_doc = {
-        "thread_id":    ObjectId(thread_id),
-        "author_id":    ObjectId(current_user.id),
-        "content":      msg_in.content,
-        "created_at":   now,
-        "updated_at":   now
+        "thread_id":   thread_oid,
+        "author_id":   ObjectId(current_user.id),
+        "content":     msg_in.content,
+        "created_at":  now,
+        "updated_at":  now
     }
     res = await messages_collection.insert_one(msg_doc)
     created = await messages_collection.find_one({"_id": res.inserted_id})

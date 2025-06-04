@@ -3,8 +3,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.routers import auth, course, user, post, submission, files, forum
+from app.routers import auth, course, user, post, submission, files
 from app.routers.activity import router as activity_router
+from app.routers.forum import router as forum_router
 
 app = FastAPI()
 
@@ -26,5 +27,5 @@ app.include_router(user.router)
 app.include_router(post.router)
 app.include_router(submission.router)
 app.include_router(files.router)
-app.include_router(forum.router)
 app.include_router(activity_router)
+app.include_router(forum_router) 

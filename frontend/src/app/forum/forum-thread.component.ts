@@ -1,6 +1,13 @@
+// src/app/forum/forum-thread.component.ts
+
 import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule }      from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import {
+  ReactiveFormsModule,
+  FormBuilder,
+  FormGroup,
+  Validators
+} from '@angular/forms';
 import { ActivatedRoute }    from '@angular/router';
 
 import { ForumService, ForumTopic, ForumMessage } from '../services/forum.service';
@@ -82,7 +89,7 @@ export class ForumThreadComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.topicId = this.route.snapshot.paramMap.get('topicId')!;
+    this.topicId = this.route.snapshot.paramMap.get('threadId')!;
     this.loadTopic();
   }
 
@@ -110,7 +117,7 @@ export class ForumThreadComponent implements OnInit {
       next: () => {
         this.messageForm.reset();
         this.loadingTopic = true;
-        // Re-charger tout le topic (y compris le nouveau message)
+        // Re-reload the topic (including the new message)
         this.forumSvc.getTopic(this.courseId, this.topicId).subscribe({
           next: (t) => {
             this.topic = t;
