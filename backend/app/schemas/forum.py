@@ -1,6 +1,7 @@
 from pydantic import BaseModel, Field
 from typing import List, Optional
 from datetime import datetime
+import base64
 
 
 # ─── When the client POSTs a new thread, we only need "title" ───
@@ -17,8 +18,6 @@ class ForumThreadDB(BaseModel):
     created_at:  datetime
     updated_at:  datetime
     # NOTE: messages themselves are fetched separately in get-thread-detail
-    # So we don't list them here for "out" in list; the detail endpoint includes them.
-
 
     model_config = {
         "populate_by_name": True,
@@ -37,16 +36,22 @@ class ForumThreadOut(ForumThreadDB):
 
 # ─── When showing one thread WITH its messages ───
 class ForumMessageOut(BaseModel):
-    id:         str        = Field(..., alias="_id")
-    thread_id:  str
-    author_id:  str
-    content:    str
-    created_at: datetime
+    id:          str        = Field(..., alias="_id")
+    thread_id:   str
+    author_id:   str
+    content:     Optional[str]       # may be None if the message only has an image
+    image_data:  Optional[bytes]     # raw bytes stored in MongoDB
+
+    created_at:  datetime
 
     model_config = {
         "populate_by_name": True,
         "from_attributes":  True,
-        "json_encoders":    { datetime: lambda dt: dt.isoformat() }
+        # datetime → isostring, bytes → base64‐encoded string
+        "json_encoders": {
+            datetime: lambda dt: dt.isoformat(),
+            bytes:    lambda b: base64.b64encode(b).decode("utf-8")
+        }
     }
 
 
@@ -57,6 +62,7 @@ class ForumThreadDetail(ForumThreadDB):
     messages: List[ForumMessageOut] = []
 
 
-# ─── When client POSTs a new message to a thread, only "content" is required ───
-class ForumMessageCreate(BaseModel):
-    content: str
+# ─── We still require only "content" or an image when the client POSTs a new message ───
+#    However, since FastAPI needs to read them from Form/File, we no longer need a Pydantic model here.
+#    The router will read content via `Form(...)` and image via `UploadFile`.
+# ───

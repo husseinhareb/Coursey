@@ -1,17 +1,20 @@
 // src/app/services/forum.service.ts
 
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../environments/environment';
 
+
 export interface ForumMessage {
-  _id:       string;
-  thread_id: string;
-  author_id: string;
-  content:   string;
+  _id:        string;
+  thread_id:  string;
+  author_id:  string;
+  content?:   string;
+  image_data?: string;   // Base64 string
   created_at: string;
 }
+
 
 export interface ForumTopic {
   _id:        string;
@@ -78,15 +81,19 @@ export class ForumService {
     );
   }
 
-  /** Add a message to the topic */
+  /**
+   * Add a message to the topic, possibly with an image.
+   * We accept FormData so that the component can append both 'content' and 'image'.
+   */
   addMessage(
     courseId: string,
     topicId: string,
-    content: string
+    payload: FormData
   ): Observable<ForumMessage> {
     return this.http.post<ForumMessage>(
       `${this.base}/${courseId}/forums/${topicId}/messages`,
-      { content }
+      payload
+      // NOTE: Angular will automatically set Content-Type to multipart/form-data with the proper boundary.
     );
   }
 }

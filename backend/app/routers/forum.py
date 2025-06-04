@@ -1,7 +1,6 @@
-# app/routers/forum.py
-
-from fastapi import APIRouter, Depends, HTTPException
-from typing import List
+import os
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form
+from typing import List, Optional
 from datetime import datetime
 from bson import ObjectId
 
@@ -9,8 +8,7 @@ from app.schemas.forum import (
     ForumThreadCreate,
     ForumThreadOut,
     ForumThreadDetail,
-    ForumMessageCreate,
-    ForumMessageOut
+    ForumMessageOut,
 )
 from app.services.auth import get_current_active_user
 from app.schemas.user import UserDB
@@ -36,7 +34,6 @@ async def create_thread(
     thread_in: ForumThreadCreate,
     current_user: UserDB = Depends(get_current_active_user)
 ):
-    # Validate that course_id is a proper ObjectId
     try:
         course_obj = ObjectId(course_id)
     except:
@@ -141,6 +138,9 @@ async def get_thread_detail(
         msg["_id"]       = str(msg["_id"])
         msg["thread_id"] = str(msg["thread_id"])
         msg["author_id"] = str(msg["author_id"])
+        # If missing keys, ensure they exist
+        msg["content"]    = msg.get("content")    # may be None
+        msg["image_data"] = msg.get("image_data") # may be None
         messages_out.append(ForumMessageOut(**msg).dict())
 
     # Log "view_thread" activity
@@ -156,13 +156,14 @@ async def get_thread_detail(
 
 
 #
-# 4) Post a new message under a specific thread
+# 4) Post a new message under a specific thread (with optional image)
 #
 @router.post("/{thread_id}/messages", response_model=ForumMessageOut)
 async def create_message(
     course_id: str,
     thread_id: str,
-    msg_in: ForumMessageCreate,
+    content: Optional[str] = Form(None),
+    image: Optional[UploadFile] = File(None),
     current_user: UserDB = Depends(get_current_active_user)
 ):
     # Validate IDs
@@ -177,22 +178,39 @@ async def create_message(
     if not thread_doc or str(thread_doc["course_id"]) != course_id:
         raise HTTPException(status_code=404, detail="Thread not found")
 
+    if not content and not image:
+        raise HTTPException(status_code=400, detail="Either `content` or an `image` must be provided")
+
     now = datetime.utcnow()
-    msg_doc = {
+    msg_doc: dict = {
         "thread_id":  thread_obj,
         "author_id":  ObjectId(current_user.id),
-        "content":    msg_in.content,
         "created_at": now,
         "updated_at": now
     }
+
+    # If text content was provided, store it
+    if content:
+        msg_doc["content"] = content
+
+    # If an image was uploaded, read its bytes and store under `image_data`
+    if image:
+        raw_bytes = await image.read()
+        msg_doc["image_data"] = raw_bytes
+
+    # Insert into MongoDB
     res = await messages_collection.insert_one(msg_doc)
     created = await messages_collection.find_one({"_id": res.inserted_id})
     if not created:
         raise HTTPException(status_code=500, detail="Message creation failed")
 
+    # Convert ObjectId → str for Pydantic
     created["_id"]       = str(created["_id"])
     created["thread_id"] = str(created["thread_id"])
     created["author_id"] = str(created["author_id"])
+    # Make sure missing keys are explicit
+    created["content"]    = created.get("content")
+    created["image_data"] = created.get("image_data")
 
     # Also update thread's updated_at
     await forums_collection.update_one(
@@ -205,7 +223,11 @@ async def create_message(
         user_id=current_user.id,
         action="create_message",
         timestamp=datetime.utcnow(),
-        metadata={"course_id": course_id, "thread_id": thread_id, "message_id": created["_id"]}
+        metadata={
+            "course_id":  course_id,
+            "thread_id":  thread_id,
+            "message_id": created["_id"]
+        }
     )
     await create_activity_log(log)
 
