@@ -14,6 +14,8 @@ import { ActivatedRoute }   from '@angular/router';
 
 import { CourseService, Course } from '../services/course.service';
 import { PostService, Post }     from '../services/post.service';
+import { SubmissionService, Submission } from '../services/submission.service';
+
 import { SubmissionFormComponent } from '../submissions/submission-form.component';
 import { SubmissionListComponent } from '../submissions/submission-list.component';
 
@@ -38,6 +40,7 @@ export class CourseDetailComponent implements OnInit {
   private route     = inject(ActivatedRoute);
   private courseSvc = inject(CourseService);
   private postSvc   = inject(PostService);
+  private submissionSvc = inject(SubmissionService);
   private auth      = inject(AuthService);
 
   /** The current course object */
@@ -50,6 +53,12 @@ export class CourseDetailComponent implements OnInit {
   loadingPosts = false;
   postsError: string | null = null;
 
+  /**
+   * Dictionary of “this student’s submission” for each homework post.
+   * Key = postId, Value = Submission
+   */
+  studentSubmissions: { [postId: string]: Submission } = {};
+
   /** Create/Edit post form toggles */
   showForm = false;        // whether to show the create/edit post form
   editing?: Post;          // if defined, we are editing that Post
@@ -61,10 +70,15 @@ export class CourseDetailComponent implements OnInit {
     due_date: ['']
   });
 
-  /** Which homework-post (by _id) currently has the “Submit Homework” form open */
+  /** Which homework‐post (by _id) currently has the “Submit Homework” form open */
   showSubmissionFormForPostId: string | null = null;
-  /** Which homework-post (by _id) currently has the “View Submissions” list open */
+  /** Which homework‐post (by _id) currently has the “View All Submissions” list open */
   showSubmissionListForPostId: string | null = null;
+
+  /**
+   * Which homework‐post (by _id) currently has the “View My Submission” list open for a student
+   */
+  public showOwnSubmissionListForPostId: string | null = null;
 
   /** Expose courseId to the template (must be public) */
   public courseId!: string;
@@ -83,22 +97,29 @@ export class CourseDetailComponent implements OnInit {
     }
     this.courseId = id;
 
-    // 1) Charger le profil pour déterminer rôles & enrollments
+    // 1) Load profile to determine roles & enrollments
     this.auth.user$.subscribe({
       next: user => {
         this.currentUser = user;
         this.computePermissions();
+
+        // As soon as we know the user is a student AND if posts are already loaded,
+        // fetch their existing submissions.
+        if (this.isStudentInCourse && this.posts.length > 0) {
+          this.loadStudentSubmissions();
+        }
       },
       error: () => {
         this.currentUser = null;
         this.computePermissions();
+        // no student submissions if not logged in
       }
     });
 
-    // 2) Charger les détails du cours
+    // 2) Load course details
     this.loadCourse();
 
-    // 3) Charger la liste des posts
+    // 3) Load list of posts
     this.loadPosts();
   }
 
@@ -112,13 +133,11 @@ export class CourseDetailComponent implements OnInit {
     const rolesLower = this.currentUser.roles.map(r => r.toLowerCase());
     this.isAdmin = rolesLower.includes('admin');
 
-    // Parcourir enrollments pour déterminer présence dans ce cours
+    // Find enrollment for this course
     const found = (this.currentUser.enrollments as Enrollment[]).find(
       (e: Enrollment) => e.courseId === this.courseId
     );
     if (found) {
-      // Si on stocke e.role, vérifier e.role === 'teacher' ou 'student'
-      // Par défaut, on traite comme professeur :
       this.isProfessorInCourse = rolesLower.includes('teacher');
       this.isStudentInCourse   = rolesLower.includes('student');
     } else {
@@ -127,7 +146,7 @@ export class CourseDetailComponent implements OnInit {
     }
   }
 
-  /** Si admin OU professeur inscrit, on peut créer/éditer/pinner/mover/delete */
+  /** If admin OR professor, they can create/edit/pin/move/delete */
   get canModifyPosts(): boolean {
     return this.isAdmin || this.isProfessorInCourse;
   }
@@ -147,13 +166,19 @@ export class CourseDetailComponent implements OnInit {
     });
   }
 
-  /** Load all posts */
+  /** Load all posts, then (if student) load that student’s submission for each homework */
   private loadPosts() {
     this.loadingPosts = true;
     this.postSvc.list(this.courseId).subscribe({
       next: (ps: Post[]) => {
         this.posts = ps;
         this.loadingPosts = false;
+
+        // If current user was already marked as “student” (from auth.user$.subscribe),
+        // fetch their submission now that posts are in memory
+        if (this.isStudentInCourse && this.currentUser) {
+          this.loadStudentSubmissions();
+        }
       },
       error: e => {
         this.postsError = e.error?.detail || 'Failed to load posts';
@@ -162,15 +187,42 @@ export class CourseDetailComponent implements OnInit {
     });
   }
 
-  /** Count how many un-pinned posts there are (for arrows) */
+  /**
+   * For every homework post, call submissionSvc.list(...) and pick out
+   * the submission whose student_id == currentUser._id (if any).
+   */
+  private loadStudentSubmissions() {
+    if (!this.currentUser) {
+      return;
+    }
+
+    this.posts
+      .filter(p => p.type === 'homework')
+      .forEach(p => {
+        this.submissionSvc.list(this.courseId, p._id).subscribe({
+          next: (subs: Submission[]) => {
+            const mine = subs.find(s => s.student_id === this.currentUser!.id);
+            if (mine) {
+              this.studentSubmissions[p._id] = mine;
+            } else {
+              delete this.studentSubmissions[p._id];
+            }
+          },
+          error: () => {
+            delete this.studentSubmissions[p._id];
+          }
+        });
+      });
+  }
+
+  /** Count how many unpinned posts there are (for arrows) */
   get unpinnedCount(): number {
     return this.posts.filter(p => !p.ispinned).length;
   }
 
   /**
    * Toggle showing the create/edit form. 
-   * Only profs inscrits et admins.
-   * If `post` is passed, we are in “edit” mode.
+   * Only professors/admins. If `post` is passed, we are in “edit” mode.
    */
   toggleForm(post?: Post) {
     if (!this.canModifyPosts) return;
@@ -194,14 +246,13 @@ export class CourseDetailComponent implements OnInit {
     }
   }
 
-  /** Called when “Save” is clicked in the post-form */
+  /** Called when “Save” is clicked in the post‐form */
   savePost() {
     if (!this.canModifyPosts) return;
     if (this.postForm.invalid) {
       return;
     }
 
-    // Build the payload from form values
     const raw = this.postForm.value as {
       title: string;
       content: string;
@@ -210,7 +261,6 @@ export class CourseDetailComponent implements OnInit {
       due_date: string;
     };
 
-    // Convert form value to PostCreate / PostUpdate
     const payload: any = {
       title:    raw.title,
       content:  raw.content,
@@ -226,7 +276,7 @@ export class CourseDetailComponent implements OnInit {
     obs.subscribe({
       next: () => {
         this.toggleForm();
-        this.loadPosts();
+        this.loadPosts(); // reload posts (and then reload student submissions)
       },
       error: e => {
         this.postsError = e.error?.detail || 'Save failed';
@@ -262,7 +312,7 @@ export class CourseDetailComponent implements OnInit {
     }
   }
 
-  /** Move a non-pinned post UP one slot among unpinned posts */
+  /** Move a non‐pinned post UP one slot among unpinned posts */
   moveUp(p: Post) {
     if (!this.canModifyPosts || p.ispinned) return;
     this.postSvc.moveUp(this.courseId, p._id).subscribe({
@@ -271,7 +321,7 @@ export class CourseDetailComponent implements OnInit {
     });
   }
 
-  /** Move a non-pinned post DOWN one slot among unpinned posts */
+  /** Move a non‐pinned post DOWN one slot among unpinned posts */
   moveDown(p: Post) {
     if (!this.canModifyPosts || p.ispinned) return;
     this.postSvc.moveDown(this.courseId, p._id).subscribe({
@@ -287,17 +337,18 @@ export class CourseDetailComponent implements OnInit {
       this.showSubmissionFormForPostId === postId ? null : postId;
   }
 
-  /** Toggle showing the “View Submissions” list for a given postId */
+  /** Toggle showing the “View All Submissions” list for a given postId */
   toggleSubmissionList(postId: string) {
     if (!this.canModifyPosts) return;
     this.showSubmissionListForPostId =
       this.showSubmissionListForPostId === postId ? null : postId;
   }
 
-  /** Called when a submission has just been completed: hide the form & refresh list */
+  /** Called when a submission has just been completed: hide the form & refresh */
   onSubmissionCompleted() {
     this.showSubmissionFormForPostId = null;
-    // The <app-submission-list> child auto-reloads its data.
+    // Reload the student’s single submission for that post
+    this.loadStudentSubmissions();
   }
 
   /** Called when the file input changes. Stub for upload logic. */

@@ -1,3 +1,5 @@
+// src/app/submissions/submission-list.component.ts
+
 import { Component, Input, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
@@ -7,6 +9,7 @@ import {
   Validators
 } from '@angular/forms';
 
+import { AuthService, Me } from '../auth/auth.service';
 import {
   SubmissionService,
   Submission,
@@ -14,6 +17,7 @@ import {
 } from '../services/submission.service';
 import { PostService, Post } from '../services/post.service';
 import { environment } from '../environments/environment';
+import { Enrollment } from '../services/user.service';
 
 @Component({
   selector: 'app-submission-list',
@@ -21,7 +25,9 @@ import { environment } from '../environments/environment';
   imports: [CommonModule, ReactiveFormsModule],
   template: `
     <div class="submission-list">
-      <h4>Toutes les soumissions</h4>
+      <!-- Title adapts to role -->
+      <h4 *ngIf="canViewAll">Toutes les soumissions</h4>
+      <h4 *ngIf="!canViewAll">Vos soumissions</h4>
 
       <div *ngIf="loading">Chargement des soumissions…</div>
       <div *ngIf="error" class="error">{{ error }}</div>
@@ -34,19 +40,23 @@ import { environment } from '../environments/environment';
       >
         <thead>
           <tr>
-            <th>Étudiant·e</th>
+            <!-- Only professors/admins see the student column -->
+            <th *ngIf="canViewAll">Étudiant·e</th>
             <th>Fichier</th>
-            <th>Soumis à</th>
-            <th>Date limite</th>
+            <th>Soumis le</th>
+            <th>Due Date</th>
             <th>Statut</th>
             <th>Note</th>
             <th>Commentaire</th>
-            <th>Actions</th>
+            <!-- Only professors/admins can grade -->
+            <th *ngIf="canGrade">Actions</th>
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let s of submissions">
-            <td>{{ s.firstName || '—' }} {{ s.lastName || '' }}</td>
+          <tr *ngFor="let s of displayedSubmissions">
+            <td *ngIf="canViewAll">
+              {{ s.firstName || '—' }} {{ s.lastName || '' }}
+            </td>
             <td>
               <ng-container *ngIf="s.file_name && s.file_id; else noFile">
                 <a
@@ -79,7 +89,7 @@ import { environment } from '../environments/environment';
             </td>
             <td>{{ s.grade != null ? s.grade : '—' }}</td>
             <td>{{ s.comment != null ? s.comment : '—' }}</td>
-            <td>
+            <td *ngIf="canGrade">
               <button
                 *ngIf="s.status !== 'graded'"
                 (click)="startGrading(s._id)"
@@ -88,13 +98,23 @@ import { environment } from '../environments/environment';
               </button>
             </td>
           </tr>
-          <tr *ngIf="submissions.length === 0">
-            <td colspan="8">Aucune soumission pour le moment.</td>
-          </tr>
+
+          <!-- “No submissions” row (with proper interpolation inside <td>) -->
+          <tr *ngIf="displayedSubmissions.length === 0">
+  <td [attr.colspan]="canViewAll ? 8 : 7">
+    {{ 
+      canViewAll 
+        ? 'Aucune soumission pour le moment.' 
+        : 'Vous n\'avez pas encore soumis.' 
+    }}
+  </td>
+</tr>
+
         </tbody>
       </table>
 
-      <div *ngIf="gradingSubmissionId" class="grading-form">
+      <!-- Grading Form (only visible to prof/admin) -->
+      <div *ngIf="gradingSubmissionId && canGrade" class="grading-form">
         <h5>Noter la soumission</h5>
         <form [formGroup]="gradeForm" (ngSubmit)="submitGrade()">
           <div>
@@ -201,82 +221,150 @@ import { environment } from '../environments/environment';
         border-radius: 0.25rem;
         font-size: 0.85em;
       }
-    `,
-  ],
+    `
+  ]
 })
 export class SubmissionListComponent implements OnInit {
   @Input() courseId!: string;
   @Input() postId!: string;
 
+  private auth = inject(AuthService);
   private svc = inject(SubmissionService);
   private postSvc = inject(PostService);
   private fb = inject(FormBuilder);
 
-  submissions: Submission[] = [];
+  currentUser: Me | null = null;
+  isAdmin = false;
+  isProfessorInCourse = false;
+  isStudentInCourse = false;
+
+  /** All fetched submissions */
+  private allSubmissions: Submission[] = [];
+  /** Filtered: either all submissions or just the current user’s */
+  displayedSubmissions: Submission[] = [];
+
   loading = false;
   error: string | null = null;
 
   /**
-   * The post’s due_date as a real Date object (or null if none).
-   * We convert the ISO‐string from the API into a Date so the `date` pipe can render it.
+   * Parsed due date of the post, used in the “Due Date” column.
    */
   postDueDate: Date | null = null;
 
-  // Grading state
+  // Grading form state (professor/admin only)
   gradingSubmissionId: string | null = null;
   gradeForm: FormGroup = this.fb.group({
     grade: [
       null,
-      [Validators.required, Validators.min(0), Validators.max(100)],
+      [Validators.required, Validators.min(0), Validators.max(100)]
     ],
-    comment: ['', Validators.required],
+    comment: ['', Validators.required]
   });
   gradingLoading = false;
   gradingError: string | null = null;
 
-  ngOnInit() {
-    this.fetchPostDueDate();
-    this.fetchSubmissions();
+  /** Computed flags **/
+  get canViewAll(): boolean {
+    return this.isAdmin || this.isProfessorInCourse;
+  }
+  get canGrade(): boolean {
+    return this.canViewAll;
   }
 
-  /** Fetch the parent post to read its due_date */
+  ngOnInit() {
+    // Subscribe to the user stream to determine roles and load submissions
+    this.auth.user$.subscribe({
+      next: (user) => {
+        this.currentUser = user;
+        this.computePermissions();
+        this.fetchPostDueDate();
+        this.fetchSubmissions();
+      },
+      error: () => {
+        this.currentUser = null;
+        this.computePermissions();
+        this.fetchPostDueDate();
+        this.fetchSubmissions();
+      }
+    });
+  }
+
+  /** Determine if currentUser is admin/professor/student in this course */
+  private computePermissions() {
+    if (!this.currentUser) {
+      this.isAdmin = false;
+      this.isProfessorInCourse = false;
+      this.isStudentInCourse = false;
+      return;
+    }
+
+    const rolesLower = this.currentUser.roles.map(r => r.toLowerCase());
+    this.isAdmin = rolesLower.includes('admin');
+
+    const found: Enrollment | undefined =
+      (this.currentUser.enrollments as Enrollment[]).find(
+        (e: Enrollment) => e.courseId === this.courseId
+      );
+
+    if (found) {
+      this.isProfessorInCourse = rolesLower.includes('teacher');
+      this.isStudentInCourse = rolesLower.includes('student');
+    } else {
+      this.isProfessorInCourse = false;
+      this.isStudentInCourse = false;
+    }
+  }
+
+  /** Load the parent post to extract its due date (if any) */
   private fetchPostDueDate() {
     this.postSvc.get(this.courseId, this.postId).subscribe({
       next: (post: Post) => {
-        if (post.due_date) {
-          // Convert ISO string → Date so the date pipe can format it
-          this.postDueDate = new Date(post.due_date);
-        } else {
-          console.warn(
-            `[SubmissionList] pas de due_date sur le post ${this.postId}`
-          );
-          this.postDueDate = null;
-        }
+        this.postDueDate = post.due_date ? new Date(post.due_date) : null;
       },
-      error: (err: any) => {
-        console.error('Impossible de charger la date limite :', err);
+      error: () => {
         this.postDueDate = null;
-      },
+      }
     });
   }
 
-  fetchSubmissions() {
-    this.loading = true;
-    this.error = null;
-    this.svc.list(this.courseId, this.postId).subscribe({
-      next: (arr: Submission[]) => {
-        this.submissions = arr;
-        this.loading = false;
-      },
-      error: (err: any) => {
-        this.error =
-          err.error?.detail || 'Impossible de charger les soumissions';
-        this.loading = false;
-      },
-    });
-  }
+  /** Fetch all submissions, then filter for display */
+  private fetchSubmissions() {
+  this.loading = true;
+  this.error = null;
+  this.svc.list(this.courseId, this.postId).subscribe({
+    next: (subs: Submission[]) => {
+      console.log('raw submissions from server:', subs);
+      this.allSubmissions = subs;
+      this.applyDisplayFilter();
+      console.log('after filter, displayedSubmissions =', this.displayedSubmissions);
+      this.loading = false;
+    },
+    error: (err: any) => {
+      this.error =
+        err.error?.detail || 'Impossible de charger les soumissions';
+      this.loading = false;
+    }
+  });
+}
 
-  /** Convert the raw status into a French label */
+
+  /** Decide which submissions to show based on role */
+  private applyDisplayFilter() {
+  if (this.canViewAll) {
+    // Professors/admins see every submission
+    this.displayedSubmissions = [...this.allSubmissions];
+  } else if (this.isStudentInCourse && this.currentUser) {
+    // Students see only submissions where studentId matches their _id:
+    this.displayedSubmissions = this.allSubmissions.filter(
+      s => (s as any).studentId === this.currentUser!.id
+    );
+  } else {
+    this.displayedSubmissions = [];
+  }
+}
+
+
+  /** Human-friendly French status labels */
   formatStatus(raw: string): string {
     switch (raw) {
       case 'submitted':
@@ -290,17 +378,20 @@ export class SubmissionListComponent implements OnInit {
     }
   }
 
+  /** Begin grading flow for a specific submission */
   startGrading(submissionId: string) {
     this.gradingSubmissionId = submissionId;
     this.gradeForm.reset();
     this.gradingError = null;
   }
 
+  /** Cancel grading form */
   cancelGrading() {
     this.gradingSubmissionId = null;
     this.gradingError = null;
   }
 
+  /** Submit a grade + comment to the backend */
   submitGrade() {
     if (!this.gradingSubmissionId || this.gradeForm.invalid) {
       return;
@@ -309,7 +400,7 @@ export class SubmissionListComponent implements OnInit {
 
     const payload: SubmissionGrade = {
       grade: this.gradeForm.value.grade!,
-      comment: this.gradeForm.value.comment!,
+      comment: this.gradeForm.value.comment!
     };
 
     this.svc
@@ -323,16 +414,18 @@ export class SubmissionListComponent implements OnInit {
         next: () => {
           this.gradingLoading = false;
           this.gradingSubmissionId = null;
+          // Reload submissions (so the “grade” and “status” update)
           this.fetchSubmissions();
         },
         error: (err: any) => {
           this.gradingError =
             err.error?.detail || 'Échec de l’enregistrement de la note';
           this.gradingLoading = false;
-        },
+        }
       });
   }
 
+  /** Build the file download URL from the file ID */
   getFileUrl(fileId: string): string {
     return `${environment.apiUrl}/files/${fileId}`;
   }

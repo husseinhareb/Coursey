@@ -16,13 +16,15 @@
     <li *ngIf="auth.isLoggedIn">
       <a routerLink="/home" routerLinkActive="active">Home</a>
     </li>
-    <li *ngIf="auth.isLoggedIn">
+    <!-- Only admin sees Users -->
+    <li *ngIf="auth.isLoggedIn && isAdmin">
       <a routerLink="/users" routerLinkActive="active">Users</a>
     </li>
     <li *ngIf="auth.isLoggedIn">
       <a routerLink="/courses" routerLinkActive="active">Courses</a>
     </li>
-    <li *ngIf="auth.isLoggedIn">
+    <!-- Only admin sees Activity Logs -->
+    <li *ngIf="auth.isLoggedIn && isAdmin">
       <a routerLink="/activity-logs" routerLinkActive="active">Activity Logs</a>
     </li>
     <li *ngIf="auth.isLoggedIn">

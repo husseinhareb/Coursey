@@ -183,34 +183,26 @@
       <br />
       <strong>Homework Actions:</strong><br />
 
-      <!-- Submit Homework (seulement étudiants inscrits) -->
-      <button
-        *ngIf="isStudentInCourse"
-        (click)="toggleSubmissionForm(p._id)"
-        class="submit-btn"
+      <!-- 1) Student: if they have not yet submitted, show Submit button -->
+      <div
+        *ngIf="
+          isStudentInCourse &&
+          !studentSubmissions[p._id] &&
+          showSubmissionFormForPostId !== p._id
+        "
       >
-        {{
-          showSubmissionFormForPostId === p._id
-            ? 'Cancel Submit'
-            : 'Submit Homework'
-        }}
-      </button>
+        <button (click)="toggleSubmissionForm(p._id)" class="submit-btn">
+          Submit Homework
+        </button>
+      </div>
 
-      <!-- View All Submissions (seulement profs inscrits et admins) -->
-      <button
-        *ngIf="canModifyPosts"
-        (click)="toggleSubmissionList(p._id)"
-        class="view-submissions-btn"
+      <!-- 2) Student: submission form -->
+      <div
+        *ngIf="
+          showSubmissionFormForPostId === p._id &&
+          isStudentInCourse
+        "
       >
-        {{
-          showSubmissionListForPostId === p._id
-            ? 'Hide Submissions'
-            : 'View All Submissions'
-        }}
-      </button>
-
-      <!-- Submission Form for Students -->
-      <div *ngIf="showSubmissionFormForPostId === p._id && isStudentInCourse">
         <app-submission-form
           [courseId]="courseId"
           [postId]="p._id"
@@ -219,9 +211,54 @@
         ></app-submission-form>
       </div>
 
-      <!-- Submission List for Teachers/Admins -->
+      <!-- 3) ALWAYS show “View My Submission” to any enrolled student -->
       <div
-        *ngIf="showSubmissionListForPostId === p._id && canModifyPosts"
+        *ngIf="
+          isStudentInCourse &&
+          showOwnSubmissionListForPostId !== p._id
+        "
+      >
+        <button
+          (click)="showOwnSubmissionListForPostId = p._id"
+          class="view-own-submission-btn"
+        >
+          View My Submission
+        </button>
+      </div>
+
+      <!-- 4) Student: show their own submission list when button is clicked -->
+      <div
+        *ngIf="
+          isStudentInCourse &&
+          showOwnSubmissionListForPostId === p._id
+        "
+        class="own-submission-container"
+      >
+        <app-submission-list
+          [courseId]="courseId"
+          [postId]="p._id"
+        ></app-submission-list>
+        <button (click)="showOwnSubmissionListForPostId = null">
+          Hide My Submission
+        </button>
+      </div>
+
+      <!-- 5) Professor/Admin: toggle “View All Submissions” -->
+      <div *ngIf="canModifyPosts">
+        <button (click)="toggleSubmissionList(p._id)" class="view-submissions-btn">
+          {{
+            showSubmissionListForPostId === p._id
+              ? 'Hide Submissions'
+              : 'View All Submissions'
+          }}
+        </button>
+      </div>
+
+      <!-- 6) Professor/Admin: show full submission list -->
+      <div
+        *ngIf="
+          showSubmissionListForPostId === p._id && canModifyPosts
+        "
         class="submissions-container"
       >
         <app-submission-list
