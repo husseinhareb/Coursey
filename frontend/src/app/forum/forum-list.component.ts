@@ -96,20 +96,21 @@ export class ForumListComponent implements OnInit {
   }
 
   loadTopics() {
-    this.loading = true;
-    this.error = null;
+  this.loading = true;
+  this.error = null;
 
-    this.forumSvc.listTopics(this.courseId).subscribe({
-      next: (arr) => {
-        this.topics = arr;
-        this.loading = false;
-      },
-      error: (err) => {
-        this.error = err.error?.detail || 'Échec du chargement';
-        this.loading = false;
-      }
-    });
-  }
+  this.forumSvc.listTopics(this.courseId).subscribe({
+    next: arr => {
+      this.topics = arr;
+      this.loading = false;
+    },
+    error: err => {
+      this.error = err.error?.detail || 'Échec du chargement';
+      this.loading = false;
+    }
+  });
+}
+
 
   toggleNewTopicForm() {
     this.showNewTopicForm = !this.showNewTopicForm;
