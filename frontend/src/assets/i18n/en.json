@@ -1,0 +1,14 @@
+{
+  "NAV": {
+    "BRAND": "Coursey",
+    "SELECT_LANGUAGE": "Language",
+    "SIGN_UP": "Sign Up",
+    "LOG_IN": "Log In",
+    "HOME": "Home",
+    "USERS": "Users",
+    "COURSES": "Courses",
+    "ACTIVITY_LOGS": "Activity Logs",
+    "PROFILE": "Profile",
+    "LOG_OUT": "Log Out"
+  }
+}

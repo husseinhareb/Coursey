@@ -61,7 +61,7 @@ import { Enrollment } from '../services/user.service';
           <small>
             Créé par {{ topic.author_id }}
             le {{ topic.created_at | date: 'short' }}
-            • {{ topic.messages?.length || 0 }} message(s)
+            • {{ topic.messages.length || 0 }} message(s)
           </small>
         </li>
       </ul>

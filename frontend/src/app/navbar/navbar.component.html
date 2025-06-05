@@ -1,37 +1,65 @@
 <!-- src/app/navbar/navbar.component.html -->
 <nav class="navbar">
   <div class="navbar-brand">
-    <a routerLink="/" class="brand">Coursey</a>
+    <a routerLink="/" class="brand">{{ 'NAV.BRAND' | translate }}</a>
   </div>
+
+  <!-- Language selector -->
+  <div class="language-selector">
+    <label for="langSelect">{{ 'NAV.SELECT_LANGUAGE' | translate }}:</label>
+    <select
+      id="langSelect"
+      #langSelect
+      (change)="switchLanguage(langSelect.value)"
+      [value]="currentLang"
+    >
+      <option *ngFor="let lang of translate.getLangs()" [value]="lang">
+        {{ lang.toUpperCase() }}
+      </option>
+    </select>
+  </div>
+
   <ul class="nav-list">
-    <!-- Public -->
+    <!-- Public links -->
     <li *ngIf="!auth.isLoggedIn">
-      <a routerLink="/register" routerLinkActive="active">Sign Up</a>
+      <a routerLink="/register" routerLinkActive="active">
+        {{ 'NAV.SIGN_UP' | translate }}
+      </a>
     </li>
     <li *ngIf="!auth.isLoggedIn">
-      <a routerLink="/login" routerLinkActive="active">Log In</a>
+      <a routerLink="/login" routerLinkActive="active">
+        {{ 'NAV.LOG_IN' | translate }}
+      </a>
     </li>
 
-    <!-- Private -->
+    <!-- Private links -->
     <li *ngIf="auth.isLoggedIn">
-      <a routerLink="/home" routerLinkActive="active">Home</a>
+      <a routerLink="/home" routerLinkActive="active">
+        {{ 'NAV.HOME' | translate }}
+      </a>
     </li>
-    <!-- Only admin sees Users -->
     <li *ngIf="auth.isLoggedIn && isAdmin">
-      <a routerLink="/users" routerLinkActive="active">Users</a>
+      <a routerLink="/users" routerLinkActive="active">
+        {{ 'NAV.USERS' | translate }}
+      </a>
     </li>
     <li *ngIf="auth.isLoggedIn">
-      <a routerLink="/courses" routerLinkActive="active">Courses</a>
+      <a routerLink="/courses" routerLinkActive="active">
+        {{ 'NAV.COURSES' | translate }}
+      </a>
     </li>
-    <!-- Only admin sees Activity Logs -->
     <li *ngIf="auth.isLoggedIn && isAdmin">
-      <a routerLink="/activity-logs" routerLinkActive="active">Activity Logs</a>
+      <a routerLink="/activity-logs" routerLinkActive="active">
+        {{ 'NAV.ACTIVITY_LOGS' | translate }}
+      </a>
     </li>
     <li *ngIf="auth.isLoggedIn">
-      <a routerLink="/profile" routerLinkActive="active">Profile</a>
+      <a routerLink="/profile" routerLinkActive="active">
+        {{ 'NAV.PROFILE' | translate }}
+      </a>
     </li>
     <li *ngIf="auth.isLoggedIn">
-      <button (click)="logout()">Log Out</button>
+      <button (click)="logout()">{{ 'NAV.LOG_OUT' | translate }}</button>
     </li>
   </ul>
 </nav>
