@@ -1,6 +1,9 @@
+<!-- src/app/courses/courses.component.html -->
+
 <div class="courses-header">
   <h2>Courses</h2>
-  <a routerLink="/courses/add" class="btn">+ Add Course</a>
+  <!-- Seul l’admin voit le bouton + Add Course -->
+  <a *ngIf="isAdmin" routerLink="/courses/add" class="btn">+ Add Course</a>
 </div>
 
 <div *ngIf="loading">Loading…</div>
@@ -13,7 +16,8 @@
       <th>Code</th>
       <th>Description</th>
       <th>Background</th>
-      <th>Actions</th>
+      <!-- Colonne Actions uniquement pour l'admin -->
+      <th *ngIf="isAdmin">Actions</th>
     </tr>
   </thead>
   <tbody>
@@ -22,7 +26,8 @@
       <td>{{ c.code }}</td>
       <td>{{ c.description }}</td>
       <td>{{ c.background || '-' }}</td>
-      <td>
+      <!-- Boutons Edit/Delete uniquement pour l'admin -->
+      <td *ngIf="isAdmin">
         <button (click)="edit(c.id)">Edit</button>
         <button (click)="delete(c.id)">Delete</button>
       </td>

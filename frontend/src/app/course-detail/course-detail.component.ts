@@ -9,7 +9,7 @@ import {
   Validators
 } from '@angular/forms';
 
-import { RouterModule }     from '@angular/router';   // ← import RouterModule
+import { RouterModule }     from '@angular/router';
 import { ActivatedRoute }   from '@angular/router';
 
 import { CourseService, Course } from '../services/course.service';
@@ -17,13 +17,16 @@ import { PostService, Post }     from '../services/post.service';
 import { SubmissionFormComponent } from '../submissions/submission-form.component';
 import { SubmissionListComponent } from '../submissions/submission-list.component';
 
+import { AuthService, Me } from '../auth/auth.service';
+import { Enrollment } from '../services/user.service';
+
 @Component({
   selector: 'app-course-detail',
   standalone: true,
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    RouterModule,               // ← add RouterModule
+    RouterModule,
     SubmissionFormComponent,
     SubmissionListComponent
   ],
@@ -35,6 +38,7 @@ export class CourseDetailComponent implements OnInit {
   private route     = inject(ActivatedRoute);
   private courseSvc = inject(CourseService);
   private postSvc   = inject(PostService);
+  private auth      = inject(AuthService);
 
   /** The current course object */
   course?: Course;
@@ -53,8 +57,8 @@ export class CourseDetailComponent implements OnInit {
     title:    ['', Validators.required],
     content:  ['', Validators.required],
     type:     ['', Validators.required],  // "lecture" | "reminder" | "homework"
-    fileId:   [''],
-    due_date: ['']  // ← FormControl for due_date
+    file_id:  [''],
+    due_date: ['']
   });
 
   /** Which homework-post (by _id) currently has the “Submit Homework” form open */
@@ -65,6 +69,12 @@ export class CourseDetailComponent implements OnInit {
   /** Expose courseId to the template (must be public) */
   public courseId!: string;
 
+  /** Current user info */
+  currentUser: Me | null = null;
+  isAdmin = false;
+  isProfessorInCourse = false;
+  isStudentInCourse = false;
+
   ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
     if (!id) {
@@ -72,8 +82,54 @@ export class CourseDetailComponent implements OnInit {
       return;
     }
     this.courseId = id;
+
+    // 1) Charger le profil pour déterminer rôles & enrollments
+    this.auth.user$.subscribe({
+      next: user => {
+        this.currentUser = user;
+        this.computePermissions();
+      },
+      error: () => {
+        this.currentUser = null;
+        this.computePermissions();
+      }
+    });
+
+    // 2) Charger les détails du cours
     this.loadCourse();
+
+    // 3) Charger la liste des posts
     this.loadPosts();
+  }
+
+  private computePermissions() {
+    if (!this.currentUser) {
+      this.isAdmin = false;
+      this.isProfessorInCourse = false;
+      this.isStudentInCourse = false;
+      return;
+    }
+    const rolesLower = this.currentUser.roles.map(r => r.toLowerCase());
+    this.isAdmin = rolesLower.includes('admin');
+
+    // Parcourir enrollments pour déterminer présence dans ce cours
+    const found = (this.currentUser.enrollments as Enrollment[]).find(
+      (e: Enrollment) => e.courseId === this.courseId
+    );
+    if (found) {
+      // Si on stocke e.role, vérifier e.role === 'teacher' ou 'student'
+      // Par défaut, on traite comme professeur :
+      this.isProfessorInCourse = rolesLower.includes('teacher');
+      this.isStudentInCourse   = rolesLower.includes('student');
+    } else {
+      this.isProfessorInCourse = false;
+      this.isStudentInCourse   = false;
+    }
+  }
+
+  /** Si admin OU professeur inscrit, on peut créer/éditer/pinner/mover/delete */
+  get canModifyPosts(): boolean {
+    return this.isAdmin || this.isProfessorInCourse;
   }
 
   /** Load course metadata */
@@ -91,7 +147,7 @@ export class CourseDetailComponent implements OnInit {
     });
   }
 
-  /** Load all posts, then sort in the service */
+  /** Load all posts */
   private loadPosts() {
     this.loadingPosts = true;
     this.postSvc.list(this.courseId).subscribe({
@@ -113,9 +169,12 @@ export class CourseDetailComponent implements OnInit {
 
   /**
    * Toggle showing the create/edit form. 
+   * Only profs inscrits et admins.
    * If `post` is passed, we are in “edit” mode.
    */
   toggleForm(post?: Post) {
+    if (!this.canModifyPosts) return;
+
     this.showForm = !this.showForm;
     this.editing = post || undefined;
 
@@ -125,7 +184,7 @@ export class CourseDetailComponent implements OnInit {
         title:    post.title,
         content:  post.content,
         type:     post.type,
-        fileId:   post.file_id || '',
+        file_id:  post.file_id || '',
         due_date: post.due_date 
           ? this.formatForInput(post.due_date) 
           : '' 
@@ -137,6 +196,7 @@ export class CourseDetailComponent implements OnInit {
 
   /** Called when “Save” is clicked in the post-form */
   savePost() {
+    if (!this.canModifyPosts) return;
     if (this.postForm.invalid) {
       return;
     }
@@ -146,7 +206,7 @@ export class CourseDetailComponent implements OnInit {
       title: string;
       content: string;
       type: string;
-      fileId: string;
+      file_id: string;
       due_date: string;
     };
 
@@ -155,7 +215,7 @@ export class CourseDetailComponent implements OnInit {
       title:    raw.title,
       content:  raw.content,
       type:     raw.type,
-      file_id:  raw.fileId || undefined,
+      file_id:  raw.file_id || undefined,
       due_date: raw.due_date ? new Date(raw.due_date).toISOString() : undefined
     };
 
@@ -176,6 +236,7 @@ export class CourseDetailComponent implements OnInit {
 
   /** Delete a post after confirmation */
   deletePost(p: Post) {
+    if (!this.canModifyPosts) return;
     if (!confirm(`Delete post “${p.title}”?`)) {
       return;
     }
@@ -187,6 +248,7 @@ export class CourseDetailComponent implements OnInit {
 
   /** Pin / Unpin: pinned posts float to top */
   togglePin(p: Post) {
+    if (!this.canModifyPosts) return;
     if (p.ispinned) {
       this.postSvc.unpin(this.courseId, p._id).subscribe({
         next: () => this.loadPosts(),
@@ -202,7 +264,7 @@ export class CourseDetailComponent implements OnInit {
 
   /** Move a non-pinned post UP one slot among unpinned posts */
   moveUp(p: Post) {
-    if (p.ispinned) return;
+    if (!this.canModifyPosts || p.ispinned) return;
     this.postSvc.moveUp(this.courseId, p._id).subscribe({
       next: () => this.loadPosts(),
       error: e => (this.postsError = e.error?.detail || 'Move up failed')
@@ -211,7 +273,7 @@ export class CourseDetailComponent implements OnInit {
 
   /** Move a non-pinned post DOWN one slot among unpinned posts */
   moveDown(p: Post) {
-    if (p.ispinned) return;
+    if (!this.canModifyPosts || p.ispinned) return;
     this.postSvc.moveDown(this.courseId, p._id).subscribe({
       next: () => this.loadPosts(),
       error: e => (this.postsError = e.error?.detail || 'Move down failed')
@@ -220,12 +282,14 @@ export class CourseDetailComponent implements OnInit {
 
   /** Toggle showing the “Submit Homework” form for a given postId */
   toggleSubmissionForm(postId: string) {
+    if (!this.isStudentInCourse) return;
     this.showSubmissionFormForPostId =
       this.showSubmissionFormForPostId === postId ? null : postId;
   }
 
   /** Toggle showing the “View Submissions” list for a given postId */
   toggleSubmissionList(postId: string) {
+    if (!this.canModifyPosts) return;
     this.showSubmissionListForPostId =
       this.showSubmissionListForPostId === postId ? null : postId;
   }
@@ -236,18 +300,15 @@ export class CourseDetailComponent implements OnInit {
     // The <app-submission-list> child auto-reloads its data.
   }
 
-  /**
-   * Called when the file input changes. Implement your own upload logic here.
-   * (This stub simply clears any existing fileId placeholder.)
-   */
+  /** Called when the file input changes. Stub for upload logic. */
   onFileSelected(event: Event): void {
     const inputEl = event.target as HTMLInputElement;
     if (!inputEl.files || inputEl.files.length === 0) {
       return;
     }
     const file = inputEl.files[0];
-    // TODO: upload `file` to backend and patch `postForm.patchValue({ fileId: returnedId })`.
-    this.postForm.patchValue({ fileId: '' });
+    // TODO: upload `file` to backend and patch `postForm.patchValue({ file_id: returnedId })`.
+    this.postForm.patchValue({ file_id: '' });
   }
 
   /**
@@ -256,7 +317,6 @@ export class CourseDetailComponent implements OnInit {
    */
   private formatForInput(isoString: string): string {
     const dt = new Date(isoString);
-    // Pad month/day/hours/minutes with leading zeros
     const pad = (n: number) => n.toString().padStart(2, '0');
     const yyyy = dt.getFullYear();
     const mm   = pad(dt.getMonth() + 1);

@@ -18,11 +18,12 @@
 
 <hr />
 
-<button (click)="toggleForm()">
+<!-- + Add Post uniquement pour professeurs inscrits et admins -->
+<button *ngIf="canModifyPosts" (click)="toggleForm()">
   {{ editing ? 'Edit Post' : '+ Add Post' }}
 </button>
 
-<div *ngIf="showForm" class="post-form">
+<div *ngIf="showForm && canModifyPosts" class="post-form">
   <form [formGroup]="postForm" (ngSubmit)="savePost()">
     <!-- Title Field -->
     <div>
@@ -150,14 +151,14 @@
       <small>Due Date: {{ p.due_date | date: 'short' }}</small><br />
     </div>
 
-    <!-- Pin / Unpin -->
-    <button (click)="togglePin(p)">
+    <!-- Pin / Unpin pour profs inscrits et admins -->
+    <button *ngIf="canModifyPosts" (click)="togglePin(p)">
       {{ p.ispinned ? 'Unpin' : 'Pin' }}
     </button>
 
-    <!-- Move Up/Down (only if not pinned) -->
+    <!-- Move Up/Down (seulement si non-pinned) pour profs inscrits et admins -->
     <button
-      *ngIf="!p.ispinned"
+      *ngIf="canModifyPosts && !p.ispinned"
       (click)="moveUp(p)"
       [disabled]="p.position === 1"
       title="Move up"
@@ -165,7 +166,7 @@
       ▲
     </button>
     <button
-      *ngIf="!p.ispinned"
+      *ngIf="canModifyPosts && !p.ispinned"
       (click)="moveDown(p)"
       [disabled]="p.position === unpinnedCount"
       title="Move down"
@@ -173,17 +174,21 @@
       ▼
     </button>
 
-    <!-- Edit / Delete -->
-    <button (click)="toggleForm(p)">Edit</button>
-    <button (click)="deletePost(p)">Delete</button>
+    <!-- Edit / Delete pour profs inscrits et admins -->
+    <button *ngIf="canModifyPosts" (click)="toggleForm(p)">Edit</button>
+    <button *ngIf="canModifyPosts" (click)="deletePost(p)">Delete</button>
 
     <!-- Homework Actions -->
     <div *ngIf="p.type === 'homework'" class="homework-actions">
       <br />
       <strong>Homework Actions:</strong><br />
 
-      <!-- Submit Homework (students) -->
-      <button (click)="toggleSubmissionForm(p._id)" class="submit-btn">
+      <!-- Submit Homework (seulement étudiants inscrits) -->
+      <button
+        *ngIf="isStudentInCourse"
+        (click)="toggleSubmissionForm(p._id)"
+        class="submit-btn"
+      >
         {{
           showSubmissionFormForPostId === p._id
             ? 'Cancel Submit'
@@ -191,8 +196,12 @@
         }}
       </button>
 
-      <!-- View All Submissions (teachers/admins) -->
-      <button (click)="toggleSubmissionList(p._id)" class="view-submissions-btn">
+      <!-- View All Submissions (seulement profs inscrits et admins) -->
+      <button
+        *ngIf="canModifyPosts"
+        (click)="toggleSubmissionList(p._id)"
+        class="view-submissions-btn"
+      >
         {{
           showSubmissionListForPostId === p._id
             ? 'Hide Submissions'
@@ -201,7 +210,7 @@
       </button>
 
       <!-- Submission Form for Students -->
-      <div *ngIf="showSubmissionFormForPostId === p._id">
+      <div *ngIf="showSubmissionFormForPostId === p._id && isStudentInCourse">
         <app-submission-form
           [courseId]="courseId"
           [postId]="p._id"
@@ -212,7 +221,7 @@
 
       <!-- Submission List for Teachers/Admins -->
       <div
-        *ngIf="showSubmissionListForPostId === p._id"
+        *ngIf="showSubmissionListForPostId === p._id && canModifyPosts"
         class="submissions-container"
       >
         <app-submission-list
