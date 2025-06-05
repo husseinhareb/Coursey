@@ -10,5 +10,16 @@
     "ACTIVITY_LOGS": "Journal d’activité",
     "PROFILE": "Profil",
     "LOG_OUT": "Déconnexion"
+  },
+  "ACTIVITY_LOG": {
+    "TITLE": "Historique d’activité",
+    "LOADING": "Chargement des logs…",
+    "TABLE": {
+      "DATE_TIME": "Date & heure",
+      "USER": "Utilisateur",
+      "ACTION": "Action",
+      "DETAILS": "Détails"
+    },
+    "NO_LOGS": "Aucune activité à afficher."
   }
 }

@@ -10,5 +10,16 @@
     "ACTIVITY_LOGS": "Activity Logs",
     "PROFILE": "Profile",
     "LOG_OUT": "Log Out"
+  },
+  "ACTIVITY_LOG": {
+    "TITLE": "Activity History",
+    "LOADING": "Loading logs…",
+    "TABLE": {
+      "DATE_TIME": "Date & Time",
+      "USER": "User",
+      "ACTION": "Action",
+      "DETAILS": "Details"
+    },
+    "NO_LOGS": "No activity to display."
   }
 }

@@ -1,17 +1,26 @@
 <!-- src/app/activity-log-list/activity-log-list.component.html -->
 <div class="activity-log-container">
-  <h3>Historique d’activité</h3>
+  <!-- Component title (translated) -->
+  <h3>{{ 'ACTIVITY_LOG.TITLE' | translate }}</h3>
 
-  <div *ngIf="loading" class="loading">Chargement des logs…</div>
-  <div *ngIf="error" class="error">{{ error }}</div>
+  <!-- Loading indicator -->
+  <div *ngIf="loading" class="loading">
+    {{ 'ACTIVITY_LOG.LOADING' | translate }}
+  </div>
 
+  <!-- Error message (assumes error text is already translated or passed in) -->
+  <div *ngIf="error" class="error">
+    {{ error }}
+  </div>
+
+  <!-- Table of logs -->
   <table *ngIf="!loading && !error" class="activity-log-table">
     <thead>
       <tr>
-        <th>Date &amp; heure</th>
-        <th>Utilisateur</th>
-        <th>Action</th>
-        <th>Détails</th>
+        <th>{{ 'ACTIVITY_LOG.TABLE.DATE_TIME' | translate }}</th>
+        <th>{{ 'ACTIVITY_LOG.TABLE.USER' | translate }}</th>
+        <th>{{ 'ACTIVITY_LOG.TABLE.ACTION' | translate }}</th>
+        <th>{{ 'ACTIVITY_LOG.TABLE.DETAILS' | translate }}</th>
       </tr>
     </thead>
     <tbody>
@@ -28,7 +37,8 @@
     </tbody>
   </table>
 
+  <!-- “No logs” message when list is empty -->
   <div *ngIf="!loading && logs.length === 0" class="no-logs">
-    Aucune activité à afficher.
+    {{ 'ACTIVITY_LOG.NO_LOGS' | translate }}
   </div>
 </div>
