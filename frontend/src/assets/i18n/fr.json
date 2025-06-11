@@ -31,5 +31,28 @@
     "PASSWORD_PLACEHOLDER": "••••••••",
     "PASSWORD_ERROR": "Mot de passe requis.",
     "SUBMIT": "Se connecter"
+  },
+  "PROFILE": {
+    "TITLE": "Mon profil",
+    "LOADING": "Chargement du profil…",
+    "ERROR_LOADING": "Échec du chargement du profil.",
+    "AVATAR_ALT": "Avatar de l’utilisateur",
+    "EMAIL_LABEL": "Adresse e-mail",
+    "EMAIL_PLACEHOLDER": "vous@exemple.com",
+    "USERNAME_LABEL": "Nom d’utilisateur",
+    "FIRST_NAME_LABEL": "Prénom",
+    "FIRST_NAME_PLACEHOLDER": "Entrez le prénom",
+    "LAST_NAME_LABEL": "Nom de famille",
+    "LAST_NAME_PLACEHOLDER": "Entrez le nom de famille",
+    "PHONE_LABEL": "Numéro de téléphone",
+    "PHONE_PLACEHOLDER": "Entrez le numéro de téléphone",
+    "ADDRESS_LABEL": "Adresse",
+    "ADDRESS_PLACEHOLDER": "Entrez l’adresse",
+    "ROLES_LABEL": "Rôles",
+    "ENROLLED_LABEL": "Cours inscrits",
+    "NO_ENROLLMENTS": "Aucun cours inscrit.",
+    "SAVE": "Enregistrer les modifications",
+    "SUCCESS": "Profil mis à jour avec succès.",
+    "UPDATE_ERROR": "Échec de la mise à jour."
   }
 }

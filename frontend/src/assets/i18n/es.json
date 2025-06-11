@@ -31,5 +31,42 @@
     "PASSWORD_PLACEHOLDER": "••••••••",
     "PASSWORD_ERROR": "Se requiere contraseña.",
     "SUBMIT": "Iniciar sesión"
+  },
+  "PROFILE": {
+    "TITLE": "Mi perfil",
+    "LOADING": "Cargando perfil…",
+    "ERROR_LOADING": "Error al cargar el perfil.",
+    "AVATAR_ALT": "Avatar del usuario",
+    "EMAIL_LABEL": "Correo electrónico",
+    "EMAIL_PLACEHOLDER": "tucorreo@ejemplo.com",
+    "USERNAME_LABEL": "Nombre de usuario",
+    "FIRST_NAME_LABEL": "Nombre",
+    "FIRST_NAME_PLACEHOLDER": "Ingrese el nombre",
+    "LAST_NAME_LABEL": "Apellido",
+    "LAST_NAME_PLACEHOLDER": "Ingrese el apellido",
+    "PHONE_LABEL": "Número de teléfono",
+    "PHONE_PLACEHOLDER": "Ingrese el número de teléfono",
+    "ADDRESS_LABEL": "Dirección",
+    "ADDRESS_PLACEHOLDER": "Ingrese la dirección",
+    "ROLES_LABEL": "Roles",
+    "ENROLLED_LABEL": "Cursos inscritos",
+    "NO_ENROLLMENTS": "No hay cursos inscritos.",
+    "SAVE": "Guardar cambios",
+    "SUCCESS": "Perfil actualizado con éxito.",
+    "UPDATE_ERROR": "Error al actualizar."
+  },
+    "COURSES": {
+    "TITLE": "Cursos",
+    "ADD": "+ Añadir curso",
+    "LOADING": "Cargando…",
+    "TABLE": {
+      "TITLE": "Título",
+      "CODE": "Código",
+      "DESCRIPTION": "Descripción",
+      "BACKGROUND": "Antecedentes",
+      "ACTIONS": "Acciones"
+    },
+    "EDIT": "Editar",
+    "DELETE": "Eliminar"
   }
 }

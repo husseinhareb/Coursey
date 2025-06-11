@@ -1,11 +1,18 @@
 <!-- src/app/profile/profile.component.html -->
 
 <div class="profile-container">
-  <h2 class="profile-header">My Profile</h2>
+  <!-- Page title -->
+  <h2 class="profile-header">{{ 'PROFILE.TITLE' | translate }}</h2>
 
-  <div *ngIf="loading" class="message">Loading profile…</div>
-  <div *ngIf="error"   class="message error">{{ error }}</div>
+  <!-- Loading & error messages -->
+  <div *ngIf="loading" class="message">
+    {{ 'PROFILE.LOADING' | translate }}
+  </div>
+  <div *ngIf="error" class="message error">
+    {{ error || ('PROFILE.ERROR_LOADING' | translate) }}
+  </div>
 
+  <!-- Form -->
   <form *ngIf="!loading" [formGroup]="form" (ngSubmit)="onSubmit()">
     <!-- Avatar -->
     <div class="avatar-container">
@@ -13,7 +20,7 @@
         <img
           *ngIf="user?.profile?.profilePic; else showInitials"
           [src]="user!.profile!.profilePic!"
-          alt="Profile Picture"
+          alt="{{ 'PROFILE.AVATAR_ALT' | translate }}"
         />
         <ng-template #showInitials>
           {{ initials }}
@@ -21,37 +28,62 @@
       </div>
     </div>
 
-    <!-- Readonly -->
+    <!-- Read-only fields -->
     <div class="profile-field">
-      <label>Email</label>
-      <input type="email" [value]="user?.email" disabled />
+      <label>{{ 'PROFILE.EMAIL_LABEL' | translate }}</label>
+      <input
+        type="email"
+        [value]="user?.email"
+        disabled
+        placeholder="{{ 'PROFILE.EMAIL_PLACEHOLDER' | translate }}"
+      />
     </div>
     <div class="profile-field">
-      <label>Username</label>
-      <input type="text"  [value]="user?.username" disabled />
+      <label>{{ 'PROFILE.USERNAME_LABEL' | translate }}</label>
+      <input
+        type="text"
+        [value]="user?.username"
+        disabled
+      />
     </div>
 
-    <!-- Editable -->
+    <!-- Editable fields -->
     <div class="profile-field">
-      <label for="firstName">First Name</label>
-      <input id="firstName" formControlName="firstName" />
+      <label for="firstName">{{ 'PROFILE.FIRST_NAME_LABEL' | translate }}</label>
+      <input
+        id="firstName"
+        formControlName="firstName"
+        placeholder="{{ 'PROFILE.FIRST_NAME_PLACEHOLDER' | translate }}"
+      />
     </div>
     <div class="profile-field">
-      <label for="lastName">Last Name</label>
-      <input id="lastName"  formControlName="lastName" />
+      <label for="lastName">{{ 'PROFILE.LAST_NAME_LABEL' | translate }}</label>
+      <input
+        id="lastName"
+        formControlName="lastName"
+        placeholder="{{ 'PROFILE.LAST_NAME_PLACEHOLDER' | translate }}"
+      />
     </div>
     <div class="profile-field">
-      <label for="phoneNumber">Phone Number</label>
-      <input id="phoneNumber" formControlName="phoneNumber" />
+      <label for="phoneNumber">{{ 'PROFILE.PHONE_LABEL' | translate }}</label>
+      <input
+        id="phoneNumber"
+        formControlName="phoneNumber"
+        placeholder="{{ 'PROFILE.PHONE_PLACEHOLDER' | translate }}"
+      />
     </div>
     <div class="profile-field">
-      <label for="address">Address</label>
-      <input id="address"    formControlName="address" />
+      <label for="address">{{ 'PROFILE.ADDRESS_LABEL' | translate }}</label>
+      <input
+        id="address"
+        formControlName="address"
+        placeholder="{{ 'PROFILE.ADDRESS_PLACEHOLDER' | translate }}"
+      />
     </div>
 
     <!-- Roles -->
     <div class="profile-field">
-      <label>Roles</label>
+      <label>{{ 'PROFILE.ROLES_LABEL' | translate }}</label>
       <ul class="profile-list">
         <li *ngFor="let role of user?.roles">{{ role }}</li>
       </ul>
@@ -59,20 +91,27 @@
 
     <!-- Enrolled Courses -->
     <div class="profile-field">
-      <label>Enrolled Courses</label>
+      <label>{{ 'PROFILE.ENROLLED_LABEL' | translate }}</label>
       <ul class="profile-list">
         <li *ngFor="let c of enrolledCourses">
           {{ c.code }} – {{ c.title }}
         </li>
+        <li *ngIf="!enrolledCourses.length">
+          {{ 'PROFILE.NO_ENROLLMENTS' | translate }}
+        </li>
       </ul>
     </div>
 
+    <!-- Submit -->
     <div class="profile-actions">
-      <button type="submit" [disabled]="form.invalid">Save Changes</button>
+      <button type="submit" [disabled]="form.invalid">
+        {{ 'PROFILE.SAVE' | translate }}
+      </button>
     </div>
   </form>
 
+  <!-- Success banner -->
   <div *ngIf="success" class="message success">
-    Profile updated successfully.
+    {{ 'PROFILE.SUCCESS' | translate }}
   </div>
 </div>

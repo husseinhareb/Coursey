@@ -1,0 +1,72 @@
+{
+    "NAV": {
+        "BRAND": "كورسي",
+        "SELECT_LANGUAGE": "اللغة",
+        "SIGN_UP": "إنشاء حساب",
+        "LOG_IN": "تسجيل الدخول",
+        "HOME": "الرئيسية",
+        "USERS": "المستخدمون",
+        "COURSES": "الدورات",
+        "ACTIVITY_LOGS": "سجلات النشاط",
+        "PROFILE": "الالملف الشخصي",
+        "LOG_OUT": "تسجيل الخروج"
+    },
+    "ACTIVITY_LOG": {
+        "TITLE": "سجل النشاط",
+        "LOADING": "جاري تحميل السجلات…",
+        "TABLE": {
+            "DATE_TIME": "التاريخ والوقت",
+            "USER": "المستخدم",
+            "ACTION": "الإجراء",
+            "DETAILS": "التفاصيل"
+        },
+        "NO_LOGS": "لا توجد نشاطات للعرض."
+    },
+    "LOGIN": {
+        "TITLE": "تسجيل الدخول",
+        "EMAIL_LABEL": "البريد الإلكتروني",
+        "EMAIL_PLACEHOLDER": "name@example.com",
+        "EMAIL_ERROR": "البريد الإلكتروني غير صالح.",
+        "PASSWORD_LABEL": "كلمة المرور",
+        "PASSWORD_PLACEHOLDER": "••••••••",
+        "PASSWORD_ERROR": "كلمة المرور مطلوبة.",
+        "SUBMIT": "تسجيل الدخول"
+    },
+    "PROFILE": {
+        "TITLE": "ملفي الشخصي",
+        "LOADING": "جاري تحميل الملف الشخصي…",
+        "ERROR_LOADING": "فشل في تحميل الملف الشخصي.",
+        "AVATAR_ALT": "رمز المستخدم",
+        "EMAIL_LABEL": "البريد الإلكتروني",
+        "EMAIL_PLACEHOLDER": "name@example.com",
+        "USERNAME_LABEL": "اسم المستخدم",
+        "FIRST_NAME_LABEL": "الاسم الأول",
+        "FIRST_NAME_PLACEHOLDER": "أدخل الاسم الأول",
+        "LAST_NAME_LABEL": "اسم العائلة",
+        "LAST_NAME_PLACEHOLDER": "أدخل اسم العائلة",
+        "PHONE_LABEL": "رقم الهاتف",
+        "PHONE_PLACEHOLDER": "أدخل رقم الهاتف",
+        "ADDRESS_LABEL": "العنوان",
+        "ADDRESS_PLACEHOLDER": "أدخل العنوان",
+        "ROLES_LABEL": "الأدوار",
+        "ENROLLED_LABEL": "الدورات المسجلة",
+        "NO_ENROLLMENTS": "لا توجد دورات مسجلة.",
+        "SAVE": "حفظ التغييرات",
+        "SUCCESS": "تم تحديث الملف الشخصي بنجاح.",
+        "UPDATE_ERROR": "حدث خطأ أثناء التحديث."
+    },
+    "COURSES": {
+        "TITLE": "الدورات",
+        "ADD": "+ إضافة دورة",
+        "LOADING": "جاري التحميل…",
+        "TABLE": {
+            "TITLE": "العنوان",
+            "CODE": "الرمز",
+            "DESCRIPTION": "الوصف",
+            "BACKGROUND": "الخلفية",
+            "ACTIONS": "إجراءات"
+        },
+        "EDIT": "تعديل",
+        "DELETE": "حذف"
+    }
+}

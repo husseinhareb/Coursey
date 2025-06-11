@@ -1,35 +1,42 @@
 <!-- src/app/courses/courses.component.html -->
 
 <div class="courses-header">
-  <h2>Courses</h2>
-  <!-- Seul l’admin voit le bouton + Add Course -->
-  <a *ngIf="isAdmin" routerLink="/courses/add" class="btn">+ Add Course</a>
+  <h2>{{ 'COURSES.TITLE' | translate }}</h2>
+  <a
+    *ngIf="isAdmin"
+    routerLink="/courses/add"
+    class="btn"
+  >
+    {{ 'COURSES.ADD' | translate }}
+  </a>
 </div>
 
-<div *ngIf="loading">Loading…</div>
+<div *ngIf="loading">{{ 'COURSES.LOADING' | translate }}</div>
 <div *ngIf="error" class="error">{{ error }}</div>
 
 <table *ngIf="!loading && !error">
   <thead>
     <tr>
-      <th>Title</th>
-      <th>Code</th>
-      <th>Description</th>
-      <th>Background</th>
-      <!-- Colonne Actions uniquement pour l'admin -->
-      <th *ngIf="isAdmin">Actions</th>
+      <th>{{ 'COURSES.TABLE.TITLE'       | translate }}</th>
+      <th>{{ 'COURSES.TABLE.CODE'        | translate }}</th>
+      <th>{{ 'COURSES.TABLE.DESCRIPTION' | translate }}</th>
+      <th>{{ 'COURSES.TABLE.BACKGROUND'  | translate }}</th>
+      <th *ngIf="isAdmin">{{ 'COURSES.TABLE.ACTIONS' | translate }}</th>
     </tr>
   </thead>
   <tbody>
     <tr *ngFor="let c of courses">
-      <td><a [routerLink]="['/courses', c.id]">{{ c.title }}</a></td>
+      <td>
+        <a [routerLink]="['/courses', c.id]">
+          {{ c.title }}
+        </a>
+      </td>
       <td>{{ c.code }}</td>
       <td>{{ c.description }}</td>
       <td>{{ c.background || '-' }}</td>
-      <!-- Boutons Edit/Delete uniquement pour l'admin -->
       <td *ngIf="isAdmin">
-        <button (click)="edit(c.id)">Edit</button>
-        <button (click)="delete(c.id)">Delete</button>
+        <button (click)="edit(c.id)">{{ 'COURSES.EDIT'   | translate }}</button>
+        <button (click)="delete(c.id)">{{ 'COURSES.DELETE' | translate }}</button>
       </td>
     </tr>
   </tbody>

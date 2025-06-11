@@ -13,11 +13,12 @@ import { forkJoin }                         from 'rxjs';
 
 import { UserService, Profile, User, Enrollment }     from '../services/user.service';
 import { CourseService, Course }                     from '../services/course.service';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule,TranslateModule],
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.css']
 })

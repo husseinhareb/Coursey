@@ -5,11 +5,12 @@ import { CommonModule }          from '@angular/common';
 import { RouterModule, Router }  from '@angular/router';
 import { CourseService, Course } from '../services/course.service';
 import { AuthService, Me }       from '../auth/auth.service';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-courses',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule,TranslateModule],
   templateUrl: './courses.component.html',
   styleUrls: ['./courses.component.css']
 })

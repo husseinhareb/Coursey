@@ -31,5 +31,44 @@
     "PASSWORD_PLACEHOLDER": "••••••••",
     "PASSWORD_ERROR": "Password is required.",
     "SUBMIT": "Log In"
+  },
+  "PROFILE": {
+    "TITLE": "My Profile",
+    "LOADING": "Loading profile…",
+    "ERROR_LOADING": "Failed to load profile.",
+    "AVATAR_ALT": "User avatar",
+    "EMAIL_LABEL": "Email",
+    "EMAIL_PLACEHOLDER": "you@example.com",
+    "USERNAME_LABEL": "Username",
+    "FIRST_NAME_LABEL": "First Name",
+    "FIRST_NAME_PLACEHOLDER": "Enter first name",
+    "LAST_NAME_LABEL": "Last Name",
+    "LAST_NAME_PLACEHOLDER": "Enter last name",
+    "PHONE_LABEL": "Phone Number",
+    "PHONE_PLACEHOLDER": "Enter phone number",
+    "ADDRESS_LABEL": "Address",
+    "ADDRESS_PLACEHOLDER": "Enter address",
+    "ROLES_LABEL": "Roles",
+    "ENROLLED_LABEL": "Enrolled Courses",
+    "NO_ENROLLMENTS": "No enrolled courses.",
+    "SAVE": "Save Changes",
+    "SUCCESS": "Profile updated successfully.",
+    "UPDATE_ERROR": "Update failed."
+  },
+
+  "COURSES": {
+    "TITLE": "Courses",
+    "ADD": "+ Add Course",
+    "LOADING": "Loading…",
+    "TABLE": {
+      "TITLE": "Title",
+      "CODE": "Code",
+      "DESCRIPTION": "Description",
+      "BACKGROUND": "Background",
+      "ACTIONS": "Actions"
+    },
+    "EDIT": "Edit",
+    "DELETE": "Delete"
   }
+
 }
