@@ -1,25 +1,94 @@
-<h2>My Profile</h2>
+<!-- src/app/profile/profile.component.html -->
 
-<div *ngIf="loading">Loading profile…</div>
-<div *ngIf="error" class="error">{{ error }}</div>
+<div class="profile-container">
+  <h2 class="profile-header">My Profile</h2>
 
-<form *ngIf="!loading" [formGroup]="form" (ngSubmit)="onSubmit()">
-  <label for="firstName">First Name</label>
-  <input id="firstName" formControlName="firstName" />
+  <div *ngIf="loading" class="message">Loading profile…</div>
+  <div *ngIf="error"   class="message error">{{ error }}</div>
 
-  <label for="lastName">Last Name</label>
-  <input id="lastName" formControlName="lastName" />
+  <form *ngIf="!loading" [formGroup]="form" (ngSubmit)="onSubmit()">
+    <!-- Avatar -->
+    <div class="avatar-container">
+      <div class="avatar">
+        <img
+          *ngIf="user?.profile?.profilePic; else showInitials"
+          [src]="user!.profile!.profilePic!"
+          alt="Profile Picture"
+        />
+        <ng-template #showInitials>
+          {{ initials }}
+        </ng-template>
+      </div>
+    </div>
 
-  <label for="profilePic">Profile Picture URL</label>
-  <input id="profilePic" formControlName="profilePic" />
+    <!-- Readonly -->
+    <div class="profile-field">
+      <label>Email</label>
+      <input type="email" [value]="user?.email" disabled />
+    </div>
+    <div class="profile-field">
+      <label>Username</label>
+      <input type="text"  [value]="user?.username" disabled />
+    </div>
 
-  <label for="phoneNumber">Phone Number</label>
-  <input id="phoneNumber" formControlName="phoneNumber" />
+    <!-- Editable -->
+    <div class="profile-field">
+      <label for="firstName">First Name</label>
+      <input id="firstName" formControlName="firstName" />
+    </div>
+    <div class="profile-field">
+      <label for="lastName">Last Name</label>
+      <input id="lastName"  formControlName="lastName" />
+    </div>
+    <div class="profile-field">
+      <label for="phoneNumber">Phone Number</label>
+      <input id="phoneNumber" formControlName="phoneNumber" />
+    </div>
+    <div class="profile-field">
+      <label for="address">Address</label>
+      <input id="address"    formControlName="address" />
+    </div>
 
-  <label for="address">Address</label>
-  <input id="address" formControlName="address" />
+    <!-- Roles -->
+    <div class="profile-field">
+      <label>Roles</label>
+      <ul class="profile-list">
+        <li *ngFor="let role of user?.roles">{{ role }}</li>
+      </ul>
+    </div>
 
-  <button type="submit" [disabled]="form.invalid">Save</button>
-</form>
+    <!-- Enrolled Courses -->
+    <div class="profile-field">
+      <label>Enrolled Courses</label>
+      <ul class="profile-list">
+        <li *ngFor="let c of enrolledCourses">
+          {{ c.code }} – {{ c.title }}
+        </li>
+      </ul>
+    </div>
 
-<div *ngIf="success" class="success">Profile updated successfully.</div>
+    <!-- Accesses -->
+    <div class="profile-field">
+      <label>Accessed Courses</label>
+      <ul class="profile-list">
+        <li *ngFor="let a of user?.accesses">{{ a.courseId }}</li>
+      </ul>
+    </div>
+
+    <!-- Alerts -->
+    <div class="profile-field">
+      <label>Alerts</label>
+      <ul class="profile-list">
+        <li *ngFor="let al of user?.alerts">{{ al.alertId }}</li>
+      </ul>
+    </div>
+
+    <div class="profile-actions">
+      <button type="submit" [disabled]="form.invalid">Save Changes</button>
+    </div>
+  </form>
+
+  <div *ngIf="success" class="message success">
+    Profile updated successfully.
+  </div>
+</div>

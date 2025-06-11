@@ -1,0 +1,289 @@
+/*====================================
+  theme.css — Light & Dark Theme Variables
+====================================*/
+
+/* Light theme variables */
+:root {
+  /* Core colors */
+  --color-bg:               #f7f8fa;
+  --color-surface:          #ffffff;
+  --color-text:             #2d3436;
+  --color-muted:            #636e72;
+  --color-primary:          #0984e3;
+  --color-primary-hover:    #74b9ff;
+  --color-accent:           #d63031;
+  --color-accent-hover:     #ff7675;
+  --color-success:          #00b894;
+  --color-error:            #d63031;
+  --color-warning:          #fdcb6e;
+  --color-border:           #dfe6e9;
+
+  /* Typography */
+  --font-family-base:       'Helvetica Neue', Arial, sans-serif;
+  --font-size-base:         16px;
+  --line-height-base:       1.5;
+
+  /* Spacing & shape */
+  --spacing-xs:             0.25rem;
+  --spacing-sm:             0.5rem;
+  --spacing-md:             1rem;
+  --spacing-lg:             1.5rem;
+  --border-radius:          0.25rem;
+  --transition-speed:       0.3s;
+}
+
+/* Dark theme overrides */
+[data-theme='dark'] {
+  --color-bg:               #2d3436;
+  --color-surface:          #353b48;
+  --color-text:             #dcdde1;
+  --color-muted:            #7f8fa6;
+  --color-primary:          #74b9ff;
+  --color-primary-hover:    #a4c4ff;
+  --color-accent:           #ff7979;
+  --color-accent-hover:     #ff9999;
+  --color-success:          #55efc4;
+  --color-error:            #ff6b6b;
+  --color-warning:          #ffeaa7;
+  --color-border:           #57606f;
+}
+
+
+/*====================================
+  Global Reset & Base Styles
+====================================*/
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-base);
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  transition: background-color var(--transition-speed) ease,
+              color var(--transition-speed) ease;
+}
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+  transition: color var(--transition-speed) ease;
+}
+a:hover {
+  color: var(--color-primary-hover);
+}
+button, input, select, textarea {
+  font-family: inherit;
+  font-size: inherit;
+}
+
+/* Utility classes */
+.text-center { text-align: center; }
+.mt-0      { margin-top: 0; }
+.mt-sm     { margin-top: var(--spacing-sm); }
+.mt-md     { margin-top: var(--spacing-md); }
+.mb-sm     { margin-bottom: var(--spacing-sm); }
+.mb-md     { margin-bottom: var(--spacing-md); }
+.p-sm      { padding: var(--spacing-sm); }
+.p-md      { padding: var(--spacing-md); }
+.rounded   { border-radius: var(--border-radius); }
+.shadow    { box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+
+
+/*====================================
+  Navbar styles
+====================================*/
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  padding: var(--spacing-md);
+}
+.navbar .brand {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--color-primary);
+}
+.navbar .brand:hover { color: var(--color-primary-hover); }
+.nav-list {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.nav-list li { margin-right: var(--spacing-md); }
+.nav-list li:last-child { margin-right: 0; }
+.nav-list a,
+.nav-list button {
+  padding: var(--spacing-sm) var(--spacing-md);
+  color: var(--color-text);
+  background: none;
+  border: none;
+  cursor: pointer;
+  border-radius: var(--border-radius);
+  transition: background-color var(--transition-speed) ease;
+}
+.nav-list a:hover,
+.nav-list button:hover,
+.nav-list a.active {
+  background-color: var(--color-border);
+}
+.nav-list .avatar {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  background-color: var(--color-primary);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+/* Responsive nav */
+@media (max-width: 768px) {
+  .navbar { flex-direction: column; }
+  .nav-list { flex-direction: column; }
+  .nav-list li { margin-bottom: var(--spacing-sm); }
+  .nav-list li:last-child { margin-bottom: 0; }
+}
+
+
+/*====================================
+  Form & Input Styles
+====================================*/
+form {
+  background-color: var(--color-surface);
+  padding: var(--spacing-md);
+  border-radius: var(--border-radius);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+label {
+  display: block;
+  margin-bottom: var(--spacing-xs);
+  font-weight: 600;
+  color: var(--color-muted);
+}
+input[type='text'],
+input[type='email'],
+input[type='password'],
+select,
+textarea {
+  width: 100%;
+  padding: var(--spacing-sm);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius);
+  transition: border-color var(--transition-speed) ease,
+              background-color var(--transition-speed) ease;
+}
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  background-color: var(--color-surface);
+}
+.error,
+.message.error {
+  color: var(--color-error);
+}
+.success,
+.message.success {
+  color: var(--color-success);
+}
+.warning {
+  color: var(--color-warning);
+}
+button[type='submit'],
+.profile-actions button,
+button {
+  background-color: var(--color-primary);
+  color: #fff;
+  border: none;
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: background-color var(--transition-speed) ease,
+              transform var(--transition-speed) ease;
+}
+button:disabled {
+  background-color: var(--color-border);
+  cursor: not-allowed;
+}
+button:not(:disabled):hover {
+  background-color: var(--color-primary-hover);
+  transform: translateY(-2px);
+}
+
+
+/*====================================
+  Profile & Card Styles
+====================================*/
+.profile-container {
+  max-width: 600px;
+  margin: var(--spacing-lg) auto;
+  padding: var(--spacing-md);
+  background-color: var(--color-surface);
+  border-radius: var(--border-radius);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+}
+.profile-header {
+  font-size: 2rem;
+  margin-bottom: var(--spacing-md);
+  text-align: center;
+  color: var(--color-primary);
+}
+.avatar-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: var(--spacing-md);
+}
+.avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background-color: var(--color-primary);
+  color: #fff;
+  font-size: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.profile-list {
+  list-style: none;
+  padding: 0;
+  margin: var(--spacing-xs) 0 0;
+}
+.profile-list li {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background-color: var(--color-bg);
+  border-radius: var(--border-radius);
+  margin-bottom: var(--spacing-xs);
+  border: 1px solid var(--color-border);
+}
+
+/* Table Styles for Manage Enrollments */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: var(--spacing-md);
+}
+thead th {
+  text-align: left;
+  padding: var(--spacing-sm);
+  background-color: var(--color-surface);
+  border-bottom: 2px solid var(--color-border);
+}
+tbody td {
+  padding: var(--spacing-sm);
+  border-bottom: 1px solid var(--color-border);
+}
+input[type='checkbox'] {
+  transform: scale(1.2);
+}
+
+/* Footer, Alerts, etc. can be added similarly */
