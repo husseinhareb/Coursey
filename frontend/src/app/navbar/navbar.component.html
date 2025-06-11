@@ -91,15 +91,22 @@
             </a>
           </li>
 
-          <!-- users -->
+          <!-- USERS -->
           <li *ngIf="searchResults.users.length" class="mt-sm"><strong>Users</strong></li>
-          <li *ngFor="let u of searchResults.users">
-            <a [routerLink]="['/users', u.id]">
-              {{ u.username }} ({{ u.profile.firstName }} {{ u.profile.lastName }})
+          <li *ngFor="let u of searchResults.users" class="search-user-item">
+            <a [routerLink]="['/users', u.id]" (click)="onPostClick()" class="search-user-link">
+              <img *ngIf="u.profile.profilePic" [src]="u.profile.profilePic" alt="{{u.username}}’s avatar"
+                class="search-user-avatar" />
+              <div class="search-user-info">
+                <div class="search-user-name">
+                  {{ u.profile.firstName }} {{ u.profile.lastName }}
+                </div>
+                <div class="search-user-email">{{ u.email }}</div>
+              </div>
             </a>
           </li>
 
-          <!-- posts -->
+
           <!-- POSTS -->
           <li *ngIf="searchResults.posts.length" class="mt-sm"><strong>Posts</strong></li>
           <li *ngFor="let p of searchResults.posts">

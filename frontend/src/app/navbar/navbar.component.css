@@ -5,7 +5,7 @@
   align-items: center;
   justify-content: center;
   width: 69.667px; /* match your viewBox width */
-  height: 44px; /* match your viewBox height */
+  height: 34px; /* match your viewBox height */
   position: relative;
   cursor: pointer;
   margin-left: var(--spacing-sm);
@@ -192,9 +192,9 @@
 .language-picker__icon {
   position: absolute;
   top: 50%;
-  left: var(--spacing-sm);
+  left: var(--spacing-md);
   transform: translateY(-50%);
-  font-size: 1rem; /* match your desired icon size */
+  font-size: 1.3rem; /* match your desired icon size */
   color: var(--color-muted);
   pointer-events: none;
   z-index: 1;
@@ -208,7 +208,7 @@
   border-radius: var(--border-radius);
   padding: var(--spacing-xs) var(--spacing-sm);
   padding-right: var(--spacing-lg); /* room for custom arrow */
-  padding-left: calc(var(--spacing-sm) + 1em + var(--spacing-xs));
+  padding-left: calc(var(--spacing-md) + 2em + var(--spacing-xs));
   font-size: 0.9rem;
   cursor: pointer;
   transition: border-color var(--transition-speed),
@@ -348,3 +348,33 @@
 
 /* small helper margin */
 .mt-sm { margin-top: var(--spacing-sm); }
+
+
+.search-user-item {
+  display: flex;
+  align-items: center;
+}
+.search-user-link {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: inherit;
+}
+.search-user-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: var(--spacing-sm);
+}
+.search-user-info {
+  display: flex;
+  flex-direction: column;
+}
+.search-user-name {
+  font-weight: 600;
+}
+.search-user-email {
+  font-size: 0.8rem;
+  color: var(--color-muted);
+}

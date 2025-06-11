@@ -22,6 +22,7 @@ import { ForumListComponent } from './forum/forum-list.component';
 import { ForumThreadComponent } from './forum/forum-thread.component';
 
 import { AuthGuard } from './auth/auth.guard';
+import { UserDetailComponent } from './users/user-detail.component';
 
 export const routes: Routes = [
   // Public landing & auth
@@ -121,7 +122,11 @@ export const routes: Routes = [
     component: ActivityLogListComponent,
     canActivate: [AuthGuard]
   },
-
+  {
+    path: 'users/:id',
+    component: UserDetailComponent,
+    canActivate: [AuthGuard]
+  },
   // Fallback
   { path: '**', redirectTo: '' }
 ];
