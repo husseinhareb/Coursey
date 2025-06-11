@@ -7,12 +7,7 @@
   <!-- Language selector -->
   <div class="language-selector">
     <label for="langSelect">{{ 'NAV.SELECT_LANGUAGE' | translate }}:</label>
-    <select
-      id="langSelect"
-      #langSelect
-      (change)="switchLanguage(langSelect.value)"
-      [value]="currentLang"
-    >
+    <select id="langSelect" #langSelect (change)="switchLanguage(langSelect.value)" [value]="currentLang">
       <option *ngFor="let lang of translate.getLangs()" [value]="lang">
         {{ lang.toUpperCase() }}
       </option>
@@ -21,11 +16,12 @@
 
   <ul class="nav-list">
     <!-- Public links -->
-    <li *ngIf="!auth.isLoggedIn">
+    <li *ngIf="auth.isLoggedIn && isAdmin">
       <a routerLink="/register" routerLinkActive="active">
         {{ 'NAV.SIGN_UP' | translate }}
       </a>
     </li>
+
     <li *ngIf="!auth.isLoggedIn">
       <a routerLink="/login" routerLinkActive="active">
         {{ 'NAV.LOG_IN' | translate }}

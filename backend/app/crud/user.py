@@ -88,11 +88,16 @@ async def authenticate_user(email: str, password: str) -> Optional[UserDB]:
 
 
 async def get_user_by_id(user_id: str) -> Optional[UserDB]:
-    """Fetch a single user by ObjectId string."""
-    doc = await users_collection.find_one({"_id": ObjectId(user_id)})
+    """Fetch a single user by ObjectId string, returning None if ID is invalid or not found."""
+    try:
+        oid = ObjectId(user_id)
+    except InvalidId:
+        return None
+
+    doc = await users_collection.find_one({"_id": oid})
     if not doc:
         return None
-    return _normalize_user_doc(doc)
+    return _normalize_user_doc(doc)  # reuse normalization logic
 
 
 async def list_users() -> List[UserDB]:
