@@ -253,3 +253,98 @@
   /* adjust if your dark primary-hover is different */
   --color-primary-hover-rgb: 164, 196, 255; /* #a4c4ff */
 }
+
+
+.navbar-center {
+  flex: 1;
+  justify-content: center;
+}
+
+.navbar-left,
+.navbar-center,
+.navbar-right {
+  display: flex;
+  align-items: center;
+}
+/* ————— search box ————— */
+.search-container {
+  position: relative;
+  display: flex;
+}
+
+.search-input {
+  width: 300px;
+  max-width: 80vw;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  padding-right: 2.5rem;    /* room for the button */
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius);
+  transition: border var(--transition-speed);
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(var(--color-primary-hover-rgb),0.2);
+}
+
+.search-btn {
+  position: absolute;
+  right: 0.25rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--color-muted);
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 0;
+}
+
+.search-btn:hover {
+  color: var(--color-text);
+}
+
+/* ————— dropdown ————— */
+.search-dropdown {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  left: 0;
+  width: 100%;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  z-index: 10;
+}
+
+.search-dropdown ul {
+  list-style: none;
+  margin: 0;
+  padding: var(--spacing-xs) 0;
+}
+
+.search-dropdown li {
+  padding: var(--spacing-xs) var(--spacing-md);
+  font-size: 0.9rem;
+}
+
+.search-dropdown li + li {
+  border-top: 1px solid var(--color-border);
+}
+
+.search-dropdown a {
+  color: var(--color-text);
+  text-decoration: none;
+  display: block;
+}
+
+.search-dropdown a:hover {
+  background: var(--color-border);
+  color: var(--color-primary);
+}
+
+/* small helper margin */
+.mt-sm { margin-top: var(--spacing-sm); }

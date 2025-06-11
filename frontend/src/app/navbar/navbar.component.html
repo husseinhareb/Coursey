@@ -72,6 +72,53 @@
     </a>
   </div>
 
+  <div class="navbar-center">
+    <div class="search-container">
+      <input type="text" class="search-input" [(ngModel)]="searchQuery" (ngModelChange)="onSearch()"
+        placeholder="🔍 Search courses, users…" />
+      <button class="search-btn" (click)="onSearch()">
+        <i class="fa-solid fa-search"></i>
+      </button>
+
+      <!-- in navbar.component.html -->
+      <div *ngIf="searchResults" class="search-dropdown">
+        <ul>
+          <!-- courses -->
+          <li *ngIf="searchResults.courses.length"><strong>Courses</strong></li>
+          <li *ngFor="let c of searchResults.courses">
+            <a [routerLink]="['/courses', c.id]">
+              {{ c.code }} — {{ c.title }}
+            </a>
+          </li>
+
+          <!-- users -->
+          <li *ngIf="searchResults.users.length" class="mt-sm"><strong>Users</strong></li>
+          <li *ngFor="let u of searchResults.users">
+            <a [routerLink]="['/users', u.id]">
+              {{ u.username }} ({{ u.profile.firstName }} {{ u.profile.lastName }})
+            </a>
+          </li>
+
+          <!-- posts -->
+          <li *ngIf="searchResults.posts.length" class="mt-sm"><strong>Posts</strong></li>
+          <li *ngFor="let p of searchResults.posts">
+            <a [routerLink]="['/courses', p.course_id, 'posts', p._id]">
+              {{ p.title }}
+            </a>
+          </li>
+
+          <!-- no results fallback -->
+          <li *ngIf="!searchResults.courses.length && !searchResults.users.length && !searchResults.posts.length">
+            <em>No results found</em>
+          </li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+
+
+
   <!-- RIGHT: courses → profile → avatar/initials + logout -->
   <div class="navbar-right">
     <a routerLink="/courses" routerLinkActive="active" class="nav-link">
