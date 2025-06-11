@@ -1,5 +1,3 @@
-// src/app/app.routes.ts
-
 import { Routes } from '@angular/router';
 
 import { HomeComponent } from './home/home.component';
@@ -14,22 +12,33 @@ import { CoursesComponent } from './courses/courses.component';
 import { CourseDetailComponent } from './course-detail/course-detail.component';
 import { CourseFormComponent } from './course-form/course-form.component';
 
-import { AuthGuard } from './auth/auth.guard';
 import { SubmissionFormComponent } from './submissions/submission.component';
 import { SubmissionListComponent } from './submissions/submission-list.component';
 
-import { ActivityLogListComponent } from './activity-log-list/activity-log-list.component';
+import { PostsComponent } from './posts/posts.component';
 
-import { ForumListComponent }   from './forum/forum-list.component';
+import { ActivityLogListComponent } from './activity-log-list/activity-log-list.component';
+import { ForumListComponent } from './forum/forum-list.component';
 import { ForumThreadComponent } from './forum/forum-thread.component';
+
+import { AuthGuard } from './auth/auth.guard';
 
 export const routes: Routes = [
   // Public landing & auth
-  { path: '', component: HomeComponent },
-  { path: 'register', component: RegisterComponent },
-  { path: 'login', component: LoginComponent },
+  {
+    path: '',
+    component: HomeComponent
+  },
+  {
+    path: 'register',
+    component: RegisterComponent
+  },
+  {
+    path: 'login',
+    component: LoginComponent
+  },
 
-  // Protected area (requires login)
+  // Protected area
   {
     path: 'home',
     component: HomeComponent,
@@ -50,6 +59,16 @@ export const routes: Routes = [
     component: ManageEnrollmentsComponent,
     canActivate: [AuthGuard]
   },
+
+
+  //individual post view
+  {
+    path: 'courses/:id/posts/:postId',
+    component: PostsComponent,
+    canActivate: [AuthGuard]
+  },
+
+  // Courses
   {
     path: 'courses',
     component: CoursesComponent,
@@ -71,6 +90,9 @@ export const routes: Routes = [
     component: CourseDetailComponent,
     canActivate: [AuthGuard]
   },
+
+
+  // submission routes
   {
     path: 'courses/:id/posts/:pid/submit',
     component: SubmissionFormComponent,
@@ -82,7 +104,7 @@ export const routes: Routes = [
     canActivate: [AuthGuard]
   },
 
-  // ▶︎ Course-specific forum routes (plural "forums")
+  // forums
   {
     path: 'courses/:id/forums',
     component: ForumListComponent,

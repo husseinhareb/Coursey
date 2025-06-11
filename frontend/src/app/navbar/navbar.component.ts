@@ -87,47 +87,46 @@ export class NavbarComponent implements OnInit {
   }
 
   onSearch() {
-    const q = this.searchQuery.trim().toLowerCase();
-    if (!q) {
-      this.searchResults = null;
-      return;
-    }
-
-    // 1) get ALL courses & users
-    forkJoin({
-      allCourses: this.courseSvc.list(),
-      allUsers:   this.userSvc.getUsers()
-    }).pipe(
-      switchMap(({ allCourses, allUsers }) => {
-        // 2) filter locally
-        const courses = allCourses.filter(c =>
-          c.title.toLowerCase().includes(q) ||
-          c.code .toLowerCase().includes(q)
-        );
-        const users = allUsers.filter(u => {
-          const name = `${u.profile.firstName} ${u.profile.lastName}`.toLowerCase();
-          return u.username.toLowerCase().includes(q) || name.includes(q);
-        });
-
-        // 3) for each matched course, fetch its posts
-        if (!courses.length) {
-          return of({ courses, users, posts: [] as Post[] });
-        }
-        return forkJoin(
-          courses.map(c => this.postSvc.list(c.id))
-        ).pipe(
-          map(arrays => arrays
-            .flat()
-            .filter(p =>
-              p.title.toLowerCase().includes(q) ||
-              p.content?.toLowerCase().includes(q)
-            )
-          ),
-          map(posts => ({ courses, users, posts }))
-        );
-      })
-    ).subscribe(results => {
-      this.searchResults = results;
-    });
+  const q = this.searchQuery.trim().toLowerCase();
+  if (!q) {
+    this.searchResults = null;
+    return;
   }
+
+  forkJoin({
+    allCourses: this.courseSvc.list(),
+    allUsers:   this.userSvc.getUsers()
+  }).pipe(
+    switchMap(({ allCourses, allUsers }) => {
+      // 1) filter courses & users as before
+      const courses = allCourses.filter(c =>
+        c.title.toLowerCase().includes(q) ||
+        c.code .toLowerCase().includes(q)
+      );
+      const users = allUsers.filter(u => {
+        const name = `${u.profile.firstName} ${u.profile.lastName}`.toLowerCase();
+        return u.username.toLowerCase().includes(q) || name.includes(q);
+      });
+
+      // 2) fetch *all* posts, then filter by query
+      if (!allCourses.length) {
+        return of({ courses, users, posts: [] as Post[] });
+      }
+      return forkJoin(
+        allCourses.map(c => this.postSvc.list(c.id))
+      ).pipe(
+        map(arrays =>
+          arrays.flat().filter(p =>
+            p.title.toLowerCase().includes(q) ||
+            p.content?.toLowerCase().includes(q)
+          )
+        ),
+        map(posts => ({ courses, users, posts }))
+      );
+    })
+  ).subscribe(results => {
+    this.searchResults = results;
+  });
+}
+
 }

@@ -1,6 +1,6 @@
 // src/app/course-detail/course-detail.component.ts
 
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, OnDestroy } from '@angular/core';
 import { CommonModule }     from '@angular/common';
 import {
   ReactiveFormsModule,
@@ -8,19 +8,18 @@ import {
   FormGroup,
   Validators
 } from '@angular/forms';
-
 import { RouterModule }     from '@angular/router';
-import { ActivatedRoute }   from '@angular/router';
+import { ActivatedRoute, ParamMap }   from '@angular/router';
+import { Subscription, forkJoin, of } from 'rxjs';
+import { switchMap }        from 'rxjs/operators';
 
-import { CourseService, Course } from '../services/course.service';
-import { PostService, Post }     from '../services/post.service';
+import { CourseService, Course }       from '../services/course.service';
+import { PostService, Post }           from '../services/post.service';
 import { SubmissionService, Submission } from '../services/submission.service';
-
-import { SubmissionFormComponent } from '../submissions/submission-form.component';
-import { SubmissionListComponent } from '../submissions/submission-list.component';
-
-import { AuthService, Me } from '../auth/auth.service';
-import { Enrollment } from '../services/user.service';
+import { SubmissionFormComponent }     from '../submissions/submission-form.component';
+import { SubmissionListComponent }     from '../submissions/submission-list.component';
+import { AuthService, Me }             from '../auth/auth.service';
+import { Enrollment }                  from '../services/user.service';
 
 @Component({
   selector: 'app-course-detail',
@@ -35,172 +34,166 @@ import { Enrollment } from '../services/user.service';
   templateUrl: './course-detail.component.html',
   styleUrls: ['./course-detail.component.css']
 })
-export class CourseDetailComponent implements OnInit {
-  private fb        = inject(FormBuilder);
-  private route     = inject(ActivatedRoute);
-  private courseSvc = inject(CourseService);
-  private postSvc   = inject(PostService);
+export class CourseDetailComponent implements OnInit, OnDestroy {
+  private fb          = inject(FormBuilder);
+  private route       = inject(ActivatedRoute);
+  private courseSvc   = inject(CourseService);
+  private postSvc     = inject(PostService);
   private submissionSvc = inject(SubmissionService);
-  private auth      = inject(AuthService);
+  private auth        = inject(AuthService);
 
-  /** The current course object */
-  course?: Course;
-  loadingCourse = false;
-  courseError: string | null = null;
+  private subs = new Subscription();
 
-  /** All posts (lecture/reminder/homework) */
-  posts: Post[] = [];
-  loadingPosts = false;
-  postsError: string | null = null;
+  /** The current course ID & data */
+  public  courseId!: string;
+  public  course?: Course;
+  public  loadingCourse = false;
+  public  courseError: string | null = null;
 
-  /**
-   * Dictionary of “this student’s submission” for each homework post.
-   * Key = postId, Value = Submission
-   */
-  studentSubmissions: { [postId: string]: Submission } = {};
+  /** All posts for the current course */
+  public posts: Post[] = [];
+  public loadingPosts = false;
+  public postsError: string | null = null;
 
-  /** Create/Edit post form toggles */
-  showForm = false;        // whether to show the create/edit post form
-  editing?: Post;          // if defined, we are editing that Post
-  postForm: FormGroup = this.fb.group({
+  /** Student’s own submissions keyed by postId */
+  public studentSubmissions: { [postId: string]: Submission } = {};
+
+  /** Form toggles & form group for creating/editing posts */
+  public showForm = false;
+  public editing?: Post;
+  public postForm: FormGroup = this.fb.group({
     title:    ['', Validators.required],
     content:  ['', Validators.required],
-    type:     ['', Validators.required],  // "lecture" | "reminder" | "homework"
+    type:     ['', Validators.required],
     file_id:  [''],
     due_date: ['']
   });
 
-  /** Which homework‐post (by _id) currently has the “Submit Homework” form open */
-  showSubmissionFormForPostId: string | null = null;
-  /** Which homework‐post (by _id) currently has the “View All Submissions” list open */
-  showSubmissionListForPostId: string | null = null;
-
-  /**
-   * Which homework‐post (by _id) currently has the “View My Submission” list open for a student
-   */
+  /** Which homework post has its “Submit” or “View all” open */
+  public showSubmissionFormForPostId: string | null = null;
+  public showSubmissionListForPostId: string | null = null;
   public showOwnSubmissionListForPostId: string | null = null;
 
-  /** Expose courseId to the template (must be public) */
-  public courseId!: string;
-
-  /** Current user info */
-  currentUser: Me | null = null;
-  isAdmin = false;
-  isProfessorInCourse = false;
-  isStudentInCourse = false;
+  /** Current user and permissions */
+  public currentUser: Me | null = null;
+  public isAdmin = false;
+  public isProfessorInCourse = false;
+  public isStudentInCourse = false;
 
   ngOnInit() {
-    const id = this.route.snapshot.paramMap.get('id');
-    if (!id) {
-      this.courseError = 'No course ID provided';
-      return;
-    }
-    this.courseId = id;
-
-    // 1) Load profile to determine roles & enrollments
-    this.auth.user$.subscribe({
-      next: user => {
-        this.currentUser = user;
-        this.computePermissions();
-
-        // As soon as we know the user is a student AND if posts are already loaded,
-        // fetch their existing submissions.
-        if (this.isStudentInCourse && this.posts.length > 0) {
-          this.loadStudentSubmissions();
+    // 1) watch for route param changes
+    this.subs.add(
+      this.route.paramMap.subscribe((params: ParamMap) => {
+        const id = params.get('id');
+        if (!id) {
+          this.courseError = 'No course ID provided';
+          return;
         }
-      },
-      error: () => {
-        this.currentUser = null;
+        this.courseId = id;
+        this.courseError = null;
+
+        // whenever the route changes, reload everything:
+        this.loadCourse();
+        this.loadPosts();
         this.computePermissions();
-        // no student submissions if not logged in
-      }
-    });
+      })
+    );
 
-    // 2) Load course details
-    this.loadCourse();
-
-    // 3) Load list of posts
-    this.loadPosts();
+    // 2) watch auth.user$ once to get user & recompute permissions
+    this.subs.add(
+      this.auth.user$.subscribe({
+        next: user => {
+          this.currentUser = user;
+          this.computePermissions();
+          // if we're already loaded posts & student, reload submissions
+          if (this.isStudentInCourse && this.posts.length > 0) {
+            this.loadStudentSubmissions();
+          }
+        },
+        error: () => {
+          this.currentUser = null;
+          this.computePermissions();
+        }
+      })
+    );
   }
 
-  private computePermissions() {
-    if (!this.currentUser) {
-      this.isAdmin = false;
-      this.isProfessorInCourse = false;
-      this.isStudentInCourse = false;
-      return;
-    }
-    const rolesLower = this.currentUser.roles.map(r => r.toLowerCase());
-    this.isAdmin = rolesLower.includes('admin');
+  ngOnDestroy() {
+    this.subs.unsubscribe();
+  }
 
-    // Find enrollment for this course
-    const found = (this.currentUser.enrollments as Enrollment[]).find(
-      (e: Enrollment) => e.courseId === this.courseId
-    );
-    if (found) {
-      this.isProfessorInCourse = rolesLower.includes('teacher');
-      this.isStudentInCourse   = rolesLower.includes('student');
+  /** Permissions */
+  private computePermissions() {
+    const u = this.currentUser;
+    this.isAdmin = !!u && u.roles.map(r => r.toLowerCase()).includes('admin');
+
+    if (u && u.enrollments) {
+      const found = (u.enrollments as Enrollment[]).find(e => e.courseId === this.courseId);
+      this.isProfessorInCourse = !!found && u.roles.map(r => r.toLowerCase()).includes('teacher');
+      this.isStudentInCourse   = !!found && u.roles.map(r => r.toLowerCase()).includes('student');
     } else {
       this.isProfessorInCourse = false;
       this.isStudentInCourse   = false;
     }
   }
 
-  /** If admin OR professor, they can create/edit/pin/move/delete */
   get canModifyPosts(): boolean {
     return this.isAdmin || this.isProfessorInCourse;
+  }
+
+  logout() {
+    this.auth.logout();
+  }
+
+  get initials(): string {
+    const u = this.currentUser;
+    if (!u) return '';
+    return ((u.profile.firstName?.[0]||'') + (u.profile.lastName?.[0]||'')).toUpperCase();
   }
 
   /** Load course metadata */
   private loadCourse() {
     this.loadingCourse = true;
+    this.courseError = null;
     this.courseSvc.get(this.courseId).subscribe({
       next: c => {
         this.course = c;
         this.loadingCourse = false;
       },
       error: e => {
-        this.courseError = e.error?.detail || 'Failed to load course';
+        this.courseError   = e.error?.detail || 'Failed to load course';
         this.loadingCourse = false;
       }
     });
   }
 
-  /** Load all posts, then (if student) load that student’s submission for each homework */
+  /** Load all posts and then student submissions if needed */
   private loadPosts() {
     this.loadingPosts = true;
+    this.postsError   = null;
     this.postSvc.list(this.courseId).subscribe({
-      next: (ps: Post[]) => {
-        this.posts = ps;
-        this.loadingPosts = false;
-
-        // If current user was already marked as “student” (from auth.user$.subscribe),
-        // fetch their submission now that posts are in memory
-        if (this.isStudentInCourse && this.currentUser) {
+      next: ps => {
+        this.posts         = ps;
+        this.loadingPosts  = false;
+        if (this.isStudentInCourse) {
           this.loadStudentSubmissions();
         }
       },
       error: e => {
-        this.postsError = e.error?.detail || 'Failed to load posts';
-        this.loadingPosts = false;
+        this.postsError    = e.error?.detail || 'Failed to load posts';
+        this.loadingPosts  = false;
       }
     });
   }
 
-  /**
-   * For every homework post, call submissionSvc.list(...) and pick out
-   * the submission whose student_id == currentUser._id (if any).
-   */
+  /** Load current student’s submission for each homework post */
   private loadStudentSubmissions() {
-    if (!this.currentUser) {
-      return;
-    }
-
+    if (!this.currentUser) return;
     this.posts
       .filter(p => p.type === 'homework')
       .forEach(p => {
         this.submissionSvc.list(this.courseId, p._id).subscribe({
-          next: (subs: Submission[]) => {
+          next: subs => {
             const mine = subs.find(s => s.student_id === this.currentUser!.id);
             if (mine) {
               this.studentSubmissions[p._id] = mine;
@@ -208,13 +201,10 @@ export class CourseDetailComponent implements OnInit {
               delete this.studentSubmissions[p._id];
             }
           },
-          error: () => {
-            delete this.studentSubmissions[p._id];
-          }
+          error: () => { delete this.studentSubmissions[p._id]; }
         });
       });
   }
-
   /** Count how many unpinned posts there are (for arrows) */
   get unpinnedCount(): number {
     return this.posts.filter(p => !p.ispinned).length;

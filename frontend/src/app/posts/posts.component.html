@@ -1,0 +1,66 @@
+<div *ngIf="loading" class="loading">Loading posts…</div>
+<div *ngIf="error" class="error">{{ error }}</div>
+
+<ul *ngIf="!loading && !error" class="posts-list">
+    <li *ngFor="let p of posts" class="post-item" id="{{ p._id }}">
+        <h3>
+            {{ p.ispinned ? '📌 ' : '' }}{{ p.title }}
+            <span *ngIf="p.type === 'homework'" class="hw-flag">(HW)</span>
+        </h3>
+        <p [innerText]="p.content"></p>
+        <small>Type: {{ p.type }}</small><br />
+        <small>Position: {{ p.position }}</small><br />
+        <small *ngIf="p.ispinned">Pinned At: {{ p.pinnedAt | date:'short' }}</small><br />
+
+        <div *ngIf="p.type === 'homework'">
+            <small>Due Date: {{ p.due_date | date:'short' }}</small><br />
+        </div>
+
+        <!-- actions for prof/admin -->
+        <div class="admin-actions" *ngIf="canModifyPosts">
+            <button (click)="togglePin.emit(p)">{{ p.ispinned ? 'Unpin' : 'Pin' }}</button>
+            <button (click)="moveUp.emit(p)" [disabled]="p.position === 1">▲</button>
+            <button (click)="moveDown.emit(p)" [disabled]="p.position === unpinnedCount">▼</button>
+            <button (click)="editPost.emit(p)">Edit</button>
+            <button (click)="deletePost.emit(p)">Delete</button>
+        </div>
+
+        <!-- student & submission UI -->
+        <div *ngIf="p.type === 'homework'" class="homework-actions">
+            <!-- submit -->
+            <button *ngIf="isStudentInCourse && !studentSubmissions[p._id] && showSubmissionFormForPostId !== p._id"
+                (click)="toggleSubmissionForm.emit(p._id)">
+                Submit Homework
+            </button>
+
+            <div *ngIf="showSubmissionFormForPostId === p._id && isStudentInCourse">
+                <app-submission-form [courseId]="courseId" [postId]="p._id" (submitted)="onSubmitted()"
+                    (cancel)="toggleSubmissionForm.emit(null)"></app-submission-form>
+            </div>
+
+            <!-- view own -->
+            <button *ngIf="isStudentInCourse && showOwnSubmissionListForPostId !== p._id"
+                (click)="viewOwnSubmission.emit(p._id)">
+                View My Submission
+            </button>
+            <div *ngIf="showOwnSubmissionListForPostId === p._id" class="own-submissions">
+                <app-submission-list [courseId]="courseId" [postId]="p._id"></app-submission-list>
+                <button (click)="viewOwnSubmission.emit(null)">Hide My Submission</button>
+            </div>
+
+            <!-- professor: view all -->
+            <button *ngIf="canModifyPosts" (click)="toggleSubmissionList.emit(p._id)">
+                {{ showSubmissionListForPostId === p._id ? 'Hide Submissions' : 'View All Submissions' }}
+            </button>
+            <div *ngIf="showSubmissionListForPostId === p._id && canModifyPosts">
+                <app-submission-list [courseId]="courseId" [postId]="p._id"></app-submission-list>
+            </div>
+        </div>
+
+        <hr />
+    </li>
+</ul>
+
+<div *ngIf="!loading && posts?.length === 0">
+    <p>No posts available.</p>
+</div>
