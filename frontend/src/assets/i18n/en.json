@@ -21,5 +21,15 @@
       "DETAILS": "Details"
     },
     "NO_LOGS": "No activity to display."
+  },
+  "LOGIN": {
+    "TITLE": "Log In",
+    "EMAIL_LABEL": "Email",
+    "EMAIL_PLACEHOLDER": "you@example.com",
+    "EMAIL_ERROR": "Valid email required.",
+    "PASSWORD_LABEL": "Password",
+    "PASSWORD_PLACEHOLDER": "••••••••",
+    "PASSWORD_ERROR": "Password is required.",
+    "SUBMIT": "Log In"
   }
 }

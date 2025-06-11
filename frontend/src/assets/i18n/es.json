@@ -10,5 +10,26 @@
     "ACTIVITY_LOGS": "Registros de actividad",
     "PROFILE": "Perfil",
     "LOG_OUT": "Cerrar sesión"
+  },
+  "ACTIVITY_LOG": {
+    "TITLE": "Historial de actividad",
+    "LOADING": "Cargando registros…",
+    "TABLE": {
+      "DATE_TIME": "Fecha y hora",
+      "USER": "Usuario",
+      "ACTION": "Acción",
+      "DETAILS": "Detalles"
+    },
+    "NO_LOGS": "No hay actividad para mostrar."
+  },
+  "LOGIN": {
+    "TITLE": "Iniciar sesión",
+    "EMAIL_LABEL": "Correo electrónico",
+    "EMAIL_PLACEHOLDER": "tucorreo@ejemplo.com",
+    "EMAIL_ERROR": "Se requiere un correo electrónico válido.",
+    "PASSWORD_LABEL": "Contraseña",
+    "PASSWORD_PLACEHOLDER": "••••••••",
+    "PASSWORD_ERROR": "Se requiere contraseña.",
+    "SUBMIT": "Iniciar sesión"
   }
 }

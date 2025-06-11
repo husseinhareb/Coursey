@@ -21,5 +21,15 @@
       "DETAILS": "Détails"
     },
     "NO_LOGS": "Aucune activité à afficher."
+  },
+  "LOGIN": {
+    "TITLE": "Se connecter",
+    "EMAIL_LABEL": "Email",
+    "EMAIL_PLACEHOLDER": "vous@exemple.com",
+    "EMAIL_ERROR": "Adresse email valide requise.",
+    "PASSWORD_LABEL": "Mot de passe",
+    "PASSWORD_PLACEHOLDER": "••••••••",
+    "PASSWORD_ERROR": "Mot de passe requis.",
+    "SUBMIT": "Se connecter"
   }
 }

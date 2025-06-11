@@ -1,13 +1,14 @@
+<!-- src/app/login/login.component.html -->
 <div class="login-container">
   <div class="login-card">
     <div class="login-header">
-      <h2>Log In</h2>
+      <h2>{{ 'LOGIN.TITLE' | translate }}</h2>
     </div>
     <div class="login-body">
       <form [formGroup]="form" (ngSubmit)="onSubmit()">
 
         <div class="form-group">
-          <label for="email">Email</label>
+          <label for="email">{{ 'LOGIN.EMAIL_LABEL' | translate }}</label>
           <div class="input-with-icon">
             <input
               id="email"
@@ -15,23 +16,20 @@
               formControlName="email"
               class="form-control"
               [ngClass]="{ 'invalid': form.get('email')?.invalid && form.get('email')?.touched }"
-              placeholder="you@example.com"
+              placeholder="{{ 'LOGIN.EMAIL_PLACEHOLDER' | translate }}"
             />
-            <i
-              class="fas fa-envelope input-icon"
-              aria-hidden="true"
-            ></i>
+            <i class="fas fa-envelope input-icon" aria-hidden="true"></i>
           </div>
           <span
             class="error-message"
             *ngIf="form.get('email')?.invalid && form.get('email')?.touched"
           >
-            Valid email required.
+            {{ 'LOGIN.EMAIL_ERROR' | translate }}
           </span>
         </div>
 
         <div class="form-group">
-          <label for="password">Password</label>
+          <label for="password">{{ 'LOGIN.PASSWORD_LABEL' | translate }}</label>
           <div class="input-with-icon">
             <input
               id="password"
@@ -39,23 +37,20 @@
               formControlName="password"
               class="form-control"
               [ngClass]="{ 'invalid': form.get('password')?.invalid && form.get('password')?.touched }"
-              placeholder="••••••••"
+              placeholder="{{ 'LOGIN.PASSWORD_PLACEHOLDER' | translate }}"
             />
-            <i
-              class="fas fa-lock input-icon"
-              aria-hidden="true"
-            ></i>
+            <i class="fas fa-lock input-icon" aria-hidden="true"></i>
           </div>
           <span
             class="error-message"
             *ngIf="form.get('password')?.invalid && form.get('password')?.touched"
           >
-            Password is required.
+            {{ 'LOGIN.PASSWORD_ERROR' | translate }}
           </span>
         </div>
 
         <button type="submit" class="submit-btn" [disabled]="form.invalid">
-          Log In
+          {{ 'LOGIN.SUBMIT' | translate }}
         </button>
       </form>
 
