@@ -1,14 +1,12 @@
 /* The switch container */
 #theme-toggle-button {
-  /* Remove the old 3em width, use the SVG’s native size */
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 69.667px; /* match your viewBox width */
-  height: 34px; /* match your viewBox height */
+  width: 69.667px; 
+  align-self: center;
   position: relative;
   cursor: pointer;
-  margin-left: var(--spacing-sm);
 }
 
 /* Hide default HTML checkbox */
@@ -79,19 +77,21 @@
   width: 100%;
   height: 100%;
   display: block;
-  pointer-events: none; /* let the checkbox catch clicks */
+  pointer-events: none; 
 }
 
 /*====================================
   Navbar Overrides — fix spacing & layout
 ====================================*/
 .navbar {
+  position: relative;  
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: var(--spacing-sm) var(--spacing-md);
   background: var(--color-surface);
 }
+
 
 /* Left & right containers */
 .navbar-left,
@@ -115,31 +115,7 @@
   background: var(--color-border);
   color: var(--color-primary);
 }
-.avatar-wrapper {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 var(--spacing-sm);
-}
-.avatar-wrapper .avatar {
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: 50%;
-  background: var(--color-primary);
-  color: #fff;
-  font-weight: 600;
-  font-size: 1rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-}
-.avatar-wrapper .avatar img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
+
 /* Language selector inline */
 .language-selector {
   display: flex;
@@ -150,27 +126,7 @@
   padding: var(--spacing-xs) var(--spacing-sm);
 }
 
-/* Theme toggle stays as before */
-#theme-toggle-button {
-  cursor: pointer;
-}
-/* … (your existing theme-toggle SVG CSS) … */
 
-/* Logout button */
-.logout-btn {
-  padding: var(--spacing-xs) var(--spacing-sm);
-  background: var(--color-accent);
-  color: #fff;
-  border: none;
-  border-radius: var(--border-radius);
-  cursor: pointer;
-  transition: background var(--transition-speed),
-    transform var(--transition-speed);
-}
-.logout-btn:hover {
-  background: var(--color-accent-hover);
-  transform: translateY(-1px);
-}
 
 /* accessible hide-for-visual users */
 .li4-sr-only {
@@ -256,9 +212,12 @@
 
 
 .navbar-center {
-  flex: 1;
-  justify-content: center;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
 }
+
 
 .navbar-left,
 .navbar-center,
@@ -345,8 +304,6 @@
   background: var(--color-border);
   color: var(--color-primary);
 }
-
-/* small helper margin */
 .mt-sm { margin-top: var(--spacing-sm); }
 
 
@@ -377,4 +334,63 @@
 .search-user-email {
   font-size: 0.8rem;
   color: var(--color-muted);
+}
+
+
+
+
+
+/* wrap avatar + logout into one pill-shaped container */
+.user-container {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  background: rgba(255, 255, 255, 0.1);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--border-radius);
+  transition: background var(--transition-speed);
+  cursor: pointer;
+}
+.user-container:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* avatar circle */
+.avatar-wrapper {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: var(--color-primary);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 1rem;
+}
+.avatar-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* logout icon button */
+.logout-btn {
+  background: none;
+  border: none;
+  padding: var(--spacing-xs);
+  color: rgba(255, 255, 255, 0.8);
+  border-radius: var(--border-radius);
+  transition: background var(--transition-speed), color var(--transition-speed), transform var(--transition-speed);
+}
+.logout-btn:hover {
+  background: rgba(255, 0, 0, 0.1);
+  color: #ff4444;
+  transform: translateX(2px);
+}
+.logout-btn i {
+  font-size: 1rem;
 }

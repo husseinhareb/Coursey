@@ -17,7 +17,6 @@
       </select>
     </div>
 
-
     <!-- Theme toggle -->
     <label id="theme-toggle-button">
       <input type="checkbox" id="toggle" [checked]="theme.isDark()" (change)="theme.toggle()" />
@@ -63,7 +62,6 @@
           </g>
         </g>
       </svg>
-
     </label>
 
     <!-- Home -->
@@ -72,14 +70,10 @@
     </a>
   </div>
 
-  <div class="navbar-center">
+  <div *ngIf="auth.isLoggedIn" class="navbar-center">
     <div class="search-container">
       <input type="text" class="search-input" [(ngModel)]="searchQuery" (ngModelChange)="onSearch()"
         placeholder="🔍 Search courses, users…" />
-      <button class="search-btn" (click)="onSearch()">
-        <i class="fa-solid fa-search"></i>
-      </button>
-
       <!-- in navbar.component.html -->
       <div *ngIf="searchResults" class="search-dropdown">
         <ul>
@@ -106,7 +100,6 @@
             </a>
           </li>
 
-
           <!-- POSTS -->
           <li *ngIf="searchResults.posts.length" class="mt-sm"><strong>Posts</strong></li>
           <li *ngFor="let p of searchResults.posts">
@@ -114,7 +107,6 @@
               {{ p.title }}
             </a>
           </li>
-
 
           <!-- no results fallback -->
           <li *ngIf="!searchResults.courses.length && !searchResults.users.length && !searchResults.posts.length">
@@ -126,11 +118,10 @@
     </div>
   </div>
 
-
-
+  <!-- RIGHT: courses → profile → avatar/initials + logout -->
   <!-- RIGHT: courses → profile → avatar/initials + logout -->
   <div class="navbar-right">
-    <a routerLink="/courses" routerLinkActive="active" class="nav-link">
+    <a *ngIf="auth.isLoggedIn" routerLink="/courses" routerLinkActive="active" class="nav-link">
       {{ 'NAV.COURSES' | translate }}
     </a>
 
@@ -138,17 +129,17 @@
       {{ 'NAV.PROFILE' | translate }}
     </a>
 
-    <!-- Avatar or initials -->
-    <div *ngIf="auth.isLoggedIn" class="avatar-wrapper">
-      <div class="avatar">
-        <img *ngIf="auth.user?.profile?.profilePic as pic; else initTpl" [src]="pic" alt="Avatar" />
-        <ng-template #initTpl>{{ initials }}</ng-template>
+    <div *ngIf="auth.isLoggedIn" class="user-container">
+      <div class="avatar-wrapper">
+        <img *ngIf="auth.user?.profile?.profilePic as pic" [src]="pic" alt="Avatar" />
+        <ng-container *ngIf="!auth.user?.profile?.profilePic">
+          {{ initials }}
+        </ng-container>
       </div>
+      <button class="logout-btn" (click)="logout()">
+        <i class="fa-solid fa-right-from-bracket"></i>
+      </button>
     </div>
-
-    <!-- Log out -->
-    <button class="logout-btn" (click)="logout()">
-      {{ 'NAV.LOG_OUT' | translate }}
-    </button>
   </div>
+
 </nav>
