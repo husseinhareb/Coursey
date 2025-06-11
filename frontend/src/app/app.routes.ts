@@ -64,8 +64,8 @@ export const routes: Routes = [
   //individual post view
   {
     path: 'courses/:id/posts/:postId',
-    component: PostsComponent,
-    canActivate: [AuthGuard]
+    component: CourseDetailComponent,
+    canActivate: [AuthGuard],
   },
 
   // Courses

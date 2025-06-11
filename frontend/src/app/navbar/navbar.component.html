@@ -100,12 +100,14 @@
           </li>
 
           <!-- posts -->
+          <!-- POSTS -->
           <li *ngIf="searchResults.posts.length" class="mt-sm"><strong>Posts</strong></li>
           <li *ngFor="let p of searchResults.posts">
-            <a [routerLink]="['/courses', p.course_id, 'posts', p._id]">
+            <a [routerLink]="['/courses', p.course_id, 'posts', p._id]" (click)="onPostClick()">
               {{ p.title }}
             </a>
           </li>
+
 
           <!-- no results fallback -->
           <li *ngIf="!searchResults.courses.length && !searchResults.users.length && !searchResults.posts.length">
