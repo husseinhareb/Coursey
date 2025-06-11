@@ -1,21 +1,67 @@
-<h2>Log In</h2>
+<div class="login-container">
+  <div class="login-card">
+    <div class="login-header">
+      <h2>Log In</h2>
+    </div>
+    <div class="login-body">
+      <form [formGroup]="form" (ngSubmit)="onSubmit()">
 
-<form [formGroup]="form" (ngSubmit)="onSubmit()">
-  <label for="email">Email</label>
-  <input id="email" formControlName="email" type="email" />
-  <div *ngIf="form.get('email')?.invalid && form.get('email')?.touched">
-    Valid email required.
+        <div class="form-group">
+          <label for="email">Email</label>
+          <div class="input-with-icon">
+            <input
+              id="email"
+              type="email"
+              formControlName="email"
+              class="form-control"
+              [ngClass]="{ 'invalid': form.get('email')?.invalid && form.get('email')?.touched }"
+              placeholder="you@example.com"
+            />
+            <i
+              class="fas fa-envelope input-icon"
+              aria-hidden="true"
+            ></i>
+          </div>
+          <span
+            class="error-message"
+            *ngIf="form.get('email')?.invalid && form.get('email')?.touched"
+          >
+            Valid email required.
+          </span>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <div class="input-with-icon">
+            <input
+              id="password"
+              type="password"
+              formControlName="password"
+              class="form-control"
+              [ngClass]="{ 'invalid': form.get('password')?.invalid && form.get('password')?.touched }"
+              placeholder="••••••••"
+            />
+            <i
+              class="fas fa-lock input-icon"
+              aria-hidden="true"
+            ></i>
+          </div>
+          <span
+            class="error-message"
+            *ngIf="form.get('password')?.invalid && form.get('password')?.touched"
+          >
+            Password is required.
+          </span>
+        </div>
+
+        <button type="submit" class="submit-btn" [disabled]="form.invalid">
+          Log In
+        </button>
+      </form>
+
+      <div *ngIf="error" class="global-error">
+        {{ error }}
+      </div>
+    </div>
   </div>
-
-  <label for="password">Password</label>
-  <input id="password" formControlName="password" type="password" />
-  <div *ngIf="form.get('password')?.invalid && form.get('password')?.touched">
-    Password is required.
-  </div>
-
-  <button type="submit" [disabled]="form.invalid">Log In</button>
-</form>
-
-<div *ngIf="error" class="error">
-  {{ error }}
 </div>

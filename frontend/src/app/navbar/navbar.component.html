@@ -119,19 +119,62 @@
   </div>
 
   <!-- RIGHT: courses → profile → avatar/initials + logout -->
-  <!-- RIGHT: courses → profile → avatar/initials + logout -->
   <div class="navbar-right">
-    <a *ngIf="auth.isLoggedIn" routerLink="/courses" routerLinkActive="active" class="nav-link">
+    <!-- Log In / Sign Up for guests -->
+    <a
+      *ngIf="!auth.isLoggedIn"
+      routerLink="/login"
+      routerLinkActive="active"
+      class="nav-link"
+    >
+      {{ 'NAV.LOGIN' | translate }}
+    </a>
+
+    <!-- Admin-only links -->
+    <a
+      *ngIf="auth.isLoggedIn && isAdmin"
+      routerLink="/users"
+      routerLinkActive="active"
+      class="nav-link"
+    >
+      {{ 'NAV.USERS' | translate }}
+    </a>
+    <a
+      *ngIf="auth.isLoggedIn && isAdmin"
+      routerLink="/activity-logs"
+      routerLinkActive="active"
+      class="nav-link"
+    >
+      {{ 'NAV.ACTIVITY_LOGS' | translate }}
+    </a>
+
+    <!-- Regular authenticated links -->
+    <a
+      *ngIf="auth.isLoggedIn"
+      routerLink="/courses"
+      routerLinkActive="active"
+      class="nav-link"
+    >
       {{ 'NAV.COURSES' | translate }}
     </a>
 
-    <a *ngIf="auth.isLoggedIn" routerLink="/profile" routerLinkActive="active" class="nav-link">
+    <a
+      *ngIf="auth.isLoggedIn"
+      routerLink="/profile"
+      routerLinkActive="active"
+      class="nav-link"
+    >
       {{ 'NAV.PROFILE' | translate }}
     </a>
 
+    <!-- Avatar + Logout -->
     <div *ngIf="auth.isLoggedIn" class="user-container">
       <div class="avatar-wrapper">
-        <img *ngIf="auth.user?.profile?.profilePic as pic" [src]="pic" alt="Avatar" />
+        <img
+          *ngIf="auth.user?.profile?.profilePic as pic"
+          [src]="pic"
+          alt="Avatar"
+        />
         <ng-container *ngIf="!auth.user?.profile?.profilePic">
           {{ initials }}
         </ng-container>
@@ -141,5 +184,6 @@
       </button>
     </div>
   </div>
+
 
 </nav>
