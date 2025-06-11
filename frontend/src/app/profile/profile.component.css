@@ -1,28 +1,16 @@
-/* Root variables for theming */
-:root {
-  --primary-color: #5a67d8;
-  --accent-color: #ed64a6;
-  --background-color: #f7fafc;
-  --card-background: #ffffff;
-  --text-color: #2d3748;
-  --muted-text: #718096;
-  --border-radius: 0.5rem;
-  --transition-speed: 0.3s;
-  --shadow-light: rgba(0, 0, 0, 0.05);
-  --shadow-medium: rgba(0, 0, 0, 0.1);
-}
+/* src/app/profile/profile.component.css */
 
 /* Container */
 .profile-container {
   max-width: 600px;
   margin: 2rem auto;
   padding: 2rem;
-  background: var(--card-background);
+  background: var(--color-surface);
   border-radius: var(--border-radius);
-  box-shadow: 0 4px 8px var(--shadow-light);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.05);
   animation: fadeIn 0.8s ease-out;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  color: var(--text-color);
+  font-family: var(--font-family-base);
+  color: var(--color-text);
 }
 
 /* Header */
@@ -30,8 +18,7 @@
   font-size: 2rem;
   margin-bottom: 1.5rem;
   text-align: center;
-  position: relative;
-  color: var(--primary-color);
+  color: var(--color-primary);
   animation: slideDown 0.6s ease-out;
 }
 .profile-header::after {
@@ -39,7 +26,7 @@
   display: block;
   width: 50px;
   height: 4px;
-  background: var(--accent-color);
+  background: var(--color-accent);
   margin: 0.5rem auto;
   border-radius: 2px;
 }
@@ -54,12 +41,12 @@
   animation: fadeIn 0.5s ease-out;
 }
 .message.error {
-  background: #fed7d7;
-  color: #c53030;
+  background: var(--color-bg);
+  color: var(--color-error);
 }
 .message.success {
-  background: #c6f6d5;
-  color: #2f855a;
+  background: var(--color-bg);
+  color: var(--color-success);
 }
 
 /* Avatar */
@@ -72,21 +59,15 @@
   width: 100px;
   height: 100px;
   border-radius: 50%;
-  background: var(--primary-color);
+  background: var(--color-primary);
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   color: #fff;
   font-size: 2.5rem;
-  position: relative;
   overflow: hidden;
-  box-shadow: 0 2px 4px var(--shadow-medium);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
   transition: transform var(--transition-speed) ease;
-}
-.avatar img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
 }
 .avatar:hover {
   transform: scale(1.05);
@@ -102,33 +83,35 @@
 .profile-field label {
   margin-bottom: 0.25rem;
   font-weight: 600;
-  color: var(--muted-text);
+  color: var(--color-muted);
 }
 .profile-field input {
   padding: 0.5rem 0.75rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--color-border);
   border-radius: var(--border-radius);
   font-size: 1rem;
   transition: border-color var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
 }
 .profile-field input:focus {
   outline: none;
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(90, 103, 216, 0.2);
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba( var(--color-primary-hover), 0.2 );
 }
+
+/* Lists */
 .profile-list {
   list-style: none;
   padding-left: 0;
-  margin: 0.5rem 0 0;
+  margin-top: 0.5rem;
 }
 .profile-list li {
-  background: var(--background-color);
+  background: var(--color-bg);
   margin-bottom: 0.5rem;
   padding: 0.5rem;
   border-radius: var(--border-radius);
-  color: var(--text-color);
+  color: var(--color-text);
   font-size: 0.95rem;
-  box-shadow: 0 1px 3px var(--shadow-light);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
 
 /* Actions */
@@ -137,22 +120,21 @@
   margin-top: 1.5rem;
 }
 .profile-actions button {
-  background: var(--primary-color);
+  background: var(--color-primary);
   color: #fff;
   border: none;
   padding: 0.75rem 1.5rem;
-  font-size: 1rem;
   border-radius: var(--border-radius);
   cursor: pointer;
   transition: background var(--transition-speed) ease, transform var(--transition-speed) ease;
 }
 .profile-actions button:disabled {
-  background: #a0aec0;
+  background: var(--color-border);
   cursor: not-allowed;
   opacity: 0.7;
 }
 .profile-actions button:not(:disabled):hover {
-  background: var(--accent-color);
+  background: var(--color-primary-hover);
   transform: translateY(-2px);
 }
 

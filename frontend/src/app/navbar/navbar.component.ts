@@ -1,10 +1,11 @@
 // src/app/navbar/navbar.component.ts
 
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { Component, OnInit }             from '@angular/core';
+import { CommonModule }                  from '@angular/common';
+import { RouterLink, RouterLinkActive }  from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { AuthService, Me } from '../auth/auth.service';
+import { AuthService, Me }               from '../auth/auth.service';
+import { ThemeService }                  from '../theme.service';
 
 @Component({
   selector: 'app-navbar',
@@ -12,8 +13,8 @@ import { AuthService, Me } from '../auth/auth.service';
   imports: [
     CommonModule,
     RouterLink,
-    RouterLinkActive,  // ← now safe, because ActivatedRoute is provided globally
-    TranslateModule    // ← so that | translate works
+    RouterLinkActive,
+    TranslateModule
   ],
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.css']
@@ -23,24 +24,35 @@ export class NavbarComponent implements OnInit {
 
   constructor(
     public auth: AuthService,
-    public translate: TranslateService
+    public translate: TranslateService,
+    public theme: ThemeService          // ← injected for template
   ) {
-    // 1) Register your supported languages and a fallback
+    // Register supported languages and fallback
     this.translate.addLangs(['en', 'fr', 'es']);
     this.translate.setDefaultLang('en');
 
-    // 2) Try to use the browser’s language (if we support it), otherwise use ‘en’
+    // Attempt to use browser language if supported
     const browserLang = this.translate.getBrowserLang();
     this.currentLang = (browserLang && this.translate.getLangs().includes(browserLang))
       ? browserLang
       : 'en';
 
-    // 3) Actually load the JSON file for that language
+    // Load translations for the selected language
     this.translate.use(this.currentLang);
+
+    // Initialize theme (apply saved or default)
+    this.theme.initialize();
   }
 
   ngOnInit(): void {
-    // No further action required here unless you want to override language later
+    // Nothing else needed here
+  }
+
+  /** Called by the <select> (change) event in the template */
+  onLanguageChange(ev: Event): void {
+    const select = ev.target as HTMLSelectElement | null;
+    if (!select) return;
+    this.switchLanguage(select.value);
   }
 
   switchLanguage(lang: string) {
@@ -58,8 +70,7 @@ export class NavbarComponent implements OnInit {
 
   get isAdmin(): boolean {
     const user: Me | null = this.auth.user;
-    if (!user) return false;
-    return user.roles.map(r => r.toLowerCase()).includes('admin');
+    return !!user && user.roles.map(r => r.toLowerCase()).includes('admin');
   }
 
   logout() {

@@ -1,61 +1,98 @@
-<!-- src/app/navbar/navbar.component.html -->
 <nav class="navbar">
-  <div class="navbar-brand">
-    <a routerLink="/" class="brand">{{ 'NAV.BRAND' | translate }}</a>
+  <!-- LEFT: brand → lang → theme → home -->
+  <div class="navbar-left">
+    <div class="navbar-brand">
+      <a routerLink="/" class="brand">{{ 'NAV.BRAND' | translate }}</a>
+    </div>
+    <div class="language-picker">
+      <!-- FontAwesome icon -->
+      <i class="fa-solid fa-language language-picker__icon"></i>
+
+      <!-- the select remains -->
+      <select id="language-picker-select" class="language-picker__select li4-btn li4-btn--subtle"
+        (change)="onLanguageChange($event)" [value]="currentLang">
+        <option *ngFor="let lang of translate.getLangs()" [value]="lang" [attr.lang]="lang">
+          {{ lang.toUpperCase() }}
+        </option>
+      </select>
+    </div>
+
+
+    <!-- Theme toggle -->
+    <label id="theme-toggle-button">
+      <input type="checkbox" id="toggle" [checked]="theme.isDark()" (change)="theme.toggle()" />
+      <svg viewBox="0 0 69.667 44" xmlns="http://www.w3.org/2000/svg">
+        <g transform="translate(3.5 3.5)">
+          <g filter="url(#container)" transform="matrix(1,0,0,1,-3.5,-3.5)">
+            <rect id="container" data-name="container" x="3.5" y="3.5" width="60.667" height="35" rx="17.5"
+              fill="#83cbd8" />
+          </g>
+          <g transform="translate(7 8)" id="button">
+            <g id="sun" data-name="sun">
+              <g filter="url(#sun-outer)" transform="matrix(1,0,0,1,-5.83,-5.83)">
+                <circle data-name="sun-outer" id="sun-outer-2" cx="15.167" cy="15.167" r="15.167" fill="#f8e664" />
+              </g>
+              <g filter="url(#sun)" transform="matrix(1,0,0,1,-5.83,-5.83)">
+                <path id="sun" data-name="sun" d="M11.667,0A11.667,11.667,0,1,1,0,11.667,11.667,11.667,0,0,1,11.667,0Z"
+                  fill="rgba(246,254,247,0.29)" />
+              </g>
+              <circle id="sun-inner" cx="7" cy="7" r="7" fill="#fcf4b9" transform="translate(8.167 8.167)" />
+            </g>
+            <g id="moon" data-name="moon">
+              <g filter="url(#moon)" transform="matrix(1,0,0,1,-31.5,-5.83)">
+                <circle id="moon-3" data-name="moon" cx="15.167" cy="15.167" r="15.167" fill="#cce6ee"
+                  transform="translate(31.5 5.83)" />
+              </g>
+              <g id="patches" fill="#a6cad0" transform="translate(-24.415 -1.009)">
+                <circle cx="2" cy="2" r="2" transform="translate(43.009 4.496)" />
+                <circle data-name="patch" cx="2" cy="2" r="2" transform="translate(39.366 17.952)" />
+                <circle data-name="patch" cx="1" cy="1" r="1" transform="translate(33.016 8.044)" />
+                <circle data-name="patch" cx="1" cy="1" r="1" transform="translate(51.081 18.888)" />
+                <circle data-name="patch" cx="1" cy="1" r="1" transform="translate(33.016 22.503)" />
+                <circle data-name="patch" cx="1.5" cy="1.5" r="1.5" transform="translate(50.081 10.53)" />
+              </g>
+            </g>
+          </g>
+          <g id="cloud" filter="url(#cloud)" transform="matrix(1,0,0,1,-3.5,-3.5)">
+            <path data-name="cloud" id="cloud"
+              d="M3512.81,173.815a4.463,4.463,0,0,1,2.243.62.95.95,0,0,1,.72-1.281,4.852,4.852,0,0,1,2.623.519c.034.02-.5-1.968.281-2.716a2.117,2.117,0,0,1,2.829-.274,1.821,1.821,0,0,1,.854,1.858c.063.037,2.594-.049,3.285,1.273s-.865,2.544-.807,2.626a12.192,12.192,0,0,1,2.278.892c.553.448,1.106,1.992-1.62,2.927a7.742,7.742,0,0,1-3.762-.3c-1.28-.49-1.181-2.65-1.137-2.624s-1.417,2.2-2.623,2.2a4.172,4.172,0,0,1-2.394-1.206,3.825,3.825,0,0,1-2.771.774c-3.429-.46-2.333-3.267-2.2-3.55A3.721,3.721,0,0,1,3512.81,173.815Z"
+              fill="#fff" />
+          </g>
+          <g id="stars" fill="#def8ff" transform="translate(3.585 1.325)">
+            <!-- stars paths omitted for brevity -->
+          </g>
+        </g>
+      </svg>
+
+    </label>
+
+    <!-- Home -->
+    <a routerLink="/home" routerLinkActive="active" class="nav-link">
+      {{ 'NAV.HOME' | translate }}
+    </a>
   </div>
 
-  <!-- Language selector -->
-  <div class="language-selector">
-    <label for="langSelect">{{ 'NAV.SELECT_LANGUAGE' | translate }}:</label>
-    <select id="langSelect" #langSelect (change)="switchLanguage(langSelect.value)" [value]="currentLang">
-      <option *ngFor="let lang of translate.getLangs()" [value]="lang">
-        {{ lang.toUpperCase() }}
-      </option>
-    </select>
+  <!-- RIGHT: courses → profile → avatar/initials + logout -->
+  <div class="navbar-right">
+    <a routerLink="/courses" routerLinkActive="active" class="nav-link">
+      {{ 'NAV.COURSES' | translate }}
+    </a>
+
+    <a *ngIf="auth.isLoggedIn" routerLink="/profile" routerLinkActive="active" class="nav-link">
+      {{ 'NAV.PROFILE' | translate }}
+    </a>
+
+    <!-- Avatar or initials -->
+    <div *ngIf="auth.isLoggedIn" class="avatar-wrapper">
+      <div class="avatar">
+        <img *ngIf="auth.user?.profile?.profilePic as pic; else initTpl" [src]="pic" alt="Avatar" />
+        <ng-template #initTpl>{{ initials }}</ng-template>
+      </div>
+    </div>
+
+    <!-- Log out -->
+    <button class="logout-btn" (click)="logout()">
+      {{ 'NAV.LOG_OUT' | translate }}
+    </button>
   </div>
-
-  <ul class="nav-list">
-    <!-- Public links -->
-    <li *ngIf="auth.isLoggedIn && isAdmin">
-      <a routerLink="/register" routerLinkActive="active">
-        {{ 'NAV.SIGN_UP' | translate }}
-      </a>
-    </li>
-
-    <li *ngIf="!auth.isLoggedIn">
-      <a routerLink="/login" routerLinkActive="active">
-        {{ 'NAV.LOG_IN' | translate }}
-      </a>
-    </li>
-
-    <!-- Private links -->
-    <li *ngIf="auth.isLoggedIn">
-      <a routerLink="/home" routerLinkActive="active">
-        {{ 'NAV.HOME' | translate }}
-      </a>
-    </li>
-    <li *ngIf="auth.isLoggedIn && isAdmin">
-      <a routerLink="/users" routerLinkActive="active">
-        {{ 'NAV.USERS' | translate }}
-      </a>
-    </li>
-    <li *ngIf="auth.isLoggedIn">
-      <a routerLink="/courses" routerLinkActive="active">
-        {{ 'NAV.COURSES' | translate }}
-      </a>
-    </li>
-    <li *ngIf="auth.isLoggedIn && isAdmin">
-      <a routerLink="/activity-logs" routerLinkActive="active">
-        {{ 'NAV.ACTIVITY_LOGS' | translate }}
-      </a>
-    </li>
-    <li *ngIf="auth.isLoggedIn">
-      <a routerLink="/profile" routerLinkActive="active">
-        {{ 'NAV.PROFILE' | translate }}
-      </a>
-    </li>
-    <li *ngIf="auth.isLoggedIn">
-      <button (click)="logout()">{{ 'NAV.LOG_OUT' | translate }}</button>
-    </li>
-  </ul>
 </nav>

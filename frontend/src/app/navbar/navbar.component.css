@@ -1,112 +1,255 @@
-/* src/app/navbar/navbar.component.css */
-
-/* theme vars */
-:host {
-  --navbar-bg:         #fff;
-  --navbar-color:      #333;
-  --navbar-hover-bg:   #f5f5f5;
-  --navbar-border:     #e0e0e0;
-  --brand-color:       #007bff;
-  --brand-hover-color: #0056b3;
-  --button-padding:    0.5rem 1rem;
-  --spacing:           1rem;
-}
-
-/* container */
-.navbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: var(--navbar-bg);
-  border-bottom: 1px solid var(--navbar-border);
-  padding: var(--spacing);
-}
-
-/* brand */
-.navbar-brand .brand {
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: var(--brand-color);
-  text-decoration: none;
-  transition: color .2s;
-}
-.navbar-brand .brand:hover {
-  color: var(--brand-hover-color);
-}
-
-/* nav list */
-.nav-list {
-  display: flex;
-  align-items: center;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-/* spacer */
-.nav-list .flex-spacer {
-  flex: 1;
-}
-
-/* everything else gets a right margin */
-.nav-list li:not(.flex-spacer) {
-  margin-right: var(--spacing);
-}
-.nav-list li:last-child {
-  margin-right: 0;
-}
-
-/* links & buttons share the same padding, hover & active styles */
-.nav-list a,
-.nav-list button {
-  display: block;
-  padding: var(--button-padding);
-  color: var(--navbar-color);
-  text-decoration: none;
-  background: none;
-  border: none;
-  border-radius: 4px;
-  font: inherit;
-  cursor: pointer;
-  transition: background .2s, color .2s;
-}
-.nav-list a:hover,
-.nav-list button:hover,
-.nav-list a.active {
-  background: var(--navbar-hover-bg);
-}
-
-/* avatar */
-.nav-list .avatar {
-  display: flex;
+/* The switch container */
+#theme-toggle-button {
+  /* Remove the old 3em width, use the SVG’s native size */
+  display: inline-flex;
   align-items: center;
   justify-content: center;
+  width: 69.667px; /* match your viewBox width */
+  height: 44px; /* match your viewBox height */
+  position: relative;
+  cursor: pointer;
+  margin-left: var(--spacing-sm);
+}
+
+/* Hide default HTML checkbox */
+#theme-toggle-button #toggle {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 2;
+}
+
+/* Animate all relevant parts */
+#container,
+#patches,
+#stars,
+#button,
+#sun,
+#moon,
+#cloud {
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Night sky background */
+#theme-toggle-button #toggle:checked + svg #container {
+  fill: #2b4360;
+}
+
+/* Move the toggle knob */
+#theme-toggle-button #toggle:checked + svg #button {
+  transform: translate(28px, 2.333px);
+}
+
+/* Sun ↔ Moon */
+#theme-toggle-button #sun {
+  opacity: 1;
+}
+#theme-toggle-button #toggle:checked + svg #sun {
+  opacity: 0;
+}
+#theme-toggle-button #moon {
+  opacity: 0;
+}
+#theme-toggle-button #toggle:checked + svg #moon {
+  opacity: 1;
+}
+
+/* Cloud ↔ Stars */
+#theme-toggle-button #cloud {
+  opacity: 1;
+}
+#theme-toggle-button #toggle:checked + svg #cloud {
+  opacity: 0;
+}
+#theme-toggle-button #stars {
+  opacity: 0;
+}
+#theme-toggle-button #toggle:checked + svg #stars {
+  opacity: 1;
+}
+
+.nav-controls #theme-toggle-button {
+  margin-left: 0.5rem;
+}
+#theme-toggle-button svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  pointer-events: none; /* let the checkbox catch clicks */
+}
+
+/*====================================
+  Navbar Overrides — fix spacing & layout
+====================================*/
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--color-surface);
+}
+
+/* Left & right containers */
+.navbar-left,
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+/* Links on both sides */
+.nav-link {
+  font-size: 0.95rem;
+  color: var(--color-text);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--border-radius);
+  text-decoration: none;
+  transition: background var(--transition-speed), color var(--transition-speed);
+}
+.nav-link:hover,
+.nav-link.active {
+  background: var(--color-border);
+  color: var(--color-primary);
+}
+.avatar-wrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 var(--spacing-sm);
+}
+.avatar-wrapper .avatar {
   width: 2.5rem;
   height: 2.5rem;
   border-radius: 50%;
-  background-color: var(--brand-color);
+  background: var(--color-primary);
   color: #fff;
-  font-weight: bold;
-  text-transform: uppercase;
-  transition: background .2s;
+  font-weight: 600;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
 }
-.nav-list .avatar:hover,
-.nav-list .avatar.active {
-  background-color: var(--brand-hover-color);
+.avatar-wrapper .avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+/* Language selector inline */
+.language-selector {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+.language-selector select {
+  padding: var(--spacing-xs) var(--spacing-sm);
 }
 
-/* responsive stack on small screens */
-@media (max-width: 768px) {
-  .navbar {
-    flex-direction: column;
-    align-items: stretch;
-  }
-  .nav-list {
-    flex-direction: column;
-  }
-  .nav-list li {
-    margin: 0 0 0.5rem 0;
-  }
-  .nav-list li:last-child {
-    margin-bottom: 0;
-  }
+/* Theme toggle stays as before */
+#theme-toggle-button {
+  cursor: pointer;
+}
+/* … (your existing theme-toggle SVG CSS) … */
+
+/* Logout button */
+.logout-btn {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background: var(--color-accent);
+  color: #fff;
+  border: none;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: background var(--transition-speed),
+    transform var(--transition-speed);
+}
+.logout-btn:hover {
+  background: var(--color-accent-hover);
+  transform: translateY(-1px);
+}
+
+/* accessible hide-for-visual users */
+.li4-sr-only {
+  position: absolute;
+  clip: rect(1px, 1px, 1px, 1px);
+  clip-path: inset(50%);
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+/* wrapper just for spacing */
+.language-picker {
+  position: relative;
+  display: inline-block;
+  margin-right: var(--spacing-md);
+}
+.language-picker__icon {
+  position: absolute;
+  top: 50%;
+  left: var(--spacing-sm);
+  transform: translateY(-50%);
+  font-size: 1rem; /* match your desired icon size */
+  color: var(--color-muted);
+  pointer-events: none;
+  z-index: 1;
+}
+/* style override for the select to use your theme vars */
+.language-picker__select {
+  appearance: none; /* remove native arrow */
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  padding-right: var(--spacing-lg); /* room for custom arrow */
+  padding-left: calc(var(--spacing-sm) + 1em + var(--spacing-xs));
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: border-color var(--transition-speed),
+    box-shadow var(--transition-speed);
+  box-shadow: inset 0 1px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+.language-picker::before {
+  position: absolute;
+  left: var(--spacing-sm); /* same as your select’s left padding */
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1rem;
+  color: var(--color-muted);
+  pointer-events: none; /* so clicks go through to the select */
+}
+/* hover & focus look */
+.language-picker__select:hover,
+.language-picker__select:focus {
+  border-color: var(--color-primary);
+  outline: none;
+  box-shadow: inset 0 1px rgba(0, 0, 0, 0.05),
+    0 0 0 3px rgba(var(--color-primary-hover-rgb), 0.2);
+}
+
+/* add a down-arrow via ::after on the wrapper */
+.language-picker::after {
+  content: "▾";
+  position: absolute;
+  top: 50%;
+  right: var(--spacing-sm);
+  transform: translateY(-50%);
+  color: var(--color-muted);
+  pointer-events: none;
+  font-size: 0.8rem;
+}
+
+/* helper: convert your primary-hover into an RGB var for focus shadow */
+:root {
+  --color-primary-hover-rgb: 116, 185, 255; /* #74b9ff */
+}
+[data-theme="dark"] {
+  /* adjust if your dark primary-hover is different */
+  --color-primary-hover-rgb: 164, 196, 255; /* #a4c4ff */
 }
