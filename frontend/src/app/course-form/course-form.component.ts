@@ -14,11 +14,12 @@ import {
   Router
 } from '@angular/router';
 import { CourseService, CourseCreate }   from '../services/course.service';
+import { TranslateModule }       from '@ngx-translate/core';
 
 @Component({
   selector: 'app-course-form',
   standalone: true,
-  imports: [ CommonModule, ReactiveFormsModule, RouterModule ],
+  imports: [ CommonModule, ReactiveFormsModule, RouterModule, TranslateModule ],
   templateUrl: './course-form.component.html',
   styleUrls: ['./course-form.component.css']
 })

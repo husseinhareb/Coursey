@@ -1,22 +1,40 @@
 <!-- src/app/courses/course-form.component.html -->
-<h2>{{ isEdit ? 'Edit' : 'Add' }} Course</h2>
+<h2>
+  {{ isEdit
+      ? ('COURSE_FORM.EDIT_TITLE'   | translate)
+      : ('COURSE_FORM.ADD_TITLE'    | translate)
+  }}
+</h2>
 
 <form [formGroup]="form" (ngSubmit)="onSubmit()">
-  <label>Title</label>
-  <input formControlName="title" />
+  <label for="title">{{ 'COURSE_FORM.TITLE_LABEL' | translate }}</label>
+  <input id="title" formControlName="title" placeholder="{{ 'COURSE_FORM.TITLE_PLACEHOLDER' | translate }}" />
 
-  <label>Code</label>
-  <input formControlName="code" />
+  <label for="code">{{ 'COURSE_FORM.CODE_LABEL'  | translate }}</label>
+  <input id="code"  formControlName="code"  placeholder="{{ 'COURSE_FORM.CODE_PLACEHOLDER'  | translate }}" />
 
-  <label>Description</label>
-  <textarea formControlName="description"></textarea>
+  <label for="description">{{ 'COURSE_FORM.DESCRIPTION_LABEL' | translate }}</label>
+  <textarea
+    id="description"
+    formControlName="description"
+    placeholder="{{ 'COURSE_FORM.DESCRIPTION_PLACEHOLDER' | translate }}"
+  ></textarea>
 
-  <label>Background</label>
-  <input formControlName="background" />
+  <label for="background">{{ 'COURSE_FORM.BACKGROUND_LABEL' | translate }}</label>
+  <input
+    id="background"
+    formControlName="background"
+    placeholder="{{ 'COURSE_FORM.BACKGROUND_PLACEHOLDER' | translate }}"
+  />
 
-  <button type="submit" [disabled]="form.invalid">
-    {{ isEdit ? 'Save Changes' : 'Create Course' }}
+  <button type="submit" [disabled]="form.invalid" class="btn btn--submit">
+    {{ isEdit
+        ? ('COURSE_FORM.SAVE'    | translate)
+        : ('COURSE_FORM.CREATE'  | translate)
+    }}
   </button>
 </form>
 
-<div *ngIf="error" class="error">{{ error }}</div>
+<div *ngIf="error" class="error">
+  {{ error || ('COURSE_FORM.ERROR' | translate) }}
+</div>

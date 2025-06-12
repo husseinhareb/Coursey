@@ -15,6 +15,7 @@ import { SubmissionService, Submission } from '../services/submission.service';
 import { AuthService, Me } from '../auth/auth.service';
 import { Enrollment } from '../services/user.service';
 import { PostsComponent } from '../posts/posts.component';
+import { TranslateModule }       from '@ngx-translate/core';
 
 @Component({
   selector: 'app-course-detail',
@@ -23,7 +24,8 @@ import { PostsComponent } from '../posts/posts.component';
     CommonModule,
     ReactiveFormsModule,
     RouterModule,
-    PostsComponent  // import the standalone posts list component
+    PostsComponent,
+    TranslateModule
   ],
   templateUrl: './course-detail.component.html',
   styleUrls: ['./course-detail.component.css']

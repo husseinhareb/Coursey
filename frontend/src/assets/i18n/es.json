@@ -55,7 +55,7 @@
     "SUCCESS": "Perfil actualizado con éxito.",
     "UPDATE_ERROR": "Error al actualizar."
   },
-    "COURSES": {
+  "COURSES": {
     "TITLE": "Cursos",
     "ADD": "+ Añadir curso",
     "LOADING": "Cargando…",
@@ -69,7 +69,7 @@
     "EDIT": "Editar",
     "DELETE": "Eliminar"
   },
-    "SIGNUP": {
+  "SIGNUP": {
     "TITLE": "Registrarse",
     "EMAIL_LABEL": "Correo electrónico",
     "EMAIL_PLACEHOLDER": "tucorreo@ejemplo.com",
@@ -89,7 +89,7 @@
     "SUBMIT": "Registrarse",
     "SUCCESS": "¡Registro exitoso! Redirigiendo al inicio de sesión…"
   },
-    "POSTS": {
+  "POSTS": {
     "LOADING": "Cargando publicaciones…",
     "HOMEWORK_FLAG": "TAREA",
     "TYPE": "Tipo",
@@ -106,5 +106,27 @@
     "VIEW_ALL_SUB": "Ver todas las entregas",
     "HIDE_ALL_SUB": "Ocultar entregas",
     "NO_POSTS": "No hay publicaciones disponibles."
+  },
+  "COURSE_DETAIL": {
+    "LOADING": "Cargando curso…",
+    "ERROR": "Error al cargar el curso.",
+    "VIEW_FORUM": "Ver foro del curso",
+    "ADD_POST": "+ Añadir publicación",
+    "EDIT_POST": "Editar publicación"
+  },
+  "COURSE_FORM": {
+    "ADD_TITLE": "Añadir curso",
+    "EDIT_TITLE": "Editar curso",
+    "TITLE_LABEL": "Título",
+    "TITLE_PLACEHOLDER": "Ingrese el título del curso",
+    "CODE_LABEL": "Código",
+    "CODE_PLACEHOLDER": "p.ej. CS101",
+    "DESCRIPTION_LABEL": "Descripción",
+    "DESCRIPTION_PLACEHOLDER": "Ingrese una breve descripción",
+    "BACKGROUND_LABEL": "Fondo",
+    "BACKGROUND_PLACEHOLDER": "URL de imagen o color hex",
+    "CREATE": "Crear curso",
+    "SAVE": "Guardar cambios",
+    "ERROR": "Error al guardar el curso."
   }
 }

@@ -106,5 +106,27 @@
         "VIEW_ALL_SUB": "عرض جميع التسجيلات",
         "HIDE_ALL_SUB": "إخفاء جميع التسجيلات",
         "NO_POSTS": "لا توجد مشاركات متاحة."
-    }
+    },
+    "COURSE_DETAIL": {
+        "LOADING": "جاري تحميل الدورة…",
+        "ERROR": "فشل في تحميل الدورة.",
+        "VIEW_FORUM": "عرض منتدى الدورة",
+        "ADD_POST": "+ إضافة منشور",
+        "EDIT_POST": "تعديل المنشور"
+    },
+      "COURSE_FORM": {
+    "ADD_TITLE": "إضافة دورة",
+    "EDIT_TITLE": "تعديل الدورة",
+    "TITLE_LABEL": "العنوان",
+    "TITLE_PLACEHOLDER": "أدخل عنوان الدورة",
+    "CODE_LABEL": "الرمز",
+    "CODE_PLACEHOLDER": "مثال CS101",
+    "DESCRIPTION_LABEL": "الوصف",
+    "DESCRIPTION_PLACEHOLDER": "أدخل وصفًا موجزًا",
+    "BACKGROUND_LABEL": "الخلفية",
+    "BACKGROUND_PLACEHOLDER": "رابط صورة أو لون سداسي",
+    "CREATE": "إنشاء الدورة",
+    "SAVE": "حفظ التعديلات",
+    "ERROR": "فشل في حفظ الدورة."
+  }
 }

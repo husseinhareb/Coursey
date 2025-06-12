@@ -1,24 +1,36 @@
-<!-- course-detail header & form -->
-<div *ngIf="loadingCourse" class="loading">Loading course…</div>
-<div *ngIf="courseError" class="error">{{ courseError }}</div>
+<!-- src/app/course-detail/course-detail.component.html -->
 
+<!-- Loading & Error -->
+<div *ngIf="loadingCourse" class="loading">
+  {{ 'COURSE_DETAIL.LOADING' | translate }}
+</div>
+<div *ngIf="courseError" class="error">
+  {{ courseError || ('COURSE_DETAIL.ERROR' | translate) }}
+</div>
+
+<!-- Course Info -->
 <div *ngIf="course">
   <h2>{{ course.title }}</h2>
   <p>{{ course.description }}</p>
 
   <!-- forum button -->
   <button
-    class="forum-link"
+    class="forum-link btn"
     [routerLink]="['/courses', courseId, 'forums']"
   >
-    View Course Forum
+    {{ 'COURSE_DETAIL.VIEW_FORUM' | translate }}
   </button>
 </div>
 
 <hr />
 
-<button *ngIf="canModifyPosts" (click)="toggleForm()">
-  {{ editing ? 'Edit Post' : '+ Add Post' }}
+<!-- Add / Edit Post -->
+<button
+  *ngIf="canModifyPosts"
+  class="btn btn--add-post"
+  (click)="toggleForm()"
+>
+  {{ editing ? ('COURSE_DETAIL.EDIT_POST' | translate) : ('COURSE_DETAIL.ADD_POST' | translate) }}
 </button>
 
 <div *ngIf="showForm && canModifyPosts" class="post-form">
@@ -27,7 +39,7 @@
 
 <hr />
 
-<!-- pull in the standalone posts list -->
+<!-- Posts list -->
 <app-posts
   [posts]="posts"
   [loading]="loadingPosts"

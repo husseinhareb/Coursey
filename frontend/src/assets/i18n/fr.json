@@ -55,7 +55,7 @@
     "SUCCESS": "Profil mis à jour avec succès.",
     "UPDATE_ERROR": "Échec de la mise à jour."
   },
-    "SIGNUP": {
+  "SIGNUP": {
     "TITLE": "S’inscrire",
     "EMAIL_LABEL": "Adresse e-mail",
     "EMAIL_PLACEHOLDER": "vous@exemple.com",
@@ -74,7 +74,8 @@
     "ROLE_ERROR": "Vous devez sélectionner un rôle.",
     "SUBMIT": "S’inscrire",
     "SUCCESS": "Inscription réussie ! Redirection vers la connexion…"
-  },  "POSTS": {
+  },
+  "POSTS": {
     "LOADING": "Chargement des publications…",
     "HOMEWORK_FLAG": "TD",
     "TYPE": "Type",
@@ -91,5 +92,27 @@
     "VIEW_ALL_SUB": "Voir toutes les soumissions",
     "HIDE_ALL_SUB": "Masquer les soumissions",
     "NO_POSTS": "Aucune publication disponible."
+  },
+  "COURSE_DETAIL": {
+    "LOADING": "Chargement du cours…",
+    "ERROR": "Échec du chargement du cours.",
+    "VIEW_FORUM": "Voir le forum du cours",
+    "ADD_POST": "+ Ajouter une publication",
+    "EDIT_POST": "Modifier la publication"
+  },
+  "COURSE_FORM": {
+    "ADD_TITLE": "Ajouter un cours",
+    "EDIT_TITLE": "Modifier le cours",
+    "TITLE_LABEL": "Titre",
+    "TITLE_PLACEHOLDER": "Entrez le titre du cours",
+    "CODE_LABEL": "Code",
+    "CODE_PLACEHOLDER": "ex. CS101",
+    "DESCRIPTION_LABEL": "Description",
+    "DESCRIPTION_PLACEHOLDER": "Entrez une brève description",
+    "BACKGROUND_LABEL": "Arrière-plan",
+    "BACKGROUND_PLACEHOLDER": "URL de l’image ou couleur hex",
+    "CREATE": "Créer le cours",
+    "SAVE": "Enregistrer les modifications",
+    "ERROR": "Échec de l’enregistrement du cours."
   }
 }

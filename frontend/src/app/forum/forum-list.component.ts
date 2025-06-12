@@ -18,75 +18,7 @@ import { Enrollment } from '../services/user.service';
   selector: 'app-forum-list',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterModule],
-  template: `
-    <div class="forum-list">
-      <h3>Forums / Sujets</h3>
-
-      <!-- Affiche le bouton + Nouveau sujet uniquement si canCreateTopic true -->
-      <button *ngIf="canCreateTopic" (click)="toggleNewTopicForm()">
-        {{ showNewTopicForm ? 'Annuler' : '+ Nouveau sujet' }}
-      </button>
-
-      <!-- Formulaire de création de sujet -->
-      <div *ngIf="showNewTopicForm" class="new-topic-form">
-        <form [formGroup]="newTopicForm" (ngSubmit)="createTopic()">
-          <div>
-            <label for="title">Titre du sujet :</label>
-            <input id="title" formControlName="title" placeholder="Titre" />
-            <div
-              *ngIf="newTopicForm.get('title')?.touched && newTopicForm.get('title')?.invalid"
-              class="error"
-            >
-              Le titre est requis.
-            </div>
-          </div>
-          <button type="submit" [disabled]="newTopicForm.invalid">
-            Créer
-          </button>
-        </form>
-      </div>
-
-      <!-- Message d'information si l'utilisateur ne peut pas créer de sujet -->
-      <div *ngIf="!loading && !canCreateTopic" class="info">
-        Seuls les professeurs inscrits peuvent créer de nouveaux sujets.
-      </div>
-
-      <div *ngIf="loading">Chargement des sujets…</div>
-      <div *ngIf="error" class="error">{{ error }}</div>
-
-      <ul *ngIf="!loading && !error">
-        <li *ngFor="let topic of topics" (click)="goToTopic(topic._id)">
-          <strong>{{ topic.title }}</strong>
-          <br />
-          <small>
-            Créé par {{ topic.author_id }}
-            le {{ topic.created_at | date: 'short' }}
-            • {{ topic.messages.length || 0 }} message(s)
-          </small>
-        </li>
-      </ul>
-
-      <div *ngIf="!loading && topics.length === 0">
-        <p>Aucun sujet pour l’instant.</p>
-      </div>
-    </div>
-  `,
-  styles: [`
-    .forum-list { padding: 1rem; }
-    .new-topic-form { margin: 1rem 0; }
-    li {
-      cursor: pointer;
-      margin: 0.5rem 0;
-      padding: 0.5rem;
-      border-bottom: 1px solid #ccc;
-    }
-    .error { color: red; }
-    .info {
-      margin-top: 1rem;
-      color: #555;
-      font-style: italic;
-    }
-  `]
+  templateUrl: './forum-list.component.html',
 })
 export class ForumListComponent implements OnInit {
   courseId!: string;              
