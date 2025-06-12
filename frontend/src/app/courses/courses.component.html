@@ -1,43 +1,56 @@
-<!-- src/app/courses/courses.component.html -->
-
+<!-- Page header -->
 <div class="courses-header">
   <h2>{{ 'COURSES.TITLE' | translate }}</h2>
-  <a
-    *ngIf="isAdmin"
-    routerLink="/courses/add"
-    class="btn"
-  >
+  <a *ngIf="isAdmin"
+     routerLink="/courses/add"
+     class="btn btn--add">
+    <i class="fa-solid fa-plus"></i>
     {{ 'COURSES.ADD' | translate }}
   </a>
 </div>
 
-<div *ngIf="loading">{{ 'COURSES.LOADING' | translate }}</div>
-<div *ngIf="error" class="error">{{ error }}</div>
+<!-- Loading / Error -->
+<div *ngIf="loading" class="status">
+  {{ 'COURSES.LOADING' | translate }}
+</div>
+<div *ngIf="error" class="status status--error">
+  {{ error }}
+</div>
 
-<table *ngIf="!loading && !error">
-  <thead>
-    <tr>
-      <th>{{ 'COURSES.TABLE.TITLE'       | translate }}</th>
-      <th>{{ 'COURSES.TABLE.CODE'        | translate }}</th>
-      <th>{{ 'COURSES.TABLE.DESCRIPTION' | translate }}</th>
-      <th>{{ 'COURSES.TABLE.BACKGROUND'  | translate }}</th>
-      <th *ngIf="isAdmin">{{ 'COURSES.TABLE.ACTIONS' | translate }}</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr *ngFor="let c of courses">
-      <td>
-        <a [routerLink]="['/courses', c.id]">
-          {{ c.title }}
-        </a>
-      </td>
-      <td>{{ c.code }}</td>
-      <td>{{ c.description }}</td>
-      <td>{{ c.background || '-' }}</td>
-      <td *ngIf="isAdmin">
-        <button (click)="edit(c.id)">{{ 'COURSES.EDIT'   | translate }}</button>
-        <button (click)="delete(c.id)">{{ 'COURSES.DELETE' | translate }}</button>
-      </td>
-    </tr>
-  </tbody>
-</table>
+<!-- Courses grid -->
+<div *ngIf="!loading && !error" class="courses-grid">
+  <div *ngFor="let c of courses" class="course-card">
+    <!-- Header: image or color via helper -->
+    <div class="course-card__header"
+         [ngStyle]="getHeaderStyle(c)">
+    </div>
+
+    <!-- Body -->
+    <div class="course-card__body">
+      <h3 class="course-card__title">{{ c.title }}</h3>
+      <p class="course-card__code">{{ c.code }}</p>
+      <p class="course-card__desc">{{ c.description }}</p>
+
+      <div class="course-card__actions">
+        <button class="btn btn--info"
+                [routerLink]="['/courses', c.id]">
+          <i class="fa-solid fa-info"></i>
+          {{ 'COURSES.INFO' | translate }}
+        </button>
+
+        <ng-container *ngIf="isAdmin">
+          <button class="btn btn--edit"
+                  (click)="edit(c.id)">
+            <i class="fa-solid fa-pen"></i>
+            {{ 'COURSES.EDIT' | translate }}
+          </button>
+          <button class="btn btn--delete"
+                  (click)="delete(c.id)">
+            <i class="fa-solid fa-trash"></i>
+            {{ 'COURSES.DELETE' | translate }}
+          </button>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+</div>

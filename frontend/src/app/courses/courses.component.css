@@ -1,0 +1,167 @@
+/* src/app/courses/courses.component.css */
+/* Leverage theme.css variables for flat design */
+
+/* Page header */
+.courses-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-lg);
+}
+.courses-header h2 {
+  margin: 0;
+  font-size: 2rem;
+  color: var(--color-primary);
+}
+.btn--add {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: var(--color-primary);
+  color: #fff;
+  font-weight: 600;
+  border: none;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: background-color var(--transition-speed),
+              transform var(--transition-speed);
+}
+.btn--add i {
+  font-size: 0.9rem;
+}
+.btn--add:hover {
+  background-color: var(--color-primary-hover);
+  transform: translateY(-1px);
+}
+
+/* Status messages */
+.status {
+  font-size: 1rem;
+  margin-bottom: var(--spacing-md);
+  color: var(--color-muted);
+}
+.status--error {
+  color: var(--color-error);
+}
+
+/* Grid layout */
+.courses-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--spacing-lg);
+}
+
+/* Card */
+.course-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--color-surface);
+  border-radius: calc(var(--border-radius) * 2);
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+  transition: transform var(--transition-speed),
+              box-shadow var(--transition-speed);
+}
+.course-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+}
+
+/* Header (image or color) */
+.course-card__header {
+  width: 100%;
+  aspect-ratio: 16/9;
+  background-size: cover;
+  background-position: center;
+}
+
+/* Body */
+.course-card__body {
+  flex: 1;
+  padding: var(--spacing-md);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Title, code, description */
+.course-card__title {
+  margin: 0;
+  font-size: 1.3rem;
+  color: var(--color-text);
+}
+.course-card__code {
+  margin: var(--spacing-xs) 0;
+  font-size: 0.9rem;
+  color: var(--color-muted);
+}
+.course-card__desc {
+  flex: 1;
+  font-size: 0.95rem;
+  color: var(--color-text);
+  margin-bottom: var(--spacing-md);
+}
+
+/* Actions row */
+.course-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  font-size: 0.9rem;
+  border-radius: var(--border-radius);
+  border: none;
+  cursor: pointer;
+  transition: background-color var(--transition-speed),
+              color var(--transition-speed);
+}
+
+/* Info button */
+.btn--info {
+  background-color: var(--color-primary);
+  color: #fff;
+}
+.btn--info:hover {
+  background-color: var(--color-primary-hover);
+}
+
+/* Edit button */
+.btn--edit {
+  background: var(--color-surface);
+  color: var(--color-primary);
+  border: 1px solid var(--color-primary);
+}
+.btn--edit:hover {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+/* Delete button */
+.btn--delete {
+  background: var(--color-surface);
+  color: var(--color-error);
+  border: 1px solid var(--color-error);
+}
+.btn--delete:hover {
+  background: var(--color-error);
+  color: #fff;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .courses-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--spacing-sm);
+  }
+  .courses-header .btn--add {
+    justify-self: end;
+  }
+}
