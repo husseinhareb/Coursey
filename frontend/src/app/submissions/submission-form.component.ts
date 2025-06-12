@@ -32,29 +32,7 @@ import { SubmissionService, SubmissionCreate } from '../services/submission.serv
       <div *ngIf="error" class="error">{{ error }}</div>
     </div>
   `,
-  styles: [`
-    .submission-form {
-      border: 1px solid #ccc;
-      padding: 1rem;
-      margin-bottom: 1rem;
-      background: #fafafa;
-    }
-    .submission-form h4 {
-      margin-top: 0;
-    }
-    .error {
-      color: red;
-      margin-top: 0.5rem;
-    }
-    label {
-      display: block;
-      margin-bottom: 0.25rem;
-    }
-    input[type="file"] {
-      display: block;
-      margin-bottom: 0.5rem;
-    }
-  `]
+
 })
 export class SubmissionFormComponent {
   @Input() courseId!: string;

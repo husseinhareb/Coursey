@@ -68,5 +68,43 @@
     },
     "EDIT": "Editar",
     "DELETE": "Eliminar"
+  },
+    "SIGNUP": {
+    "TITLE": "Registrarse",
+    "EMAIL_LABEL": "Correo electrónico",
+    "EMAIL_PLACEHOLDER": "tucorreo@ejemplo.com",
+    "EMAIL_ERROR": "Se requiere un correo válido.",
+    "FIRST_NAME_LABEL": "Nombre",
+    "FIRST_NAME_PLACEHOLDER": "Ingrese el nombre",
+    "FIRST_NAME_ERROR": "El nombre es obligatorio.",
+    "LAST_NAME_LABEL": "Apellido",
+    "LAST_NAME_PLACEHOLDER": "Ingrese el apellido",
+    "LAST_NAME_ERROR": "El apellido es obligatorio.",
+    "ROLE_LABEL": "Rol",
+    "ROLE_PLACEHOLDER": "Seleccione un rol",
+    "ROLE_STUDENT": "Estudiante",
+    "ROLE_PROFESSOR": "Profesor",
+    "ROLE_ADMIN": "Administrador",
+    "ROLE_ERROR": "Debe seleccionar un rol.",
+    "SUBMIT": "Registrarse",
+    "SUCCESS": "¡Registro exitoso! Redirigiendo al inicio de sesión…"
+  },
+    "POSTS": {
+    "LOADING": "Cargando publicaciones…",
+    "HOMEWORK_FLAG": "TAREA",
+    "TYPE": "Tipo",
+    "POSITION": "Posición",
+    "PINNED_AT": "Fijado el",
+    "DUE_DATE": "Fecha de entrega",
+    "PIN": "Fijar",
+    "UNPIN": "Desfijar",
+    "EDIT": "Editar",
+    "DELETE": "Eliminar",
+    "SUBMIT_HW": "Enviar tarea",
+    "VIEW_MY_SUB": "Ver mi entrega",
+    "HIDE_MY_SUB": "Ocultar mi entrega",
+    "VIEW_ALL_SUB": "Ver todas las entregas",
+    "HIDE_ALL_SUB": "Ocultar entregas",
+    "NO_POSTS": "No hay publicaciones disponibles."
   }
 }

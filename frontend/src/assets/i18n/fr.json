@@ -54,5 +54,42 @@
     "SAVE": "Enregistrer les modifications",
     "SUCCESS": "Profil mis à jour avec succès.",
     "UPDATE_ERROR": "Échec de la mise à jour."
+  },
+    "SIGNUP": {
+    "TITLE": "S’inscrire",
+    "EMAIL_LABEL": "Adresse e-mail",
+    "EMAIL_PLACEHOLDER": "vous@exemple.com",
+    "EMAIL_ERROR": "Une adresse e-mail valide est requise.",
+    "FIRST_NAME_LABEL": "Prénom",
+    "FIRST_NAME_PLACEHOLDER": "Entrez le prénom",
+    "FIRST_NAME_ERROR": "Le prénom est requis.",
+    "LAST_NAME_LABEL": "Nom de famille",
+    "LAST_NAME_PLACEHOLDER": "Entrez le nom de famille",
+    "LAST_NAME_ERROR": "Le nom de famille est requis.",
+    "ROLE_LABEL": "Rôle",
+    "ROLE_PLACEHOLDER": "Sélectionnez un rôle",
+    "ROLE_STUDENT": "Étudiant",
+    "ROLE_PROFESSOR": "Professeur",
+    "ROLE_ADMIN": "Admin",
+    "ROLE_ERROR": "Vous devez sélectionner un rôle.",
+    "SUBMIT": "S’inscrire",
+    "SUCCESS": "Inscription réussie ! Redirection vers la connexion…"
+  },  "POSTS": {
+    "LOADING": "Chargement des publications…",
+    "HOMEWORK_FLAG": "TD",
+    "TYPE": "Type",
+    "POSITION": "Position",
+    "PINNED_AT": "Épinglé le",
+    "DUE_DATE": "Date limite",
+    "PIN": "Épingler",
+    "UNPIN": "Désépingler",
+    "EDIT": "Modifier",
+    "DELETE": "Supprimer",
+    "SUBMIT_HW": "Soumettre le devoir",
+    "VIEW_MY_SUB": "Voir ma soumission",
+    "HIDE_MY_SUB": "Masquer ma soumission",
+    "VIEW_ALL_SUB": "Voir toutes les soumissions",
+    "HIDE_ALL_SUB": "Masquer les soumissions",
+    "NO_POSTS": "Aucune publication disponible."
   }
 }

@@ -164,65 +164,8 @@ import { Enrollment } from '../services/user.service';
       </div>
     </div>
   `,
-  styles: [
-    `
-      .submission-list {
-        border: 1px solid #ddd;
-        padding: 1rem;
-        margin: 1rem 0;
-        background: #f9f9f9;
-      }
-      .grading-form {
-        border: 2px solid #f90;
-        padding: 1rem;
-        margin-top: 1rem;
-        background: #fff3e0;
-      }
-      .error {
-        color: red;
-        margin-top: 0.5rem;
-      }
-      table {
-        width: 100%;
-        margin-bottom: 1rem;
-        border-collapse: collapse;
-      }
-      th,
-      td {
-        padding: 0.5rem;
-        text-align: left;
-        border: 1px solid #ccc;
-      }
-      a {
-        color: #1976d2;
-        text-decoration: underline;
-        cursor: pointer;
-      }
 
-      /* Badges for different statuses */
-      .badge-submitted {
-        background: #ffd54f;
-        color: #212121;
-        padding: 0.25rem 0.6rem;
-        border-radius: 0.25rem;
-        font-size: 0.85em;
-      }
-      .badge-late {
-        background: #e57373;
-        color: #fff;
-        padding: 0.25rem 0.6rem;
-        border-radius: 0.25rem;
-        font-size: 0.85em;
-      }
-      .badge-graded {
-        background: #81c784;
-        color: #fff;
-        padding: 0.25rem 0.6rem;
-        border-radius: 0.25rem;
-        font-size: 0.85em;
-      }
-    `
-  ]
+
 })
 export class SubmissionListComponent implements OnInit {
   @Input() courseId!: string;
@@ -329,39 +272,39 @@ export class SubmissionListComponent implements OnInit {
 
   /** Fetch all submissions, then filter for display */
   private fetchSubmissions() {
-  this.loading = true;
-  this.error = null;
-  this.svc.list(this.courseId, this.postId).subscribe({
-    next: (subs: Submission[]) => {
-      console.log('raw submissions from server:', subs);
-      this.allSubmissions = subs;
-      this.applyDisplayFilter();
-      console.log('after filter, displayedSubmissions =', this.displayedSubmissions);
-      this.loading = false;
-    },
-    error: (err: any) => {
-      this.error =
-        err.error?.detail || 'Impossible de charger les soumissions';
-      this.loading = false;
-    }
-  });
-}
+    this.loading = true;
+    this.error = null;
+    this.svc.list(this.courseId, this.postId).subscribe({
+      next: (subs: Submission[]) => {
+        console.log('raw submissions from server:', subs);
+        this.allSubmissions = subs;
+        this.applyDisplayFilter();
+        console.log('after filter, displayedSubmissions =', this.displayedSubmissions);
+        this.loading = false;
+      },
+      error: (err: any) => {
+        this.error =
+          err.error?.detail || 'Impossible de charger les soumissions';
+        this.loading = false;
+      }
+    });
+  }
 
 
   /** Decide which submissions to show based on role */
   private applyDisplayFilter() {
-  if (this.canViewAll) {
-    // Professors/admins see every submission
-    this.displayedSubmissions = [...this.allSubmissions];
-  } else if (this.isStudentInCourse && this.currentUser) {
-    // Students see only submissions where studentId matches their _id:
-    this.displayedSubmissions = this.allSubmissions.filter(
-      s => (s as any).studentId === this.currentUser!.id
-    );
-  } else {
-    this.displayedSubmissions = [];
+    if (this.canViewAll) {
+      // Professors/admins see every submission
+      this.displayedSubmissions = [...this.allSubmissions];
+    } else if (this.isStudentInCourse && this.currentUser) {
+      // Students see only submissions where studentId matches their _id:
+      this.displayedSubmissions = this.allSubmissions.filter(
+        s => (s as any).studentId === this.currentUser!.id
+      );
+    } else {
+      this.displayedSubmissions = [];
+    }
   }
-}
 
 
   /** Human-friendly French status labels */

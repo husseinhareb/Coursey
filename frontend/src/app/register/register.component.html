@@ -1,69 +1,78 @@
-<h2>Sign Up</h2>
+<!-- src/app/signup/signup.component.html -->
+
+<h2>{{ 'SIGNUP.TITLE' | translate }}</h2>
 
 <form [formGroup]="signupForm" (ngSubmit)="onSubmit()">
   <!-- Email -->
-  <label for="email">Email</label>
-  <input id="email" type="email" formControlName="email" />
+  <label for="email">{{ 'SIGNUP.EMAIL_LABEL' | translate }}</label>
+  <input
+    id="email"
+    type="email"
+    formControlName="email"
+    placeholder="{{ 'SIGNUP.EMAIL_PLACEHOLDER' | translate }}"
+  />
   <div
-    *ngIf="
-      signupForm.get('email')?.invalid &&
-      signupForm.get('email')?.touched
-    "
+    *ngIf="signupForm.get('email')?.invalid && signupForm.get('email')?.touched"
     class="error"
   >
-    A valid email is required.
+    {{ 'SIGNUP.EMAIL_ERROR' | translate }}
   </div>
 
   <!-- First Name -->
-  <label for="firstName">First Name</label>
-  <input id="firstName" type="text" formControlName="firstName" />
+  <label for="firstName">{{ 'SIGNUP.FIRST_NAME_LABEL' | translate }}</label>
+  <input
+    id="firstName"
+    type="text"
+    formControlName="firstName"
+    placeholder="{{ 'SIGNUP.FIRST_NAME_PLACEHOLDER' | translate }}"
+  />
   <div
-    *ngIf="
-      signupForm.get('firstName')?.invalid &&
-      signupForm.get('firstName')?.touched
-    "
+    *ngIf="signupForm.get('firstName')?.invalid && signupForm.get('firstName')?.touched"
     class="error"
   >
-    First name is required.
+    {{ 'SIGNUP.FIRST_NAME_ERROR' | translate }}
   </div>
 
   <!-- Last Name -->
-  <label for="lastName">Last Name</label>
-  <input id="lastName" type="text" formControlName="lastName" />
+  <label for="lastName">{{ 'SIGNUP.LAST_NAME_LABEL' | translate }}</label>
+  <input
+    id="lastName"
+    type="text"
+    formControlName="lastName"
+    placeholder="{{ 'SIGNUP.LAST_NAME_PLACEHOLDER' | translate }}"
+  />
   <div
-    *ngIf="
-      signupForm.get('lastName')?.invalid &&
-      signupForm.get('lastName')?.touched
-    "
+    *ngIf="signupForm.get('lastName')?.invalid && signupForm.get('lastName')?.touched"
     class="error"
   >
-    Last name is required.
+    {{ 'SIGNUP.LAST_NAME_ERROR' | translate }}
   </div>
 
   <!-- Role Dropdown -->
-  <label for="role">Role</label>
+  <label for="role">{{ 'SIGNUP.ROLE_LABEL' | translate }}</label>
   <select id="role" formControlName="role">
-    <option value="" disabled>Select a role</option>
-    <option value="student">Student</option>
-    <option value="professor">Professor</option>
-    <option value="admin">Admin</option>
+    <option value="" disabled>
+      {{ 'SIGNUP.ROLE_PLACEHOLDER' | translate }}
+    </option>
+    <option value="student">{{ 'SIGNUP.ROLE_STUDENT' | translate }}</option>
+    <option value="professor">{{ 'SIGNUP.ROLE_PROFESSOR' | translate }}</option>
+    <option value="admin">{{ 'SIGNUP.ROLE_ADMIN' | translate }}</option>
   </select>
   <div
-    *ngIf="
-      signupForm.get('role')?.invalid &&
-      signupForm.get('role')?.touched
-    "
+    *ngIf="signupForm.get('role')?.invalid && signupForm.get('role')?.touched"
     class="error"
   >
-    You must select one role.
+    {{ 'SIGNUP.ROLE_ERROR' | translate }}
   </div>
 
   <!-- Submit Button -->
-  <button type="submit" [disabled]="signupForm.invalid">Sign Up</button>
+  <button type="submit" [disabled]="signupForm.invalid">
+    {{ 'SIGNUP.SUBMIT' | translate }}
+  </button>
 </form>
 
 <div *ngIf="signupSuccess" class="success">
-  Signup successful! Redirecting to login…
+  {{ 'SIGNUP.SUCCESS' | translate }}
 </div>
 <div *ngIf="signupError" class="error">
   {{ signupError }}

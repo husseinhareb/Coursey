@@ -69,6 +69,44 @@
     },
     "EDIT": "Edit",
     "DELETE": "Delete"
+  },
+    "SIGNUP": {
+    "TITLE": "Sign Up",
+    "EMAIL_LABEL": "Email",
+    "EMAIL_PLACEHOLDER": "you@example.com",
+    "EMAIL_ERROR": "A valid email is required.",
+    "FIRST_NAME_LABEL": "First Name",
+    "FIRST_NAME_PLACEHOLDER": "Enter first name",
+    "FIRST_NAME_ERROR": "First name is required.",
+    "LAST_NAME_LABEL": "Last Name",
+    "LAST_NAME_PLACEHOLDER": "Enter last name",
+    "LAST_NAME_ERROR": "Last name is required.",
+    "ROLE_LABEL": "Role",
+    "ROLE_PLACEHOLDER": "Select a role",
+    "ROLE_STUDENT": "Student",
+    "ROLE_PROFESSOR": "Professor",
+    "ROLE_ADMIN": "Admin",
+    "ROLE_ERROR": "You must select one role.",
+    "SUBMIT": "Sign Up",
+    "SUCCESS": "Signup successful! Redirecting to login…"
+  },
+    "POSTS": {
+    "LOADING": "Loading posts…",
+    "HOMEWORK_FLAG": "HW",
+    "TYPE": "Type",
+    "POSITION": "Position",
+    "PINNED_AT": "Pinned At",
+    "DUE_DATE": "Due Date",
+    "PIN": "Pin",
+    "UNPIN": "Unpin",
+    "EDIT": "Edit",
+    "DELETE": "Delete",
+    "SUBMIT_HW": "Submit Homework",
+    "VIEW_MY_SUB": "View My Submission",
+    "HIDE_MY_SUB": "Hide My Submission",
+    "VIEW_ALL_SUB": "View All Submissions",
+    "HIDE_ALL_SUB": "Hide Submissions",
+    "NO_POSTS": "No posts available."
   }
 
 }

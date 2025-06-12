@@ -68,5 +68,43 @@
         },
         "EDIT": "تعديل",
         "DELETE": "حذف"
+    },
+    "SIGNUP": {
+        "TITLE": "إنشاء حساب",
+        "EMAIL_LABEL": "البريد الإلكتروني",
+        "EMAIL_PLACEHOLDER": "name@example.com",
+        "EMAIL_ERROR": "البريد الإلكتروني غير صالح.",
+        "FIRST_NAME_LABEL": "الاسم الأول",
+        "FIRST_NAME_PLACEHOLDER": "أدخل الاسم الأول",
+        "FIRST_NAME_ERROR": "الاسم الأول مطلوب.",
+        "LAST_NAME_LABEL": "اسم العائلة",
+        "LAST_NAME_PLACEHOLDER": "أدخل اسم العائلة",
+        "LAST_NAME_ERROR": "اسم العائلة مطلوب.",
+        "ROLE_LABEL": "الدور",
+        "ROLE_PLACEHOLDER": "اختر دورًا",
+        "ROLE_STUDENT": "طالب",
+        "ROLE_PROFESSOR": "أستاذ",
+        "ROLE_ADMIN": "مشرف",
+        "ROLE_ERROR": "يجب اختيار دور.",
+        "SUBMIT": "إنشاء حساب",
+        "SUCCESS": "تم التسجيل بنجاح! إعادة التوجيه لتسجيل الدخول…"
+    },
+    "POSTS": {
+        "LOADING": "جاري تحميل المشاركات…",
+        "HOMEWORK_FLAG": "واجب",
+        "TYPE": "النوع",
+        "POSITION": "الترتيب",
+        "PINNED_AT": "تم التثبيت في",
+        "DUE_DATE": "تاريخ الاستحقاق",
+        "PIN": "تثبيت",
+        "UNPIN": "إلغاء التثبيت",
+        "EDIT": "تعديل",
+        "DELETE": "حذف",
+        "SUBMIT_HW": "تقديم الواجب",
+        "VIEW_MY_SUB": "عرض تسجيلي",
+        "HIDE_MY_SUB": "إخفاء تسجيلي",
+        "VIEW_ALL_SUB": "عرض جميع التسجيلات",
+        "HIDE_ALL_SUB": "إخفاء جميع التسجيلات",
+        "NO_POSTS": "لا توجد مشاركات متاحة."
     }
 }

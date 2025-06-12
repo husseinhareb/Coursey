@@ -8,6 +8,7 @@ import { SubmissionFormComponent } from '../submissions/submission-form.componen
 import { SubmissionListComponent } from '../submissions/submission-list.component';
 import { Post } from '../services/post.service';
 import { Submission } from '../services/submission.service';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-posts',
@@ -16,7 +17,8 @@ import { Submission } from '../services/submission.service';
     CommonModule,
     RouterModule,
     SubmissionFormComponent,
-    SubmissionListComponent
+    SubmissionListComponent,
+    TranslateModule
   ],
   templateUrl: './posts.component.html',
   styleUrls: ['./posts.component.css']

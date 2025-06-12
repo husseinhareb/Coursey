@@ -13,7 +13,7 @@ import { forkJoin }                         from 'rxjs';
 
 import { UserService, Profile, User, Enrollment }     from '../services/user.service';
 import { CourseService, Course }                     from '../services/course.service';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-profile',

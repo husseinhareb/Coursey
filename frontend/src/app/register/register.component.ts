@@ -8,11 +8,12 @@ import {
 } from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
 import { AuthService, SignupData } from '../auth/auth.service';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule,TranslateModule],
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.css']
 })
