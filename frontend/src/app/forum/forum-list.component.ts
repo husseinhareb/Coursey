@@ -1,5 +1,4 @@
 // src/app/forum-list/forum-list.component.ts
-
 import { Component, OnInit } from '@angular/core';
 import { CommonModule }      from '@angular/common';
 import {
@@ -13,12 +12,13 @@ import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { ForumService, ForumTopic, NewTopic } from '../services/forum.service';
 import { AuthService, Me }         from '../auth/auth.service';
 import { Enrollment } from '../services/user.service';
+import { TranslateModule }       from '@ngx-translate/core';
 
 @Component({
   selector: 'app-forum-list',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule],
-  templateUrl: './forum-list.component.html',
+  imports: [CommonModule, ReactiveFormsModule, RouterModule,TranslateModule],
+  templateUrl: './form-list.component.html',
 })
 export class ForumListComponent implements OnInit {
   courseId!: string;              

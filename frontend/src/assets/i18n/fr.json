@@ -114,5 +114,21 @@
     "CREATE": "Créer le cours",
     "SAVE": "Enregistrer les modifications",
     "ERROR": "Échec de l’enregistrement du cours."
+  },
+  "FORUM": {
+    "LIST_TITLE": "Forums / Sujets",
+    "NEW_TOPIC": "+ Nouveau sujet",
+    "CANCEL": "Annuler",
+    "TITLE_LABEL": "Titre du sujet",
+    "TITLE_PLACEHOLDER": "Entrez le titre",
+    "TITLE_ERROR": "Le titre est requis.",
+    "CREATE_BUTTON": "Créer",
+    "NO_CREATE_PERMISSION": "Seuls les professeurs inscrits peuvent créer des sujets.",
+    "LOADING": "Chargement des sujets…",
+    "ERROR_LOADING": "Échec du chargement des sujets.",
+    "CREATED_BY": "Créé par",
+    "ON": "le",
+    "MESSAGES_COUNT": "message(s)",
+    "NO_TOPICS": "Aucun sujet pour l’instant."
   }
 }

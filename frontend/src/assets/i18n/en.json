@@ -114,7 +114,7 @@
     "ADD_POST": "+ Add Post",
     "EDIT_POST": "Edit Post"
   },
-    "COURSE_FORM": {
+  "COURSE_FORM": {
     "ADD_TITLE": "Ajouter un cours",
     "EDIT_TITLE": "Modifier le cours",
     "TITLE_LABEL": "Titre",
@@ -128,6 +128,21 @@
     "CREATE": "Créer le cours",
     "SAVE": "Enregistrer les modifications",
     "ERROR": "Échec de l’enregistrement du cours."
+  },
+  "FORUM": {
+    "LIST_TITLE": "Forums / Topics",
+    "NEW_TOPIC": "+ New Topic",
+    "CANCEL": "Cancel",
+    "TITLE_LABEL": "Topic Title",
+    "TITLE_PLACEHOLDER": "Enter title",
+    "TITLE_ERROR": "Title is required.",
+    "CREATE_BUTTON": "Create",
+    "NO_CREATE_PERMISSION": "Only enrolled instructors may create topics.",
+    "LOADING": "Loading topics…",
+    "ERROR_LOADING": "Failed to load topics.",
+    "CREATED_BY": "Created by",
+    "ON": "on",
+    "MESSAGES_COUNT": "messages",
+    "NO_TOPICS": "No topics yet."
   }
-  
 }

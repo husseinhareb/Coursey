@@ -114,19 +114,35 @@
         "ADD_POST": "+ إضافة منشور",
         "EDIT_POST": "تعديل المنشور"
     },
-      "COURSE_FORM": {
-    "ADD_TITLE": "إضافة دورة",
-    "EDIT_TITLE": "تعديل الدورة",
-    "TITLE_LABEL": "العنوان",
-    "TITLE_PLACEHOLDER": "أدخل عنوان الدورة",
-    "CODE_LABEL": "الرمز",
-    "CODE_PLACEHOLDER": "مثال CS101",
-    "DESCRIPTION_LABEL": "الوصف",
-    "DESCRIPTION_PLACEHOLDER": "أدخل وصفًا موجزًا",
-    "BACKGROUND_LABEL": "الخلفية",
-    "BACKGROUND_PLACEHOLDER": "رابط صورة أو لون سداسي",
-    "CREATE": "إنشاء الدورة",
-    "SAVE": "حفظ التعديلات",
-    "ERROR": "فشل في حفظ الدورة."
-  }
+    "COURSE_FORM": {
+        "ADD_TITLE": "إضافة دورة",
+        "EDIT_TITLE": "تعديل الدورة",
+        "TITLE_LABEL": "العنوان",
+        "TITLE_PLACEHOLDER": "أدخل عنوان الدورة",
+        "CODE_LABEL": "الرمز",
+        "CODE_PLACEHOLDER": "مثال CS101",
+        "DESCRIPTION_LABEL": "الوصف",
+        "DESCRIPTION_PLACEHOLDER": "أدخل وصفًا موجزًا",
+        "BACKGROUND_LABEL": "الخلفية",
+        "BACKGROUND_PLACEHOLDER": "رابط صورة أو لون سداسي",
+        "CREATE": "إنشاء الدورة",
+        "SAVE": "حفظ التعديلات",
+        "ERROR": "فشل في حفظ الدورة."
+    },
+    "FORUM": {
+        "LIST_TITLE": "المنتديات / المواضيع",
+        "NEW_TOPIC": "+ موضوع جديد",
+        "CANCEL": "إلغاء",
+        "TITLE_LABEL": "عنوان الموضوع",
+        "TITLE_PLACEHOLDER": "أدخل العنوان",
+        "TITLE_ERROR": "العنوان مطلوب.",
+        "CREATE_BUTTON": "إنشاء",
+        "NO_CREATE_PERMISSION": "فقط المدرسون المسجلون يمكنهم إنشاء مواضيع.",
+        "LOADING": "جاري تحميل المواضيع…",
+        "ERROR_LOADING": "فشل في تحميل المواضيع.",
+        "CREATED_BY": "أنشأها",
+        "ON": "في",
+        "MESSAGES_COUNT": "رسائل",
+        "NO_TOPICS": "لا توجد مواضيع بعد."
+    }
 }

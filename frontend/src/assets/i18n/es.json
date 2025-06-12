@@ -128,5 +128,21 @@
     "CREATE": "Crear curso",
     "SAVE": "Guardar cambios",
     "ERROR": "Error al guardar el curso."
+  },
+  "FORUM": {
+    "LIST_TITLE": "Foros / Temas",
+    "NEW_TOPIC": "+ Nuevo tema",
+    "CANCEL": "Cancelar",
+    "TITLE_LABEL": "Título del tema",
+    "TITLE_PLACEHOLDER": "Ingrese título",
+    "TITLE_ERROR": "El título es obligatorio.",
+    "CREATE_BUTTON": "Crear",
+    "NO_CREATE_PERMISSION": "Solo los instructores inscritos pueden crear temas.",
+    "LOADING": "Cargando temas…",
+    "ERROR_LOADING": "Error al cargar los temas.",
+    "CREATED_BY": "Creado por",
+    "ON": "el",
+    "MESSAGES_COUNT": "mensajes",
+    "NO_TOPICS": "No hay temas todavía."
   }
 }
