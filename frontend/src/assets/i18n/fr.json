@@ -130,5 +130,19 @@
     "ON": "le",
     "MESSAGES_COUNT": "message(s)",
     "NO_TOPICS": "Aucun sujet pour l’instant."
+  },
+    "FORUM_THREAD": {
+    "LOADING": "Chargement du sujet…",
+    "ERROR": "Échec du chargement du sujet.",
+    "CREATED_BY": "Créé par",
+    "ON": "le",
+    "NO_MESSAGES": "Aucun message dans ce sujet.",
+    "ADD_REPLY": "Ajouter une réponse",
+    "CONTENT_PLACEHOLDER": "Votre message…",
+    "CONTENT_ERROR": "Le contenu est requis si aucune image n’est jointe.",
+    "ATTACH_IMAGE": "Joindre une image…",
+    "IMG_ALT": "Image jointe",
+    "SEND": "Envoyer",
+    "SENDING": "Envoi…"
   }
 }

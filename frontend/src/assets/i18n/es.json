@@ -144,5 +144,19 @@
     "ON": "el",
     "MESSAGES_COUNT": "mensajes",
     "NO_TOPICS": "No hay temas todavía."
+  },
+  "FORUM_THREAD": {
+    "LOADING": "Cargando tema…",
+    "ERROR": "Error al cargar el tema.",
+    "CREATED_BY": "Creado por",
+    "ON": "el",
+    "NO_MESSAGES": "No hay mensajes en este tema.",
+    "ADD_REPLY": "Agregar una respuesta",
+    "CONTENT_PLACEHOLDER": "Tu mensaje…",
+    "CONTENT_ERROR": "El contenido es obligatorio si no se adjunta imagen.",
+    "ATTACH_IMAGE": "Adjuntar imagen…",
+    "IMG_ALT": "Imagen adjunta",
+    "SEND": "Enviar",
+    "SENDING": "Enviando…"
   }
 }

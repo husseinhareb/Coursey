@@ -6,17 +6,17 @@ import {
   ReactiveFormsModule,
   FormBuilder,
   FormGroup,
-  Validators
 } from '@angular/forms';
 import { ActivatedRoute }    from '@angular/router';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 
-import { ForumService, ForumTopic, ForumMessage } from '../services/forum.service';
+import { ForumService, ForumTopic } from '../services/forum.service';
+import { TranslateModule }       from '@ngx-translate/core';
 
 @Component({
   selector: 'app-forum-thread',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule,TranslateModule],
   templateUrl: './forum-thread.component.html',
 })
 export class ForumThreadComponent implements OnInit {

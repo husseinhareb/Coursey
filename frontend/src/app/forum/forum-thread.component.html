@@ -1,58 +1,79 @@
+<!-- src/app/forum/forum-thread.component.html -->
+
 <div class="forum-thread">
-    <h3 *ngIf="!loadingTopic">{{ topic?.title }}</h3>
-    <div *ngIf="loadingTopic">Chargement du sujet…</div>
-    <div *ngIf="errorTopic" class="error">{{ errorTopic }}</div>
+  <!-- Title / Loading / Error -->
+  <h3 *ngIf="!loadingTopic">{{ topic?.title }}</h3>
+  <div *ngIf="loadingTopic" class="status">
+    {{ 'FORUM_THREAD.LOADING' | translate }}
+  </div>
+  <div *ngIf="errorTopic" class="status status--error">
+    {{ errorTopic || ('FORUM_THREAD.ERROR' | translate) }}
+  </div>
 
-    <div *ngIf="topic && !loadingTopic">
-        <p>
-            Créé par {{ topic.author_id }}
-            le {{ topic.created_at | date:'short' }}
-        </p>
+  <!-- Thread details -->
+  <div *ngIf="topic && !loadingTopic">
+    <p>
+      {{ 'FORUM_THREAD.CREATED_BY' | translate }} {{ topic.author_id }}
+      {{ 'FORUM_THREAD.ON' | translate }} {{ topic.created_at | date:'short' }}
+    </p>
 
+    <hr />
+
+    <!-- Messages -->
+    <div *ngIf="topic.messages.length > 0; else noMessages">
+      <div *ngFor="let msg of topic.messages" class="forum-message">
+        <strong>{{ msg.author_id }}</strong>
+        <em>{{ 'FORUM_THREAD.ON' | translate }} {{ msg.created_at | date:'short' }}</em>
+        <p *ngIf="msg.content">{{ msg.content }}</p>
+        <img
+          *ngIf="msg.image_data"
+          [src]="toSafeUrl(msg.image_data)"
+          alt="{{ 'FORUM_THREAD.IMG_ALT' | translate }}"
+          class="message-image"
+        />
         <hr />
-
-        <!-- Zone d’affichage des messages -->
-        <div *ngIf="topic.messages.length > 0; else noMessages">
-            <div *ngFor="let msg of topic.messages" class="forum-message">
-                <strong>{{ msg.author_id }}</strong>
-                <em>le {{ msg.created_at | date:'short' }}</em>
-                <p *ngIf="msg.content">{{ msg.content }}</p>
-                <img *ngIf="msg.image_data" [src]="toSafeUrl(msg.image_data)" alt="Image jointe"
-                    class="message-image" />
-                <hr />
-            </div>
-        </div>
-        <ng-template #noMessages>
-            <p>Aucun message dans ce sujet.</p>
-        </ng-template>
-
-        <!-- Formulaire pour poster un nouveau message -->
-        <div class="reply-form">
-            <h4>Ajouter une réponse</h4>
-            <form [formGroup]="messageForm" (ngSubmit)="postMessage()">
-                <textarea formControlName="content" rows="3" placeholder="Votre message…">
-            </textarea>
-                <div *ngIf="messageForm.get('content')?.touched && messageForm.get('content')?.invalid" class="error">
-                    Le contenu est requis si vous n’ajoutez pas d’image.
-                </div>
-
-                <br />
-
-                <!-- File picker for image -->
-                <label class="file-input-label">
-                    <input type="file" accept="image/*" (change)="onFileSelected($event)" />
-                    <span *ngIf="!selectedFile">Joindre une image…</span>
-                    <span *ngIf="selectedFile">{{ selectedFile.name }}</span>
-                </label>
-                <div *ngIf="fileError" class="error">{{ fileError }}</div>
-
-                <br />
-
-                <button type="submit" [disabled]="posting || (!messageForm.value.content && !selectedFile)">
-                    {{ posting ? 'Envoi…' : 'Envoyer' }}
-                </button>
-            </form>
-            <div *ngIf="errorMessage" class="error">{{ errorMessage }}</div>
-        </div>
+      </div>
     </div>
+    <ng-template #noMessages>
+      <p>{{ 'FORUM_THREAD.NO_MESSAGES' | translate }}</p>
+    </ng-template>
+
+    <!-- Reply form -->
+    <div class="reply-form">
+      <h4>{{ 'FORUM_THREAD.ADD_REPLY' | translate }}</h4>
+      <form [formGroup]="messageForm" (ngSubmit)="postMessage()">
+        <textarea
+          formControlName="content"
+          rows="3"
+          placeholder="{{ 'FORUM_THREAD.CONTENT_PLACEHOLDER' | translate }}"
+        ></textarea>
+        <div
+          *ngIf="messageForm.get('content')?.touched && messageForm.get('content')?.invalid"
+          class="error"
+        >
+          {{ 'FORUM_THREAD.CONTENT_ERROR' | translate }}
+        </div>
+
+        <label class="file-input-label">
+          <input type="file" accept="image/*" (change)="onFileSelected($event)" />
+          <span *ngIf="!selectedFile">{{ 'FORUM_THREAD.ATTACH_IMAGE' | translate }}</span>
+          <span *ngIf="selectedFile">{{ selectedFile.name }}</span>
+        </label>
+        <div *ngIf="fileError" class="error">
+          {{ fileError }}
+        </div>
+
+        <button
+          type="submit"
+          class="btn btn--submit"
+          [disabled]="posting || (!messageForm.value.content && !selectedFile)"
+        >
+          {{ posting ? ('FORUM_THREAD.SENDING' | translate) : ('FORUM_THREAD.SEND' | translate) }}
+        </button>
+      </form>
+      <div *ngIf="errorMessage" class="error">
+        {{ errorMessage }}
+      </div>
+    </div>
+  </div>
 </div>

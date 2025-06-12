@@ -144,5 +144,19 @@
     "ON": "on",
     "MESSAGES_COUNT": "messages",
     "NO_TOPICS": "No topics yet."
+  },
+  "FORUM_THREAD": {
+    "LOADING": "Loading topic…",
+    "ERROR": "Failed to load topic.",
+    "CREATED_BY": "Created by",
+    "ON": "on",
+    "NO_MESSAGES": "No messages in this topic.",
+    "ADD_REPLY": "Add a Reply",
+    "CONTENT_PLACEHOLDER": "Your message…",
+    "CONTENT_ERROR": "Content is required if no image attached.",
+    "ATTACH_IMAGE": "Attach an image…",
+    "IMG_ALT": "Attached image",
+    "SEND": "Send",
+    "SENDING": "Sending…"
   }
 }
