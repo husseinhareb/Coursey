@@ -158,5 +158,25 @@
     "IMG_ALT": "Imagen adjunta",
     "SEND": "Enviar",
     "SENDING": "Enviando…"
+  },
+  "USERS": {
+    "MANAGE_ENROLLMENTS": {
+      "TITLE": "Gestionar inscripciones",
+      "LOADING": "Cargando…",
+      "ERROR": "Error al cargar inscripciones.",
+      "CANNOT_ENROLL_ADMIN": "No se puede inscribir a un administrador en ningún curso.",
+      "TABLE": {
+        "COURSE": "Curso",
+        "ENROLLED": "Inscrito"
+      }
+    }
+  },  "USER_DETAIL": {
+    "LOADING": "Cargando usuario…",
+    "ERROR": "Error al cargar el usuario.",
+    "AVATAR_ALT": "Avatar del usuario",
+    "EMAIL_LABEL": "Correo electrónico:",
+    "ROLES_LABEL": "Roles:",
+    "ENROLLED_TITLE": "Cursos inscritos"
   }
+  
 }

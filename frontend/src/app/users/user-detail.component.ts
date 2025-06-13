@@ -7,11 +7,12 @@ import { forkJoin } from 'rxjs';
 
 import { UserService, User } from '../services/user.service';
 import { CourseService, Course } from '../services/course.service';
+import { TranslateModule }       from '@ngx-translate/core';
 
 @Component({
     selector: 'app-user-detail',
     standalone: true,
-    imports: [CommonModule, RouterModule],
+    imports: [CommonModule, RouterModule,TranslateModule],
     templateUrl: './user-detail.component.html',
     styleUrls: ['./user-detail.component.css']
 })

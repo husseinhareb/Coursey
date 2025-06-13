@@ -1,26 +1,29 @@
 <!-- src/app/users/manage-enrollments.component.html -->
 
-<h2>Manage Enrollments</h2>
+<h2>{{ 'USERS.MANAGE_ENROLLMENTS.TITLE' | translate }}</h2>
 
-<div *ngIf="loading">Loading…</div>
-<div *ngIf="error" class="error">{{ error }}</div>
-
-<div *ngIf="!loading && isTargetAdmin" class="warning">
-  Cannot enroll an admin in any courses.
+<div *ngIf="loading" class="status">
+  {{ 'USERS.MANAGE_ENROLLMENTS.LOADING' | translate }}
+</div>
+<div *ngIf="error" class="status status--error">
+  {{ error }}
 </div>
 
-<table *ngIf="!loading && !isTargetAdmin">
+<div *ngIf="!loading && isTargetAdmin" class="warning">
+  {{ 'USERS.MANAGE_ENROLLMENTS.CANNOT_ENROLL_ADMIN' | translate }}
+</div>
+
+<table *ngIf="!loading && !isTargetAdmin" class="enroll-table">
   <thead>
     <tr>
-      <th>Course</th>
-      <th>Enrolled</th>
+      <th>{{ 'USERS.MANAGE_ENROLLMENTS.TABLE.COURSE'   | translate }}</th>
+      <th>{{ 'USERS.MANAGE_ENROLLMENTS.TABLE.ENROLLED' | translate }}</th>
     </tr>
   </thead>
   <tbody>
     <tr *ngFor="let c of courses">
       <td>{{ c.title }}</td>
       <td>
-        <!-- disable checkbox for admins -->
         <input
           type="checkbox"
           #cb

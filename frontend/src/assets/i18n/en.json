@@ -158,5 +158,25 @@
     "IMG_ALT": "Attached image",
     "SEND": "Send",
     "SENDING": "Sending…"
+  },
+  "USERS": {
+    "MANAGE_ENROLLMENTS": {
+      "TITLE": "Manage Enrollments",
+      "LOADING": "Loading…",
+      "ERROR": "Failed to load enrollments.",
+      "CANNOT_ENROLL_ADMIN": "Cannot enroll an admin in any courses.",
+      "TABLE": {
+        "COURSE": "Course",
+        "ENROLLED": "Enrolled"
+      }
+    }
+  },
+  "USER_DETAIL": {
+    "LOADING": "Loading user…",
+    "ERROR": "Failed to load user.",
+    "AVATAR_ALT": "User avatar",
+    "EMAIL_LABEL": "Email:",
+    "ROLES_LABEL": "Roles:",
+    "ENROLLED_TITLE": "Enrolled Courses"
   }
 }

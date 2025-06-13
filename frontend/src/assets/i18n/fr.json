@@ -131,7 +131,7 @@
     "MESSAGES_COUNT": "message(s)",
     "NO_TOPICS": "Aucun sujet pour l’instant."
   },
-    "FORUM_THREAD": {
+  "FORUM_THREAD": {
     "LOADING": "Chargement du sujet…",
     "ERROR": "Échec du chargement du sujet.",
     "CREATED_BY": "Créé par",
@@ -144,5 +144,25 @@
     "IMG_ALT": "Image jointe",
     "SEND": "Envoyer",
     "SENDING": "Envoi…"
+  },
+  "USERS": {
+    "MANAGE_ENROLLMENTS": {
+      "TITLE": "Gérer les inscriptions",
+      "LOADING": "Chargement…",
+      "ERROR": "Échec du chargement des inscriptions.",
+      "CANNOT_ENROLL_ADMIN": "Impossible d’inscrire un administrateur aux cours.",
+      "TABLE": {
+        "COURSE": "Cours",
+        "ENROLLED": "Inscrit"
+      }
+    }
+  },
+  "USER_DETAIL": {
+    "LOADING": "Chargement de l’utilisateur…",
+    "ERROR": "Échec du chargement de l’utilisateur.",
+    "AVATAR_ALT": "Avatar de l’utilisateur",
+    "EMAIL_LABEL": "E-mail :",
+    "ROLES_LABEL": "Rôles :",
+    "ENROLLED_TITLE": "Cours inscrits"
   }
 }

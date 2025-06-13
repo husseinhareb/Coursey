@@ -158,5 +158,25 @@
         "IMG_ALT": "الصورة المرفقة",
         "SEND": "إرسال",
         "SENDING": "جاري الإرسال…"
+    },
+    "USERS": {
+        "MANAGE_ENROLLMENTS": {
+            "TITLE": "إدارة التسجيلات",
+            "LOADING": "جاري التحميل…",
+            "ERROR": "فشل في تحميل التسجيلات.",
+            "CANNOT_ENROLL_ADMIN": "لا يمكن تسجيل المشرف في أي دورة.",
+            "TABLE": {
+                "COURSE": "الدورة",
+                "ENROLLED": "مسجل"
+            }
+        }
+    },
+    "USER_DETAIL": {
+        "LOADING": "جاري تحميل المستخدم…",
+        "ERROR": "فشل في تحميل المستخدم.",
+        "AVATAR_ALT": "رمز المستخدم",
+        "EMAIL_LABEL": "البريد الإلكتروني:",
+        "ROLES_LABEL": "الأدوار:",
+        "ENROLLED_TITLE": "الدورات المسجلة"
     }
 }

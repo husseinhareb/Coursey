@@ -4,12 +4,13 @@ import { Component, OnInit }      from '@angular/core';
 import { CommonModule }            from '@angular/common';
 import { ActivatedRoute }          from '@angular/router';
 import { CourseService, Course }   from '../services/course.service';
-import { UserService, Enrollment } from '../services/user.service';
+import { UserService } from '../services/user.service';
+import { TranslateModule }       from '@ngx-translate/core';
 
 @Component({
   selector: 'app-manage-enrollments',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TranslateModule],
   templateUrl: './manage-enrollments.component.html'
 })
 export class ManageEnrollmentsComponent implements OnInit {
