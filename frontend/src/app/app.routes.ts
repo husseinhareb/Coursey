@@ -22,7 +22,7 @@ import { ForumListComponent } from './forum/forum-list.component';
 import { ForumThreadComponent } from './forum/forum-thread.component';
 
 import { AuthGuard } from './auth/auth.guard';
-import { UserDetailComponent } from './users/user-detail.component';
+import { UserDetailComponent } from './user-detail/user-detail.component';
 
 export const routes: Routes = [
   // Public landing & auth

@@ -9,29 +9,7 @@ import { SubmissionService, SubmissionCreate } from '../services/submission.serv
   selector: 'app-submission-form',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
-  template: `
-    <div class="submission-form">
-      <h4>Soumettre un devoir</h4>
-      <form [formGroup]="form" (ngSubmit)="onSubmit()">
-        <div>
-          <label for="fileInput">Téléverser le fichier :</label>
-          <input
-            id="fileInput"
-            type="file"
-            (change)="onFileSelected($event)"
-            accept="*/*"
-          />
-        </div>
-        <div style="margin-top: 0.5rem;">
-          <button type="submit" [disabled]="form.invalid || loading">
-            {{ loading ? 'Envoi…' : 'Soumettre' }}
-          </button>
-          <button type="button" (click)="cancel.emit()">Annuler</button>
-        </div>
-      </form>
-      <div *ngIf="error" class="error">{{ error }}</div>
-    </div>
-  `,
+  templateUrl: `./submission-form.component.html`,
 
 })
 export class SubmissionFormComponent {

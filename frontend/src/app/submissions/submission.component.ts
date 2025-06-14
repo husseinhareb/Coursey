@@ -10,53 +10,8 @@ import { SubmissionService, SubmissionCreate } from '../services/submission.serv
   selector: 'app-submission-form',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
-  template: `
-    <div class="submission-form">
-      <h4>Submit Homework</h4>
-      <form (ngSubmit)="onSubmit()">
-        <div>
-          <label for="file">Choose file to upload:</label>
-          <input
-            id="file"
-            type="file"
-            (change)="onFileSelected($event)"
-            required
-          />
-        </div>
+  templateUrl: `./submission.component.html`,
 
-        <div style="margin-top: 0.5rem;">
-          <button type="submit" [disabled]="!selectedFile || loading">
-            {{ loading ? 'Submitting…' : 'Submit' }}
-          </button>
-          <button type="button" (click)="cancel.emit()">Cancel</button>
-        </div>
-      </form>
-      <div *ngIf="error" class="error">{{ error }}</div>
-    </div>
-  `,
-  styles: [`
-    .submission-form {
-      border: 1px solid #ccc;
-      padding: 1rem;
-      margin-bottom: 1rem;
-      background: #fafafa;
-    }
-    .submission-form h4 {
-      margin-top: 0;
-    }
-    .error {
-      color: red;
-      margin-top: 0.5rem;
-    }
-    label {
-      display: block;
-      margin-bottom: 0.25rem;
-    }
-    input[type="file"] {
-      display: block;
-      margin-bottom: 0.5rem;
-    }
-  `]
 })
 export class SubmissionFormComponent {
   @Input() courseId!: string;
