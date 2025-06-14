@@ -1,30 +1,37 @@
 <!-- src/app/users/user-detail.component.html -->
 
-<div *ngIf="loading">Loading user…</div>
-<div *ngIf="error" class="error">{{ error }}</div>
+<div *ngIf="loading" class="status">
+  {{ 'USER_DETAIL.LOADING' | translate }}
+</div>
+<div *ngIf="error" class="status status--error">
+  {{ error || ('USER_DETAIL.ERROR' | translate) }}
+</div>
 
 <article *ngIf="user" class="user-detail">
   <img
     *ngIf="user.profile.profilePic"
     [src]="user.profile.profilePic"
-    alt="Avatar"
+    alt="{{ 'USER_DETAIL.AVATAR_ALT' | translate }}"
     class="user-detail-avatar"
   />
 
-  <h2>{{ user.profile.firstName }} {{ user.profile.lastName }}</h2>
-  <p><strong>Email:</strong> {{ user.email }}</p>
+  <h2>
+    {{ user.profile.firstName }} {{ user.profile.lastName }}
+  </h2>
+  <p>
+    <strong>{{ 'USER_DETAIL.EMAIL_LABEL' | translate }}</strong>
+    {{ user.email }}
+  </p>
 
-  <!-- new: Roles -->
   <p *ngIf="user.roles?.length">
-    <strong>Roles:</strong>
+    <strong>{{ 'USER_DETAIL.ROLES_LABEL' | translate }}</strong>
     <span *ngFor="let r of user.roles; let last = last">
       {{ r }}<span *ngIf="!last">, </span>
     </span>
   </p>
 
-  <!-- new: Enrolled Courses -->
   <section *ngIf="enrolledCourses.length">
-    <h3>Enrolled Courses</h3>
+    <h3>{{ 'USER_DETAIL.ENROLLED_TITLE' | translate }}</h3>
     <ul>
       <li *ngFor="let c of enrolledCourses">
         {{ c.code }} — {{ c.title }}

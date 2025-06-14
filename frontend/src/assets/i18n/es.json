@@ -166,23 +166,42 @@
     "SENDING": "Enviando…"
   },
   "USERS": {
-    "MANAGE_ENROLLMENTS": {
-      "TITLE": "Gestionar inscripciones",
-      "LOADING": "Cargando…",
-      "ERROR": "Error al cargar inscripciones.",
-      "CANNOT_ENROLL_ADMIN": "No se puede inscribir a un administrador en cursos.",
-      "TABLE": {
-        "COURSE": "Curso",
-        "ENROLLED": "Inscrito"
+    "LOADING": "Cargando usuarios…",
+    "ERROR_LOADING": "Error al cargar usuarios.",
+    "TABLE": {
+      "AVATAR": "Avatar",
+      "AVATAR_ALT": "Avatar del usuario",
+      "FIRST_NAME": "Nombre",
+      "LAST_NAME": "Apellido",
+      "EMAIL": "Correo electrónico",
+      "USERNAME": "Usuario",
+      "PHONE": "Teléfono",
+      "ADDRESS": "Dirección",
+      "ROLES": "Roles",
+      "CREATED_AT": "Creado el",
+      "UPDATED_AT": "Actualizado el",
+      "ENROLLMENTS": "Inscripciones",
+      "NO_ENROLLMENTS": "— sin inscripciones —",
+      "ACTIONS": "Acciones",
+      "MANAGE_ENROLLMENT": "Gestionar inscripción",
+      "MANAGE_ENROLLMENTS": {
+        "TITLE": "Gestionar inscripciones",
+        "LOADING": "Cargando…",
+        "ERROR": "Error al cargar inscripciones.",
+        "CANNOT_ENROLL_ADMIN": "No se puede inscribir a un administrador en cursos.",
+        "TABLE": {
+          "COURSE": "Curso",
+          "ENROLLED": "Inscrito"
+        }
       }
+    },
+    "USER_DETAIL": {
+      "LOADING": "Cargando usuario…",
+      "ERROR": "Error al cargar el usuario.",
+      "AVATAR_ALT": "Avatar del usuario",
+      "EMAIL_LABEL": "Correo electrónico:",
+      "ROLES_LABEL": "Roles:",
+      "ENROLLED_TITLE": "Cursos inscritos"
     }
-  },
-  "USER_DETAIL": {
-    "LOADING": "Cargando usuario…",
-    "ERROR": "Error al cargar el usuario.",
-    "AVATAR_ALT": "Avatar del usuario",
-    "EMAIL_LABEL": "Correo electrónico:",
-    "ROLES_LABEL": "Roles:",
-    "ENROLLED_TITLE": "Cursos inscritos"
   }
 }

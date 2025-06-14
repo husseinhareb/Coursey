@@ -1,77 +1,64 @@
 <!-- src/app/users/users.component.html -->
 
-<section *ngIf="loading" >
-  Loading users…
+<section *ngIf="loading" class="status">
+  {{ 'USERS.LOADING' | translate }}
 </section>
 
-<section *ngIf="error" class="error" >
-  {{ error }}
+<section *ngIf="error" class="status status--error">
+  {{ error || ('USERS.ERROR_LOADING' | translate) }}
 </section>
 
-<!-- Only show the table if there's no error AND we are done loading -->
-<table
-  *ngIf="!loading && !error">
+<table *ngIf="!loading && !error" class="users-table">
   <thead>
     <tr>
-      <th>Avatar</th>
-      <th>First Name</th>
-      <th>Last Name</th>
-      <th>Email</th>
-      <th>Username</th>
-      <th>Phone</th>
-      <th>Address</th>
-      <th>Roles</th>
-      <th>Created At</th>
-      <th>Updated At</th>
-      <th>Enrollments</th>
-      <th>Actions</th>
+      <th>{{ 'USERS.TABLE.AVATAR'       | translate }}</th>
+      <th>{{ 'USERS.TABLE.FIRST_NAME'   | translate }}</th>
+      <th>{{ 'USERS.TABLE.LAST_NAME'    | translate }}</th>
+      <th>{{ 'USERS.TABLE.EMAIL'        | translate }}</th>
+      <th>{{ 'USERS.TABLE.USERNAME'     | translate }}</th>
+      <th>{{ 'USERS.TABLE.PHONE'        | translate }}</th>
+      <th>{{ 'USERS.TABLE.ADDRESS'      | translate }}</th>
+      <th>{{ 'USERS.TABLE.ROLES'        | translate }}</th>
+      <th>{{ 'USERS.TABLE.CREATED_AT'   | translate }}</th>
+      <th>{{ 'USERS.TABLE.UPDATED_AT'   | translate }}</th>
+      <th>{{ 'USERS.TABLE.ENROLLMENTS'  | translate }}</th>
+      <th>{{ 'USERS.TABLE.ACTIONS'      | translate }}</th>
     </tr>
   </thead>
   <tbody>
     <tr *ngFor="let u of users">
-      <!-- Avatar (if any) -->
       <td>
         <img
           *ngIf="u.profile.profilePic"
           [src]="u.profile.profilePic"
-          alt="avatar"
+          alt="{{ 'USERS.TABLE.AVATAR_ALT' | translate }}"
+          class="avatar"
         />
       </td>
-
-      <!-- Profile fields -->
       <td>{{ u.profile.firstName }}</td>
       <td>{{ u.profile.lastName }}</td>
       <td>{{ u.email }}</td>
       <td>{{ u.username }}</td>
       <td>{{ u.profile.phoneNumber || '-' }}</td>
       <td>{{ u.profile.address || '-' }}</td>
-
-      <!-- Roles (display as comma‐separated) -->
       <td>
         {{ u.roles.length ? (u.roles.join(', ')) : '-' }}
       </td>
-
-      <!-- Timestamps -->
-      <td>{{ u.createdAt | date: 'short' }}</td>
-      <td>{{ u.updatedAt | date: 'short' }}</td>
-
-      <!-- Enrollments: Show course code + date -->
+      <td>{{ u.createdAt | date:'short' }}</td>
+      <td>{{ u.updatedAt | date:'short' }}</td>
       <td>
         <ul *ngIf="userEnrollments[u.id]?.length; else noEnroll">
           <li *ngFor="let e of userEnrollments[u.id]">
-            <!-- If we loaded the code, show code; otherwise fall back to ID -->
             {{ courseCodeMap[e.courseId] || e.courseId }}
           </li>
         </ul>
         <ng-template #noEnroll>
-          <small>— no enrollments —</small>
+          <small>{{ 'USERS.TABLE.NO_ENROLLMENTS' | translate }}</small>
         </ng-template>
       </td>
-
-      <!-- Example action: link to manage that user’s enrollments -->
       <td>
-        <a [routerLink]="['/users', u.id, 'enrollments']">
-          Manage Enrollment
+        <a [routerLink]="['/users', u.id, 'enrollments']" class="link">
+          {{ 'USERS.TABLE.MANAGE_ENROLLMENT' | translate }}
         </a>
       </td>
     </tr>

@@ -8,6 +8,7 @@ import { forkJoin, switchMap, map, of } from 'rxjs';
 
 import { UserService, User, Enrollment } from '../services/user.service';
 import { CourseService, Course }        from '../services/course.service';
+import { TranslateModule }       from '@ngx-translate/core';
 
 @Component({
   selector: 'app-users',
@@ -15,7 +16,8 @@ import { CourseService, Course }        from '../services/course.service';
   imports: [
     CommonModule,
     HttpClientModule,
-    RouterModule    // ← so that [routerLink] works
+    RouterModule,
+    TranslateModule
   ],
   templateUrl: './users.component.html',
   styleUrls: ['./users.component.css']

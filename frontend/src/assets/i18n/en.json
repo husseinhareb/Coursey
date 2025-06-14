@@ -166,6 +166,25 @@
     "SENDING": "Sending…"
   },
   "USERS": {
+    "LOADING": "Loading users…",
+    "ERROR_LOADING": "Failed to load users.",
+    "TABLE": {
+      "AVATAR": "Avatar",
+      "AVATAR_ALT": "User avatar",
+      "FIRST_NAME": "First Name",
+      "LAST_NAME": "Last Name",
+      "EMAIL": "Email",
+      "USERNAME": "Username",
+      "PHONE": "Phone",
+      "ADDRESS": "Address",
+      "ROLES": "Roles",
+      "CREATED_AT": "Created At",
+      "UPDATED_AT": "Updated At",
+      "ENROLLMENTS": "Enrollments",
+      "NO_ENROLLMENTS": "— no enrollments —",
+      "ACTIONS": "Actions",
+      "MANAGE_ENROLLMENT": "Manage Enrollment"
+    },
     "MANAGE_ENROLLMENTS": {
       "TITLE": "Manage Enrollments",
       "LOADING": "Loading…",

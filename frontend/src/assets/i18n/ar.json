@@ -166,23 +166,42 @@
         "SENDING": "جاري الإرسال…"
     },
     "USERS": {
-        "MANAGE_ENROLLMENTS": {
-            "TITLE": "إدارة التسجيل في الدورات",
-            "LOADING": "جارٍ التحميل…",
-            "ERROR": "فشل في تحميل التسجيلات.",
-            "CANNOT_ENROLL_ADMIN": "لا يمكن تسجيل المشرف في الدورات.",
-            "TABLE": {
-                "COURSE": "الدورة",
-                "ENROLLED": "مسجل"
+        "LOADING": "جاري تحميل المستخدمين…",
+        "ERROR_LOADING": "فشل في تحميل المستخدمين.",
+        "TABLE": {
+            "AVATAR": "رمز",
+            "AVATAR_ALT": "رمز المستخدم",
+            "FIRST_NAME": "الاسم الأول",
+            "LAST_NAME": "اسم العائلة",
+            "EMAIL": "البريد الإلكتروني",
+            "USERNAME": "اسم المستخدم",
+            "PHONE": "الهاتف",
+            "ADDRESS": "العنوان",
+            "ROLES": "الأدوار",
+            "CREATED_AT": "تاريخ الإنشاء",
+            "UPDATED_AT": "تاريخ التحديث",
+            "ENROLLMENTS": "التسجيلات",
+            "NO_ENROLLMENTS": "— لا توجد تسجيلات —",
+            "ACTIONS": "إجراءات",
+            "MANAGE_ENROLLMENT": "إدارة التسجيل",
+            "MANAGE_ENROLLMENTS": {
+                "TITLE": "إدارة التسجيل في الدورات",
+                "LOADING": "جارٍ التحميل…",
+                "ERROR": "فشل في تحميل التسجيلات.",
+                "CANNOT_ENROLL_ADMIN": "لا يمكن تسجيل المشرف في الدورات.",
+                "TABLE": {
+                    "COURSE": "الدورة",
+                    "ENROLLED": "مسجل"
+                }
             }
+        },
+        "USER_DETAIL": {
+            "LOADING": "جارٍ تحميل المستخدم…",
+            "ERROR": "فشل في تحميل المستخدم.",
+            "AVATAR_ALT": "صورة المستخدم",
+            "EMAIL_LABEL": "البريد الإلكتروني:",
+            "ROLES_LABEL": "الأدوار:",
+            "ENROLLED_TITLE": "الدورات المسجلة"
         }
-    },
-    "USER_DETAIL": {
-        "LOADING": "جارٍ تحميل المستخدم…",
-        "ERROR": "فشل في تحميل المستخدم.",
-        "AVATAR_ALT": "صورة المستخدم",
-        "EMAIL_LABEL": "البريد الإلكتروني:",
-        "ROLES_LABEL": "الأدوار:",
-        "ENROLLED_TITLE": "الدورات المسجلة"
     }
 }
