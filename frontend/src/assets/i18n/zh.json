@@ -18,46 +18,46 @@
     },
     "ACTIVITY_LOG": {
         "TITLE": "活动历史",
-        "LOADING": "加载日志…",
+        "LOADING": "正在加载日志…",
         "TABLE": {
             "DATE_TIME": "日期和时间",
             "USER": "用户",
             "ACTION": "操作",
             "DETAILS": "详情"
         },
-        "NO_LOGS": "无活动可显示。"
+        "NO_LOGS": "暂无活动。"
     },
     "LOGIN": {
         "TITLE": "登录",
         "EMAIL_LABEL": "邮箱",
-        "EMAIL_PLACEHOLDER": "你@例子.com",
+        "EMAIL_PLACEHOLDER": "you@example.com",
         "EMAIL_ERROR": "请输入有效邮箱。",
         "PASSWORD_LABEL": "密码",
         "PASSWORD_PLACEHOLDER": "••••••••",
-        "PASSWORD_ERROR": "请输入密码。",
+        "PASSWORD_ERROR": "密码为必填项。",
         "SUBMIT": "登录"
     },
     "PROFILE": {
         "TITLE": "我的资料",
-        "LOADING": "加载个人资料…",
-        "ERROR_LOADING": "加载个人资料失败。",
+        "LOADING": "正在加载资料…",
+        "ERROR_LOADING": "加载资料失败。",
         "AVATAR_ALT": "用户头像",
         "EMAIL_LABEL": "邮箱",
-        "EMAIL_PLACEHOLDER": "你@例子.com",
+        "EMAIL_PLACEHOLDER": "you@example.com",
         "USERNAME_LABEL": "用户名",
-        "FIRST_NAME_LABEL": "名字",
-        "FIRST_NAME_PLACEHOLDER": "输入名字",
-        "LAST_NAME_LABEL": "姓氏",
-        "LAST_NAME_PLACEHOLDER": "输入姓氏",
-        "PHONE_LABEL": "电话号码",
-        "PHONE_PLACEHOLDER": "输入电话号码",
+        "FIRST_NAME_LABEL": "名",
+        "FIRST_NAME_PLACEHOLDER": "输入名",
+        "LAST_NAME_LABEL": "姓",
+        "LAST_NAME_PLACEHOLDER": "输入姓",
+        "PHONE_LABEL": "电话",
+        "PHONE_PLACEHOLDER": "输入电话",
         "ADDRESS_LABEL": "地址",
         "ADDRESS_PLACEHOLDER": "输入地址",
         "ROLES_LABEL": "角色",
         "ENROLLED_LABEL": "已选课程",
-        "NO_ENROLLMENTS": "没有已选课程。",
-        "SAVE": "保存更改",
-        "SUCCESS": "个人资料更新成功。",
+        "NO_ENROLLMENTS": "暂无已选课程。",
+        "SAVE": "保存",
+        "SUCCESS": "资料更新成功。",
         "UPDATE_ERROR": "更新失败。"
     },
     "COURSES": {
@@ -73,19 +73,19 @@
         },
         "EDIT": "编辑",
         "DELETE": "删除",
-        "INFO": "信息"
+        "INFO": "详情"
     },
     "SIGNUP": {
         "TITLE": "注册",
         "EMAIL_LABEL": "邮箱",
-        "EMAIL_PLACEHOLDER": "你@例子.com",
+        "EMAIL_PLACEHOLDER": "you@example.com",
         "EMAIL_ERROR": "请输入有效邮箱。",
-        "FIRST_NAME_LABEL": "名字",
-        "FIRST_NAME_PLACEHOLDER": "输入名字",
-        "FIRST_NAME_ERROR": "名字为必填项。",
-        "LAST_NAME_LABEL": "姓氏",
-        "LAST_NAME_PLACEHOLDER": "输入姓氏",
-        "LAST_NAME_ERROR": "姓氏为必填项。",
+        "FIRST_NAME_LABEL": "名",
+        "FIRST_NAME_PLACEHOLDER": "输入名",
+        "FIRST_NAME_ERROR": "名为必填项。",
+        "LAST_NAME_LABEL": "姓",
+        "LAST_NAME_PLACEHOLDER": "输入姓",
+        "LAST_NAME_ERROR": "姓为必填项。",
         "ROLE_LABEL": "角色",
         "ROLE_PLACEHOLDER": "选择角色",
         "ROLE_STUDENT": "学生",
@@ -93,28 +93,28 @@
         "ROLE_ADMIN": "管理员",
         "ROLE_ERROR": "必须选择一个角色。",
         "SUBMIT": "注册",
-        "SUCCESS": "注册成功！正在跳转到登录…"
+        "SUCCESS": "注册成功！正在跳转…"
     },
     "POSTS": {
         "LOADING": "加载帖子…",
         "HOMEWORK_FLAG": "作业",
         "TYPE": "类型",
         "POSITION": "位置",
-        "PINNED_AT": "置顶于",
+        "PINNED_AT": "固定于",
         "DUE_DATE": "截止日期",
-        "PIN": "置顶",
-        "UNPIN": "取消置顶",
+        "PIN": "固定",
+        "UNPIN": "取消固定",
         "EDIT": "编辑",
         "DELETE": "删除",
         "SUBMIT_HW": "提交作业",
         "VIEW_MY_SUB": "查看我的提交",
         "HIDE_MY_SUB": "隐藏我的提交",
-        "VIEW_ALL_SUB": "查看所有提交",
-        "HIDE_ALL_SUB": "隐藏所有提交",
+        "VIEW_ALL_SUB": "查看全部提交",
+        "HIDE_ALL_SUB": "隐藏提交",
         "NO_POSTS": "暂无帖子。"
     },
     "COURSE_DETAIL": {
-        "LOADING": "加载课程…",
+        "LOADING": "正在加载课程…",
         "ERROR": "加载课程失败。",
         "VIEW_FORUM": "查看课程论坛",
         "ADD_POST": "+ 添加帖子",
@@ -130,26 +130,26 @@
         "DESCRIPTION_LABEL": "描述",
         "DESCRIPTION_PLACEHOLDER": "输入简要描述",
         "BACKGROUND_LABEL": "背景",
-        "BACKGROUND_PLACEHOLDER": "图片 URL 或 十六进制颜色",
+        "BACKGROUND_PLACEHOLDER": "图片 URL 或 十六进制 颜色",
         "CREATE": "创建课程",
-        "SAVE": "保存更改",
-        "ERROR": "保存课程失败。"
+        "SAVE": "保存",
+        "ERROR": "保存失败。"
     },
     "FORUM": {
         "LIST_TITLE": "论坛 / 话题",
-        "NEW_TOPIC": "+ 新话题",
+        "NEW_TOPIC": "+ 新建话题",
         "CANCEL": "取消",
         "TITLE_LABEL": "话题标题",
         "TITLE_PLACEHOLDER": "输入标题",
         "TITLE_ERROR": "标题为必填项。",
         "CREATE_BUTTON": "创建",
-        "NO_CREATE_PERMISSION": "只有已注册的讲师可以创建话题。",
+        "NO_CREATE_PERMISSION": "仅限已注册讲师创建话题。",
         "LOADING": "加载话题…",
         "ERROR_LOADING": "加载话题失败。",
         "CREATED_BY": "创建者",
         "ON": "于",
         "MESSAGES_COUNT": "条消息",
-        "NO_TOPICS": "暂无话题。"
+        "NO_TOPICS": "暂时暂无话题。"
     },
     "FORUM_THREAD": {
         "LOADING": "加载话题…",
@@ -159,21 +159,40 @@
         "NO_MESSAGES": "该话题暂无消息。",
         "ADD_REPLY": "添加回复",
         "CONTENT_PLACEHOLDER": "您的消息…",
-        "CONTENT_ERROR": "如果未附加图片，则内容为必填项。",
+        "CONTENT_ERROR": "若未附加图片，内容为必填项。",
         "ATTACH_IMAGE": "附加图片…",
         "IMG_ALT": "附加图片",
         "SEND": "发送",
         "SENDING": "发送中…"
     },
     "USERS": {
+        "LOADING": "加载用户…",
+        "ERROR_LOADING": "加载用户失败。",
+        "TABLE": {
+            "AVATAR": "头像",
+            "AVATAR_ALT": "用户头像",
+            "FIRST_NAME": "名",
+            "LAST_NAME": "姓",
+            "EMAIL": "邮箱",
+            "USERNAME": "用户名",
+            "PHONE": "电话",
+            "ADDRESS": "地址",
+            "ROLES": "角色",
+            "CREATED_AT": "创建于",
+            "UPDATED_AT": "更新于",
+            "ENROLLMENTS": "注册",
+            "NO_ENROLLMENTS": "— 暂无注册 —",
+            "ACTIONS": "操作",
+            "MANAGE_ENROLLMENT": "管理注册"
+        },
         "MANAGE_ENROLLMENTS": {
-            "TITLE": "管理选课",
+            "TITLE": "管理注册",
             "LOADING": "加载中…",
-            "ERROR": "加载选课失败。",
-            "CANNOT_ENROLL_ADMIN": "无法为管理员选课。",
+            "ERROR": "加载注册失败。",
+            "CANNOT_ENROLL_ADMIN": "无法为管理员注册课程。",
             "TABLE": {
                 "COURSE": "课程",
-                "ENROLLED": "已选"
+                "ENROLLED": "已注册"
             }
         }
     },
@@ -183,6 +202,6 @@
         "AVATAR_ALT": "用户头像",
         "EMAIL_LABEL": "邮箱：",
         "ROLES_LABEL": "角色：",
-        "ENROLLED_TITLE": "已选课程"
+        "ENROLLED_TITLE": "已注册课程"
     }
 }

@@ -7,7 +7,7 @@
     "HOME": "Inicio",
     "USERS": "Usuarios",
     "COURSES": "Cursos",
-    "ACTIVITY_LOGS": "Registro de actividad",
+    "ACTIVITY_LOGS": "Registros de actividad",
     "PROFILE": "Perfil",
     "LOG_OUT": "Cerrar sesión",
     "SEARCH_PLACEHOLDER": "🔍 Buscar cursos, usuarios…",
@@ -31,28 +31,28 @@
     "TITLE": "Iniciar sesión",
     "EMAIL_LABEL": "Correo electrónico",
     "EMAIL_PLACEHOLDER": "tú@ejemplo.com",
-    "EMAIL_ERROR": "Se requiere un correo válido.",
+    "EMAIL_ERROR": "Correo válido requerido.",
     "PASSWORD_LABEL": "Contraseña",
     "PASSWORD_PLACEHOLDER": "••••••••",
     "PASSWORD_ERROR": "La contraseña es obligatoria.",
-    "SUBMIT": "Entrar"
+    "SUBMIT": "Iniciar sesión"
   },
   "PROFILE": {
     "TITLE": "Mi perfil",
     "LOADING": "Cargando perfil…",
     "ERROR_LOADING": "Error al cargar el perfil.",
-    "AVATAR_ALT": "Avatar del usuario",
+    "AVATAR_ALT": "Avatar de usuario",
     "EMAIL_LABEL": "Correo electrónico",
     "EMAIL_PLACEHOLDER": "tú@ejemplo.com",
-    "USERNAME_LABEL": "Nombre de usuario",
+    "USERNAME_LABEL": "Usuario",
     "FIRST_NAME_LABEL": "Nombre",
-    "FIRST_NAME_PLACEHOLDER": "Introduce el nombre",
+    "FIRST_NAME_PLACEHOLDER": "Ingresa el nombre",
     "LAST_NAME_LABEL": "Apellido",
-    "LAST_NAME_PLACEHOLDER": "Introduce el apellido",
+    "LAST_NAME_PLACEHOLDER": "Ingresa el apellido",
     "PHONE_LABEL": "Teléfono",
-    "PHONE_PLACEHOLDER": "Introduce el número",
+    "PHONE_PLACEHOLDER": "Ingresa el teléfono",
     "ADDRESS_LABEL": "Dirección",
-    "ADDRESS_PLACEHOLDER": "Introduce la dirección",
+    "ADDRESS_PLACEHOLDER": "Ingresa la dirección",
     "ROLES_LABEL": "Roles",
     "ENROLLED_LABEL": "Cursos inscritos",
     "NO_ENROLLMENTS": "No hay cursos inscritos.",
@@ -81,10 +81,10 @@
     "EMAIL_PLACEHOLDER": "tú@ejemplo.com",
     "EMAIL_ERROR": "Se requiere un correo válido.",
     "FIRST_NAME_LABEL": "Nombre",
-    "FIRST_NAME_PLACEHOLDER": "Introduce el nombre",
+    "FIRST_NAME_PLACEHOLDER": "Ingresa el nombre",
     "FIRST_NAME_ERROR": "El nombre es obligatorio.",
     "LAST_NAME_LABEL": "Apellido",
-    "LAST_NAME_PLACEHOLDER": "Introduce el apellido",
+    "LAST_NAME_PLACEHOLDER": "Ingresa el apellido",
     "LAST_NAME_ERROR": "El apellido es obligatorio.",
     "ROLE_LABEL": "Rol",
     "ROLE_PLACEHOLDER": "Selecciona un rol",
@@ -93,7 +93,7 @@
     "ROLE_ADMIN": "Administrador",
     "ROLE_ERROR": "Debes seleccionar un rol.",
     "SUBMIT": "Registrarse",
-    "SUCCESS": "¡Registro exitoso! Redirigiendo al inicio de sesión…"
+    "SUCCESS": "¡Registro exitoso! Redirigiendo…"
   },
   "POSTS": {
     "LOADING": "Cargando publicaciones…",
@@ -116,21 +116,21 @@
   "COURSE_DETAIL": {
     "LOADING": "Cargando curso…",
     "ERROR": "Error al cargar el curso.",
-    "VIEW_FORUM": "Ver el foro del curso",
+    "VIEW_FORUM": "Ver foro del curso",
     "ADD_POST": "+ Añadir publicación",
     "EDIT_POST": "Editar publicación"
   },
   "COURSE_FORM": {
-    "ADD_TITLE": "Añadir un curso",
+    "ADD_TITLE": "Añadir curso",
     "EDIT_TITLE": "Editar curso",
     "TITLE_LABEL": "Título",
-    "TITLE_PLACEHOLDER": "Introduce el título del curso",
+    "TITLE_PLACEHOLDER": "Ingresa el título del curso",
     "CODE_LABEL": "Código",
-    "CODE_PLACEHOLDER": "p.ej. CS101",
+    "CODE_PLACEHOLDER": "ej. CS101",
     "DESCRIPTION_LABEL": "Descripción",
-    "DESCRIPTION_PLACEHOLDER": "Introduce una breve descripción",
+    "DESCRIPTION_PLACEHOLDER": "Ingresa una breve descripción",
     "BACKGROUND_LABEL": "Fondo",
-    "BACKGROUND_PLACEHOLDER": "URL de la imagen o color hexadecimal",
+    "BACKGROUND_PLACEHOLDER": "URL de imagen o color hex",
     "CREATE": "Crear curso",
     "SAVE": "Guardar cambios",
     "ERROR": "Error al guardar el curso."
@@ -140,12 +140,12 @@
     "NEW_TOPIC": "+ Nuevo tema",
     "CANCEL": "Cancelar",
     "TITLE_LABEL": "Título del tema",
-    "TITLE_PLACEHOLDER": "Introduce el título",
+    "TITLE_PLACEHOLDER": "Ingresa el título",
     "TITLE_ERROR": "El título es obligatorio.",
     "CREATE_BUTTON": "Crear",
-    "NO_CREATE_PERMISSION": "Solo los instructores inscritos pueden crear temas.",
+    "NO_CREATE_PERMISSION": "Solo instructores inscritos pueden crear temas.",
     "LOADING": "Cargando temas…",
-    "ERROR_LOADING": "Error al cargar los temas.",
+    "ERROR_LOADING": "Error al cargar temas.",
     "CREATED_BY": "Creado por",
     "ON": "el",
     "MESSAGES_COUNT": "mensajes",
@@ -157,9 +157,9 @@
     "CREATED_BY": "Creado por",
     "ON": "el",
     "NO_MESSAGES": "No hay mensajes en este tema.",
-    "ADD_REPLY": "Añadir respuesta",
+    "ADD_REPLY": "Agregar respuesta",
     "CONTENT_PLACEHOLDER": "Tu mensaje…",
-    "CONTENT_ERROR": "El contenido es obligatorio si no hay imagen adjunta.",
+    "CONTENT_ERROR": "El contenido es obligatorio si no se adjunta imagen.",
     "ATTACH_IMAGE": "Adjuntar imagen…",
     "IMG_ALT": "Imagen adjunta",
     "SEND": "Enviar",
@@ -170,7 +170,7 @@
     "ERROR_LOADING": "Error al cargar usuarios.",
     "TABLE": {
       "AVATAR": "Avatar",
-      "AVATAR_ALT": "Avatar del usuario",
+      "AVATAR_ALT": "Avatar de usuario",
       "FIRST_NAME": "Nombre",
       "LAST_NAME": "Apellido",
       "EMAIL": "Correo electrónico",
@@ -183,25 +183,25 @@
       "ENROLLMENTS": "Inscripciones",
       "NO_ENROLLMENTS": "— sin inscripciones —",
       "ACTIONS": "Acciones",
-      "MANAGE_ENROLLMENT": "Gestionar inscripción",
-      "MANAGE_ENROLLMENTS": {
-        "TITLE": "Gestionar inscripciones",
-        "LOADING": "Cargando…",
-        "ERROR": "Error al cargar inscripciones.",
-        "CANNOT_ENROLL_ADMIN": "No se puede inscribir a un administrador en cursos.",
-        "TABLE": {
-          "COURSE": "Curso",
-          "ENROLLED": "Inscrito"
-        }
-      }
+      "MANAGE_ENROLLMENT": "Gestionar inscripción"
     },
-    "USER_DETAIL": {
-      "LOADING": "Cargando usuario…",
-      "ERROR": "Error al cargar el usuario.",
-      "AVATAR_ALT": "Avatar del usuario",
-      "EMAIL_LABEL": "Correo electrónico:",
-      "ROLES_LABEL": "Roles:",
-      "ENROLLED_TITLE": "Cursos inscritos"
+    "MANAGE_ENROLLMENTS": {
+      "TITLE": "Gestionar inscripciones",
+      "LOADING": "Cargando…",
+      "ERROR": "Error al cargar inscripciones.",
+      "CANNOT_ENROLL_ADMIN": "No se puede inscribir a un administrador.",
+      "TABLE": {
+        "COURSE": "Curso",
+        "ENROLLED": "Inscrito"
+      }
     }
+  },
+  "USER_DETAIL": {
+    "LOADING": "Cargando usuario…",
+    "ERROR": "Error al cargar el usuario.",
+    "AVATAR_ALT": "Avatar de usuario",
+    "EMAIL_LABEL": "Correo electrónico:",
+    "ROLES_LABEL": "Roles:",
+    "ENROLLED_TITLE": "Cursos inscritos"
   }
 }

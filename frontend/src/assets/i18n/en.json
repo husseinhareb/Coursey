@@ -121,19 +121,19 @@
     "EDIT_POST": "Edit Post"
   },
   "COURSE_FORM": {
-    "ADD_TITLE": "Ajouter un cours",
-    "EDIT_TITLE": "Modifier le cours",
-    "TITLE_LABEL": "Titre",
-    "TITLE_PLACEHOLDER": "Entrez le titre du cours",
+    "ADD_TITLE": "Add Course",
+    "EDIT_TITLE": "Edit Course",
+    "TITLE_LABEL": "Title",
+    "TITLE_PLACEHOLDER": "Enter course title",
     "CODE_LABEL": "Code",
-    "CODE_PLACEHOLDER": "ex. CS101",
+    "CODE_PLACEHOLDER": "e.g. CS101",
     "DESCRIPTION_LABEL": "Description",
-    "DESCRIPTION_PLACEHOLDER": "Entrez une brève description",
-    "BACKGROUND_LABEL": "Arrière-plan",
-    "BACKGROUND_PLACEHOLDER": "URL de l’image ou couleur hex",
-    "CREATE": "Créer le cours",
-    "SAVE": "Enregistrer les modifications",
-    "ERROR": "Échec de l’enregistrement du cours."
+    "DESCRIPTION_PLACEHOLDER": "Enter a brief description",
+    "BACKGROUND_LABEL": "Background",
+    "BACKGROUND_PLACEHOLDER": "Image URL or hex color",
+    "CREATE": "Create Course",
+    "SAVE": "Save Changes",
+    "ERROR": "Failed to save course."
   },
   "FORUM": {
     "LIST_TITLE": "Forums / Topics",

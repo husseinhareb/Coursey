@@ -2,8 +2,8 @@
   "NAV": {
     "BRAND": "Coursey",
     "SELECT_LANGUAGE": "Langue",
-    "SIGN_UP": "Inscription",
-    "LOG_IN": "Connexion",
+    "SIGN_UP": "S’inscrire",
+    "LOG_IN": "Se connecter",
     "HOME": "Accueil",
     "USERS": "Utilisateurs",
     "COURSES": "Cours",
@@ -18,9 +18,9 @@
   },
   "ACTIVITY_LOG": {
     "TITLE": "Historique d’activité",
-    "LOADING": "Chargement du journal…",
+    "LOADING": "Chargement des logs…",
     "TABLE": {
-      "DATE_TIME": "Date et heure",
+      "DATE_TIME": "Date & heure",
       "USER": "Utilisateur",
       "ACTION": "Action",
       "DETAILS": "Détails"
@@ -28,10 +28,10 @@
     "NO_LOGS": "Aucune activité à afficher."
   },
   "LOGIN": {
-    "TITLE": "Connexion",
+    "TITLE": "Se connecter",
     "EMAIL_LABEL": "E-mail",
     "EMAIL_PLACEHOLDER": "vous@exemple.com",
-    "EMAIL_ERROR": "E-mail valide requis.",
+    "EMAIL_ERROR": "Adresse e-mail valide requise.",
     "PASSWORD_LABEL": "Mot de passe",
     "PASSWORD_PLACEHOLDER": "••••••••",
     "PASSWORD_ERROR": "Le mot de passe est requis.",
@@ -56,7 +56,7 @@
     "ROLES_LABEL": "Rôles",
     "ENROLLED_LABEL": "Cours inscrits",
     "NO_ENROLLMENTS": "Aucun cours inscrit.",
-    "SAVE": "Enregistrer les modifications",
+    "SAVE": "Enregistrer",
     "SUCCESS": "Profil mis à jour avec succès.",
     "UPDATE_ERROR": "Échec de la mise à jour."
   },
@@ -73,13 +73,13 @@
     },
     "EDIT": "Modifier",
     "DELETE": "Supprimer",
-    "INFO": "Infos"
+    "INFO": "Info"
   },
   "SIGNUP": {
-    "TITLE": "Inscription",
+    "TITLE": "S’inscrire",
     "EMAIL_LABEL": "E-mail",
     "EMAIL_PLACEHOLDER": "vous@exemple.com",
-    "EMAIL_ERROR": "Un e-mail valide est requis.",
+    "EMAIL_ERROR": "Une adresse e-mail valide est requise.",
     "FIRST_NAME_LABEL": "Prénom",
     "FIRST_NAME_PLACEHOLDER": "Entrez le prénom",
     "FIRST_NAME_ERROR": "Le prénom est requis.",
@@ -87,17 +87,17 @@
     "LAST_NAME_PLACEHOLDER": "Entrez le nom",
     "LAST_NAME_ERROR": "Le nom est requis.",
     "ROLE_LABEL": "Rôle",
-    "ROLE_PLACEHOLDER": "Sélectionnez un rôle",
+    "ROLE_PLACEHOLDER": "Sélectionner un rôle",
     "ROLE_STUDENT": "Étudiant",
     "ROLE_PROFESSOR": "Professeur",
-    "ROLE_ADMIN": "Administrateur",
+    "ROLE_ADMIN": "Admin",
     "ROLE_ERROR": "Vous devez sélectionner un rôle.",
     "SUBMIT": "S’inscrire",
-    "SUCCESS": "Inscription réussie ! Redirection vers la connexion…"
+    "SUCCESS": "Inscription réussie ! Redirection…"
   },
   "POSTS": {
     "LOADING": "Chargement des publications…",
-    "HOMEWORK_FLAG": "DM",
+    "HOMEWORK_FLAG": "TD",
     "TYPE": "Type",
     "POSITION": "Position",
     "PINNED_AT": "Épinglé le",
@@ -128,12 +128,12 @@
     "CODE_LABEL": "Code",
     "CODE_PLACEHOLDER": "ex. CS101",
     "DESCRIPTION_LABEL": "Description",
-    "DESCRIPTION_PLACEHOLDER": "Entrez une brève description",
+    "DESCRIPTION_PLACEHOLDER": "Entrez une description",
     "BACKGROUND_LABEL": "Arrière-plan",
-    "BACKGROUND_PLACEHOLDER": "URL de l’image ou couleur hexadécimale",
+    "BACKGROUND_PLACEHOLDER": "URL image ou couleur hex",
     "CREATE": "Créer le cours",
-    "SAVE": "Enregistrer les modifications",
-    "ERROR": "Échec de l’enregistrement du cours."
+    "SAVE": "Enregistrer",
+    "ERROR": "Échec de l’enregistrement."
   },
   "FORUM": {
     "LIST_TITLE": "Forums / Sujets",
@@ -143,13 +143,13 @@
     "TITLE_PLACEHOLDER": "Entrez le titre",
     "TITLE_ERROR": "Le titre est requis.",
     "CREATE_BUTTON": "Créer",
-    "NO_CREATE_PERMISSION": "Seuls les instructeurs inscrits peuvent créer des sujets.",
+    "NO_CREATE_PERMISSION": "Seuls les professeurs inscrits peuvent créer des sujets.",
     "LOADING": "Chargement des sujets…",
     "ERROR_LOADING": "Échec du chargement des sujets.",
     "CREATED_BY": "Créé par",
     "ON": "le",
-    "MESSAGES_COUNT": "messages",
-    "NO_TOPICS": "Aucun sujet pour le moment."
+    "MESSAGES_COUNT": "message(s)",
+    "NO_TOPICS": "Aucun sujet pour l’instant."
   },
   "FORUM_THREAD": {
     "LOADING": "Chargement du sujet…",
@@ -159,7 +159,7 @@
     "NO_MESSAGES": "Aucun message dans ce sujet.",
     "ADD_REPLY": "Ajouter une réponse",
     "CONTENT_PLACEHOLDER": "Votre message…",
-    "CONTENT_ERROR": "Le contenu est requis s’il n’y a pas d’image.",
+    "CONTENT_ERROR": "Le contenu est requis si aucune image n’est jointe.",
     "ATTACH_IMAGE": "Joindre une image…",
     "IMG_ALT": "Image jointe",
     "SEND": "Envoyer",
@@ -183,25 +183,25 @@
       "ENROLLMENTS": "Inscriptions",
       "NO_ENROLLMENTS": "— aucune inscription —",
       "ACTIONS": "Actions",
-      "MANAGE_ENROLLMENT": "Gérer l’inscription",
-      "MANAGE_ENROLLMENTS": {
-        "TITLE": "Gérer les inscriptions",
-        "LOADING": "Chargement…",
-        "ERROR": "Échec du chargement des inscriptions.",
-        "CANNOT_ENROLL_ADMIN": "Impossible d’inscrire un administrateur à des cours.",
-        "TABLE": {
-          "COURSE": "Cours",
-          "ENROLLED": "Inscrit"
-        }
-      }
+      "MANAGE_ENROLLMENT": "Gérer l’inscription"
     },
-    "USER_DETAIL": {
-      "LOADING": "Chargement de l’utilisateur…",
-      "ERROR": "Échec du chargement de l’utilisateur.",
-      "AVATAR_ALT": "Avatar de l’utilisateur",
-      "EMAIL_LABEL": "E-mail :",
-      "ROLES_LABEL": "Rôles :",
-      "ENROLLED_TITLE": "Cours inscrits"
+    "MANAGE_ENROLLMENTS": {
+      "TITLE": "Gérer les inscriptions",
+      "LOADING": "Chargement…",
+      "ERROR": "Échec du chargement.",
+      "CANNOT_ENROLL_ADMIN": "Impossible d’inscrire un administrateur.",
+      "TABLE": {
+        "COURSE": "Cours",
+        "ENROLLED": "Inscrit"
+      }
     }
+  },
+  "USER_DETAIL": {
+    "LOADING": "Chargement de l’utilisateur…",
+    "ERROR": "Échec du chargement de l’utilisateur.",
+    "AVATAR_ALT": "Avatar de l’utilisateur",
+    "EMAIL_LABEL": "E-mail :",
+    "ROLES_LABEL": "Rôles :",
+    "ENROLLED_TITLE": "Cours inscrits"
   }
 }
