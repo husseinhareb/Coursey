@@ -9,7 +9,12 @@
     "COURSES": "Cours",
     "ACTIVITY_LOGS": "Journal d’activité",
     "PROFILE": "Profil",
-    "LOG_OUT": "Déconnexion"
+    "LOG_OUT": "Déconnexion",
+    "SEARCH_PLACEHOLDER": "🔍 Rechercher cours, utilisateurs…",
+    "SEARCH_COURSES": "Cours",
+    "SEARCH_USERS": "Utilisateurs",
+    "SEARCH_POSTS": "Publications",
+    "SEARCH_NONE": "Aucun résultat"
   },
   "ACTIVITY_LOG": {
     "TITLE": "Historique d’activité",

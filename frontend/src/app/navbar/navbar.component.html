@@ -73,12 +73,14 @@
   <div *ngIf="auth.isLoggedIn" class="navbar-center">
     <div class="search-container">
       <input type="text" class="search-input" [(ngModel)]="searchQuery" (ngModelChange)="onSearch()"
-        placeholder="🔍 Search courses, users…" />
+        placeholder="{{ 'NAV.SEARCH_PLACEHOLDER' | translate }}" />
       <!-- in navbar.component.html -->
       <div *ngIf="searchResults" class="search-dropdown">
         <ul>
           <!-- courses -->
-          <li *ngIf="searchResults.courses.length"><strong>Courses</strong></li>
+          <li *ngIf="searchResults.courses.length">
+            <strong>{{ 'NAV.SEARCH_COURSES' | translate }}</strong>
+          </li>
           <li *ngFor="let c of searchResults.courses">
             <a [routerLink]="['/courses', c.id]">
               {{ c.code }} — {{ c.title }}
@@ -86,7 +88,9 @@
           </li>
 
           <!-- USERS -->
-          <li *ngIf="searchResults.users.length" class="mt-sm"><strong>Users</strong></li>
+          <li *ngIf="searchResults.users.length" class="mt-sm">
+            <strong>{{ 'NAV.SEARCH_USERS' | translate }}</strong>
+          </li>
           <li *ngFor="let u of searchResults.users" class="search-user-item">
             <a [routerLink]="['/users', u.id]" (click)="onPostClick()" class="search-user-link">
               <img *ngIf="u.profile.profilePic" [src]="u.profile.profilePic" alt="{{u.username}}’s avatar"
@@ -101,7 +105,9 @@
           </li>
 
           <!-- POSTS -->
-          <li *ngIf="searchResults.posts.length" class="mt-sm"><strong>Posts</strong></li>
+          <li *ngIf="searchResults.posts.length" class="mt-sm">
+            <strong>{{ 'NAV.SEARCH_POSTS' | translate }}</strong>
+          </li>
           <li *ngFor="let p of searchResults.posts">
             <a [routerLink]="['/courses', p.course_id, 'posts', p._id]" (click)="onPostClick()">
               {{ p.title }}
@@ -110,7 +116,7 @@
 
           <!-- no results fallback -->
           <li *ngIf="!searchResults.courses.length && !searchResults.users.length && !searchResults.posts.length">
-            <em>No results found</em>
+            <em>{{ 'NAV.SEARCH_NONE' | translate }}</em>
           </li>
         </ul>
       </div>
@@ -121,60 +127,31 @@
   <!-- RIGHT: courses → profile → avatar/initials + logout -->
   <div class="navbar-right">
     <!-- Log In / Sign Up for guests -->
-    <a
-      *ngIf="!auth.isLoggedIn"
-      routerLink="/login"
-      routerLinkActive="active"
-      class="nav-link"
-    >
+    <a *ngIf="!auth.isLoggedIn" routerLink="/login" routerLinkActive="active" class="nav-link">
       {{ 'NAV.LOG_IN' | translate }}
     </a>
 
     <!-- Admin-only links -->
-    <a
-      *ngIf="auth.isLoggedIn && isAdmin"
-      routerLink="/users"
-      routerLinkActive="active"
-      class="nav-link"
-    >
+    <a *ngIf="auth.isLoggedIn && isAdmin" routerLink="/users" routerLinkActive="active" class="nav-link">
       {{ 'NAV.USERS' | translate }}
     </a>
-    <a
-      *ngIf="auth.isLoggedIn && isAdmin"
-      routerLink="/activity-logs"
-      routerLinkActive="active"
-      class="nav-link"
-    >
+    <a *ngIf="auth.isLoggedIn && isAdmin" routerLink="/activity-logs" routerLinkActive="active" class="nav-link">
       {{ 'NAV.ACTIVITY_LOGS' | translate }}
     </a>
 
     <!-- Regular authenticated links -->
-    <a
-      *ngIf="auth.isLoggedIn"
-      routerLink="/courses"
-      routerLinkActive="active"
-      class="nav-link"
-    >
+    <a *ngIf="auth.isLoggedIn" routerLink="/courses" routerLinkActive="active" class="nav-link">
       {{ 'NAV.COURSES' | translate }}
     </a>
 
-    <a
-      *ngIf="auth.isLoggedIn"
-      routerLink="/profile"
-      routerLinkActive="active"
-      class="nav-link"
-    >
+    <a *ngIf="auth.isLoggedIn" routerLink="/profile" routerLinkActive="active" class="nav-link">
       {{ 'NAV.PROFILE' | translate }}
     </a>
 
     <!-- Avatar + Logout -->
     <div *ngIf="auth.isLoggedIn" class="user-container">
       <div class="avatar-wrapper">
-        <img
-          *ngIf="auth.user?.profile?.profilePic as pic"
-          [src]="pic"
-          alt="Avatar"
-        />
+        <img *ngIf="auth.user?.profile?.profilePic as pic" [src]="pic" alt="Avatar" />
         <ng-container *ngIf="!auth.user?.profile?.profilePic">
           {{ initials }}
         </ng-container>

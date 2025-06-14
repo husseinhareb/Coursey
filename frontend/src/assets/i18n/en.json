@@ -9,7 +9,12 @@
     "COURSES": "Courses",
     "ACTIVITY_LOGS": "Activity Logs",
     "PROFILE": "Profile",
-    "LOG_OUT": "Log Out"
+    "LOG_OUT": "Log Out",
+    "SEARCH_PLACEHOLDER": "🔍 Search courses, users…",
+    "SEARCH_COURSES": "Courses",
+    "SEARCH_USERS": "Users",
+    "SEARCH_POSTS": "Posts",
+    "SEARCH_NONE": "No results found"
   },
   "ACTIVITY_LOG": {
     "TITLE": "Activity History",

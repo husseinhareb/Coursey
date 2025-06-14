@@ -9,7 +9,12 @@
     "COURSES": "Cursos",
     "ACTIVITY_LOGS": "Registros de actividad",
     "PROFILE": "Perfil",
-    "LOG_OUT": "Cerrar sesión"
+    "LOG_OUT": "Cerrar sesión",
+    "SEARCH_PLACEHOLDER": "🔍 Buscar cursos, usuarios…",
+    "SEARCH_COURSES": "Cursos",
+    "SEARCH_USERS": "Usuarios",
+    "SEARCH_POSTS": "Publicaciones",
+    "SEARCH_NONE": "No se encontraron resultados"
   },
   "ACTIVITY_LOG": {
     "TITLE": "Historial de actividad",
@@ -170,7 +175,8 @@
         "ENROLLED": "Inscrito"
       }
     }
-  },  "USER_DETAIL": {
+  },
+  "USER_DETAIL": {
     "LOADING": "Cargando usuario…",
     "ERROR": "Error al cargar el usuario.",
     "AVATAR_ALT": "Avatar del usuario",
@@ -178,5 +184,4 @@
     "ROLES_LABEL": "Roles:",
     "ENROLLED_TITLE": "Cursos inscritos"
   }
-  
 }
