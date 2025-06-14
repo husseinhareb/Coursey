@@ -46,7 +46,7 @@ export class NavbarComponent implements OnInit {
     private postSvc: PostService
   ) {
     // — language init —
-    this.translate.addLangs(['en', 'fr', 'es','ar']);
+    this.translate.addLangs(['en', 'fr', 'es','ar','zh']);
     this.translate.setDefaultLang('en');
     const browser = this.translate.getBrowserLang();
     this.currentLang = browser && this.translate.getLangs().includes(browser)

@@ -72,7 +72,8 @@
       "ACTIONS": "Actions"
     },
     "EDIT": "Edit",
-    "DELETE": "Delete"
+    "DELETE": "Delete",
+    "INFO": "Info"
   },
   "SIGNUP": {
     "TITLE": "Sign Up",
