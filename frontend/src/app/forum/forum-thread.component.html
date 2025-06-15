@@ -1,79 +1,78 @@
 <!-- src/app/forum/forum-thread.component.html -->
 
-<div class="forum-thread">
-  <!-- Title / Loading / Error -->
-  <h3 *ngIf="!loadingTopic">{{ topic?.title }}</h3>
-  <div *ngIf="loadingTopic" class="status">
-    {{ 'FORUM_THREAD.LOADING' | translate }}
+<div class="chat-container">
+  <!-- Header -->
+  <div class="header-chat">
+    <i class="icon fa fa-comments"></i>
+    <div class="title-container">
+      <p class="name">{{ topic?.title }}</p>
+      <p class="created-meta">
+        {{ 'FORUM_THREAD.CREATED_BY' | translate }}
+        <strong>{{ authorNames[topic?.author_id] }}</strong>
+        {{ 'FORUM_THREAD.ON' | translate }}
+        {{ topic?.created_at | date:'short' }}
+      </p>
+    </div>
+    <i class="icon fa fa-ellipsis-h right"></i>
   </div>
-  <div *ngIf="errorTopic" class="status status--error">
-    {{ errorTopic || ('FORUM_THREAD.ERROR' | translate) }}
-  </div>
 
-  <!-- Thread details -->
-  <div *ngIf="topic && !loadingTopic">
-    <p>
-      {{ 'FORUM_THREAD.CREATED_BY' | translate }} {{ topic.author_id }}
-      {{ 'FORUM_THREAD.ON' | translate }} {{ topic.created_at | date:'short' }}
-    </p>
+  <!-- Loading / Error -->
+  <div *ngIf="loadingTopic" class="status">Loading…</div>
+  <div *ngIf="errorTopic" class="status status--error">{{ errorTopic }}</div>
 
-    <hr />
+  <!-- Messages -->
+  <div *ngIf="topic && !loadingTopic" class="messages-chat">
+    <ng-container *ngIf="topic.messages.length; else noMessages">
+      <div
+        *ngFor="let msg of topic.messages"
+        class="message"
+        [ngClass]="{
+          outgoing: isOutgoing(msg.author_id),
+          incoming: !isOutgoing(msg.author_id)
+        }"
+      >
+        <p class="author">
+          {{ authorNames[msg.author_id] || msg.author_id }}
+        </p>
+        <p class="bubble">{{ msg.content }}</p>
+        <em class="time">{{ msg.created_at | date:'short' }}</em>
 
-    <!-- Messages -->
-    <div *ngIf="topic.messages.length > 0; else noMessages">
-      <div *ngFor="let msg of topic.messages" class="forum-message">
-        <strong>{{ msg.author_id }}</strong>
-        <em>{{ 'FORUM_THREAD.ON' | translate }} {{ msg.created_at | date:'short' }}</em>
-        <p *ngIf="msg.content">{{ msg.content }}</p>
         <img
           *ngIf="msg.image_data"
           [src]="toSafeUrl(msg.image_data)"
-          alt="{{ 'FORUM_THREAD.IMG_ALT' | translate }}"
+          alt="attached image"
           class="message-image"
         />
-        <hr />
       </div>
-    </div>
+    </ng-container>
+
     <ng-template #noMessages>
-      <p>{{ 'FORUM_THREAD.NO_MESSAGES' | translate }}</p>
-    </ng-template>
-
-    <!-- Reply form -->
-    <div class="reply-form">
-      <h4>{{ 'FORUM_THREAD.ADD_REPLY' | translate }}</h4>
-      <form [formGroup]="messageForm" (ngSubmit)="postMessage()">
-        <textarea
-          formControlName="content"
-          rows="3"
-          placeholder="{{ 'FORUM_THREAD.CONTENT_PLACEHOLDER' | translate }}"
-        ></textarea>
-        <div
-          *ngIf="messageForm.get('content')?.touched && messageForm.get('content')?.invalid"
-          class="error"
-        >
-          {{ 'FORUM_THREAD.CONTENT_ERROR' | translate }}
-        </div>
-
-        <label class="file-input-label">
-          <input type="file" accept="image/*" (change)="onFileSelected($event)" />
-          <span *ngIf="!selectedFile">{{ 'FORUM_THREAD.ATTACH_IMAGE' | translate }}</span>
-          <span *ngIf="selectedFile">{{ selectedFile.name }}</span>
-        </label>
-        <div *ngIf="fileError" class="error">
-          {{ fileError }}
-        </div>
-
-        <button
-          type="submit"
-          class="btn btn--submit"
-          [disabled]="posting || (!messageForm.value.content && !selectedFile)"
-        >
-          {{ posting ? ('FORUM_THREAD.SENDING' | translate) : ('FORUM_THREAD.SEND' | translate) }}
-        </button>
-      </form>
-      <div *ngIf="errorMessage" class="error">
-        {{ errorMessage }}
+      <div class="message text-only">
+        <p class="text">No messages yet.</p>
       </div>
-    </div>
+    </ng-template>
+  </div>
+
+  <!-- Reply form -->
+  <div class="footer-chat">
+    <textarea
+      formControlName="content"
+      class="write-message"
+      rows="2"
+      placeholder="Type your reply..."
+      (keydown.enter)="postMessage(); $event.preventDefault()"
+    ></textarea>
+
+    <label class="file-input-label">
+      <input type="file" accept="image/*" (change)="onFileSelected($event)" />
+      <i class="fa fa-paperclip"></i>
+      <span>{{ selectedFile?.name || 'Attach image' }}</span>
+    </label>
+
+    <i
+      class="fa fa-paper-plane-o send"
+      (click)="postMessage()"
+      [class.disabled]="posting || (!messageForm.value.content && !selectedFile)"
+    ></i>
   </div>
 </div>

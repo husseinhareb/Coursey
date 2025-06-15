@@ -1,135 +1,160 @@
-// src/app/forum-thread/forum-thread.component.ts
+// src/app/forum/forum-thread.component.ts
 
-import { Component, OnInit } from '@angular/core';
-import { CommonModule }      from '@angular/common';
 import {
-  ReactiveFormsModule,
+  Component,
+  OnInit,
+} from '@angular/core';
+import {
   FormBuilder,
   FormGroup,
+  ReactiveFormsModule,
 } from '@angular/forms';
-import { ActivatedRoute }    from '@angular/router';
-import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
+import { ActivatedRoute } from '@angular/router';
+import {
+  DomSanitizer,
+  SafeUrl,
+} from '@angular/platform-browser';
+import {
+  CommonModule,
+} from '@angular/common';
+import { TranslateModule } from '@ngx-translate/core';
 
 import { ForumService, ForumTopic } from '../services/forum.service';
-import { TranslateModule }       from '@ngx-translate/core';
+import { AuthService, Me }          from '../auth/auth.service';
 
 @Component({
   selector: 'app-forum-thread',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule,TranslateModule],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    TranslateModule,
+  ],
   templateUrl: './forum-thread.component.html',
+  styleUrls: ['./forum-thread.component.css'],
 })
 export class ForumThreadComponent implements OnInit {
+  /** route-derived identifiers */
   courseId!: string;
-  topicId!: string;
+  threadId!: string;
 
+  /** current topic */
   topic?: ForumTopic;
   loadingTopic = false;
   errorTopic: string | null = null;
 
+  /** form for new messages */
   messageForm: FormGroup;
   posting = false;
   errorMessage: string | null = null;
 
+  /** file attachment */
   selectedFile: File | null = null;
   fileError: string | null = null;
+
+  /** who’s logged in */
+  currentUser: Me | null = null;
 
   constructor(
     private forumSvc: ForumService,
     private fb: FormBuilder,
     private route: ActivatedRoute,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
+    private auth: AuthService
   ) {
-    this.messageForm = this.fb.group({
-      content: ['']  // le champ texte reste optionnel si l’utilisateur fournit une image
-    });
+    this.messageForm = this.fb.group({ content: [''] });
   }
 
-  ngOnInit() {
-    const cId = this.route.snapshot.paramMap.get('id');
-    const tId = this.route.snapshot.paramMap.get('threadId');
-    if (!cId || !tId) {
-      this.errorTopic = 'Identifiants manquants';
+  ngOnInit(): void {
+    // 1) grab course/thread from the URL
+    const cid = this.route.snapshot.paramMap.get('id');
+    const tid = this.route.snapshot.paramMap.get('threadId');
+    if (!cid || !tid) {
+      this.errorTopic = 'Missing course or thread ID';
       return;
     }
-    this.courseId = cId;
-    this.topicId = tId;
+    this.courseId = cid;
+    this.threadId = tid;
+
+    // 2) watch current user
+    this.auth.user$.subscribe(u => this.currentUser = u || null);
+
+    // 3) load messages
     this.loadTopic();
   }
 
-  loadTopic() {
+  /** load topic + its messages */
+  private loadTopic(): void {
     this.loadingTopic = true;
-    this.errorTopic = null;
-
-    this.forumSvc.getTopic(this.courseId, this.topicId).subscribe({
-      next: (t) => {
-        this.topic = t;
-        this.loadingTopic = false;
-      },
-      error: (err) => {
-        this.errorTopic = err.error?.detail || 'Échec du chargement du sujet';
-        this.loadingTopic = false;
-      }
-    });
+    this.forumSvc
+      .getTopic(this.courseId, this.threadId)
+      .subscribe({
+        next: t => {
+          this.topic = t;
+          this.loadingTopic = false;
+        },
+        error: err => {
+          this.errorTopic = err.error?.detail || 'Failed to load topic';
+          this.loadingTopic = false;
+        }
+      });
   }
 
-  onFileSelected(event: Event) {
+  /** handle file picker */
+  onFileSelected(event: Event): void {
     this.fileError = null;
     const input = event.target as HTMLInputElement;
-    if (!input.files || input.files.length === 0) {
+    if (!input.files?.length) {
       this.selectedFile = null;
       return;
     }
-    const file = input.files[0];
-    if (!file.type.startsWith('image/')) {
-      this.fileError = 'Veuillez sélectionner un fichier image';
+    const f = input.files[0];
+    if (!f.type.startsWith('image/')) {
+      this.fileError = 'Please select an image file';
       this.selectedFile = null;
       return;
     }
-    this.selectedFile = file;
+    this.selectedFile = f;
   }
 
-  postMessage() {
+  /** post new message (text and/or image) */
+  postMessage(): void {
     if (!this.messageForm.value.content && !this.selectedFile) {
-      this.errorMessage = 'Vous devez entrer un message ou choisir une image.';
+      this.errorMessage = 'Enter text or attach an image';
       return;
     }
-
     this.posting = true;
     this.errorMessage = null;
 
     const formData = new FormData();
-    const contentValue = this.messageForm.value.content?.trim();
-    if (contentValue) {
-      formData.append('content', contentValue);
-    }
-    if (this.selectedFile) {
-      formData.append('image', this.selectedFile);
-    }
+    const txt = this.messageForm.value.content?.trim();
+    if (txt) formData.append('content', txt);
+    if (this.selectedFile) formData.append('image', this.selectedFile);
 
-    this.forumSvc.addMessage(this.courseId, this.topicId, formData).subscribe({
-      next: () => {
-        this.messageForm.reset();
-        this.selectedFile = null;
-        this.loadTopic();
-        this.posting = false;
-      },
-      error: (err) => {
-        this.errorMessage = err.error?.detail || 'Échec de l’envoi du message';
-        this.posting = false;
-      }
-    });
+    this.forumSvc
+      .addMessage(this.courseId, this.threadId, formData)
+      .subscribe({
+        next: () => {
+          this.messageForm.reset();
+          this.selectedFile = null;
+          this.loadTopic();            // reload after post
+          this.posting = false;
+        },
+        error: err => {
+          this.errorMessage = err.error?.detail || 'Failed to send';
+          this.posting = false;
+        }
+      });
   }
 
-  /**
-   * Convertit la chaîne Base64 reçue en SafeUrl pour qu’Angular puisse l’injecter dans <img [src]> sans blocage de sécurité.
-   */
+  /** convert base64 to SafeUrl */
   toSafeUrl(base64: string): SafeUrl {
-    // Si vous savez que c’est un JPEG, utilisez 'data:image/jpeg;base64,'. 
-    // Sinon, si PNG, utilisez 'data:image/png;base64,'. 
-    // Vous pouvez aussi ajuster dynamiquement selon vos besoins,
-    // mais ici on part sur PNG par défaut :
-    const dataUrl = `data:image/png;base64,${base64}`;
-    return this.sanitizer.bypassSecurityTrustUrl(dataUrl);
+    const url = `data:image/png;base64,${base64}`;
+    return this.sanitizer.bypassSecurityTrustUrl(url);
+  }
+
+  /** true if this message was sent by the logged-in user */
+  isOutgoing(authorId: string): boolean {
+    return !!this.currentUser && this.currentUser.id === authorId;
   }
 }
