@@ -203,5 +203,42 @@
     "EMAIL_LABEL": "Email:",
     "ROLES_LABEL": "Roles:",
     "ENROLLED_TITLE": "Enrolled Courses"
+  },
+  "SUBMISSIONS": {
+    "LIST": {
+      "TITLE_ALL": "All Submissions",
+      "TITLE_MINE": "Your Submissions",
+      "LOADING": "Loading submissions…",
+      "TABLE": {
+        "STUDENT": "Student",
+        "FILE": "File",
+        "SUBMITTED_AT": "Submitted At",
+        "DUE_DATE": "Due Date",
+        "STATUS": "Status",
+        "GRADE": "Grade",
+        "COMMENT": "Comment",
+        "ACTIONS": "Actions",
+        "GRADE_BUTTON": "Grade"
+      },
+      "NO_ALL": "No submissions yet.",
+      "NO_MINE": "You haven't submitted anything."
+    },
+    "STATUS": {
+      "SUBMITTED": "Submitted",
+      "LATE": "Late",
+      "GRADED": "Graded"
+    },
+    "GRADING": {
+      "TITLE": "Grade Submission",
+      "GRADE_LABEL": "Grade (0–100):",
+      "GRADE_PLACEHOLDER": "e.g. 85",
+      "GRADE_ERROR": "Grade must be between 0 and 100.",
+      "COMMENT_LABEL": "Comment:",
+      "COMMENT_PLACEHOLDER": "Your comments…",
+      "COMMENT_ERROR": "Comment is required.",
+      "SAVE_BUTTON": "Save Grade",
+      "SAVING": "Saving…",
+      "CANCEL_BUTTON": "Cancel"
+    }
   }
 }

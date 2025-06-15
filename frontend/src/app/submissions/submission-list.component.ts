@@ -18,11 +18,12 @@ import {
 import { PostService, Post } from '../services/post.service';
 import { environment } from '../environments/environment';
 import { Enrollment } from '../services/user.service';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-submission-list',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule,TranslateModule],
   templateUrl: `./submission-list.component.html`,
 
 

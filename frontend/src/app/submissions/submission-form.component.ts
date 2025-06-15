@@ -4,11 +4,12 @@ import { Component, Input, Output, EventEmitter, inject } from '@angular/core';
 import { CommonModule }     from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { SubmissionService, SubmissionCreate } from '../services/submission.service';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-submission-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule,TranslateModule],
   templateUrl: `./submission-form.component.html`,
 
 })

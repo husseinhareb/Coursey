@@ -1,16 +1,35 @@
+<!-- src/app/submission/submission-form.component.html -->
+
 <div class="submission-form">
-    <h4>Soumettre un devoir</h4>
-    <form [formGroup]="form" (ngSubmit)="onSubmit()">
-        <div>
-            <label for="fileInput">Téléverser le fichier :</label>
-            <input id="fileInput" type="file" (change)="onFileSelected($event)" accept="*/*" />
-        </div>
-        <div style="margin-top: 0.5rem;">
-            <button type="submit" [disabled]="form.invalid || loading">
-                {{ loading ? 'Envoi…' : 'Soumettre' }}
-            </button>
-            <button type="button" (click)="cancel.emit()">Annuler</button>
-        </div>
-    </form>
-    <div *ngIf="error" class="error">{{ error }}</div>
+  <h4>{{ 'SUBMISSION.FORM.TITLE' | translate }}</h4>
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div>
+      <label for="fileInput">{{ 'SUBMISSION.FORM.LABEL' | translate }}</label>
+      <input
+        id="fileInput"
+        type="file"
+        (change)="onFileSelected($event)"
+        accept="*/*"
+      />
+    </div>
+    <div class="actions" style="margin-top: var(--spacing-xs);">
+      <button
+        type="submit"
+        [disabled]="form.invalid || loading"
+        class="btn btn--submit"
+      >
+        {{ loading ? ('SUBMISSION.FORM.SENDING' | translate) : ('SUBMISSION.FORM.SUBMIT' | translate) }}
+      </button>
+      <button
+        type="button"
+        (click)="cancel.emit()"
+        class="btn btn--cancel"
+      >
+        {{ 'SUBMISSION.FORM.CANCEL' | translate }}
+      </button>
+    </div>
+  </form>
+  <div *ngIf="error" class="error">
+    {{ error }}
+  </div>
 </div>
