@@ -3,7 +3,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 69.667px; 
+  width: 69.667px;
   align-self: center;
   position: relative;
   cursor: pointer;
@@ -77,21 +77,20 @@
   width: 100%;
   height: 100%;
   display: block;
-  pointer-events: none; 
+  pointer-events: none;
 }
 
 /*====================================
   Navbar Overrides — fix spacing & layout
 ====================================*/
 .navbar {
-  position: relative;  
+  position: relative;
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: var(--spacing-sm) var(--spacing-md);
   background: var(--color-surface);
 }
-
 
 /* Left & right containers */
 .navbar-left,
@@ -125,8 +124,6 @@
 .language-selector select {
   padding: var(--spacing-xs) var(--spacing-sm);
 }
-
-
 
 /* accessible hide-for-visual users */
 .li4-sr-only {
@@ -210,14 +207,12 @@
   --color-primary-hover-rgb: 164, 196, 255; /* #a4c4ff */
 }
 
-
 .navbar-center {
   position: absolute;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
 }
-
 
 .navbar-left,
 .navbar-center,
@@ -235,7 +230,7 @@
   width: 300px;
   max-width: 80vw;
   padding: var(--spacing-xs) var(--spacing-sm);
-  padding-right: 2.5rem;    /* room for the button */
+  padding-right: 2.5rem; /* room for the button */
   border: 1px solid var(--color-border);
   border-radius: var(--border-radius);
   transition: border var(--transition-speed);
@@ -246,7 +241,7 @@
 .search-input:focus {
   outline: none;
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(var(--color-primary-hover-rgb),0.2);
+  box-shadow: 0 0 0 3px rgba(var(--color-primary-hover-rgb), 0.2);
 }
 
 .search-btn {
@@ -275,7 +270,7 @@
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--border-radius);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   z-index: 10;
 }
 
@@ -304,8 +299,9 @@
   background: var(--color-border);
   color: var(--color-primary);
 }
-.mt-sm { margin-top: var(--spacing-sm); }
-
+.mt-sm {
+  margin-top: var(--spacing-sm);
+}
 
 .search-user-item {
   display: flex;
@@ -336,24 +332,21 @@
   color: var(--color-muted);
 }
 
-
-
-
-
 /* wrap avatar + logout into one pill-shaped container */
 .user-container {
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--color-container-bg);
   padding: var(--spacing-xs) var(--spacing-sm);
   border-radius: var(--border-radius);
   transition: background var(--transition-speed);
   cursor: pointer;
 }
 .user-container:hover {
-  background: rgba(255, 255, 255, 0.15);
+  background: var(--color-container-bg-hover);
 }
+
 
 /* avatar circle */
 .avatar-wrapper {
@@ -384,7 +377,8 @@
   padding: var(--spacing-xs);
   color: rgba(255, 255, 255, 0.8);
   border-radius: var(--border-radius);
-  transition: background var(--transition-speed), color var(--transition-speed), transform var(--transition-speed);
+  transition: background var(--transition-speed), color var(--transition-speed),
+    transform var(--transition-speed);
 }
 .logout-btn:hover {
   background: rgba(255, 0, 0, 0.1);
@@ -393,4 +387,18 @@
 }
 .logout-btn i {
   font-size: 1rem;
+}
+
+/* Logout Button */
+.logout-btn {
+  background: transparent;
+  border: none;
+  color: var(--color-text);
+  cursor: pointer;
+  padding: var(--spacing-sm);
+  border-radius: var(--border-radius);
+  transition: background-color var(--transition-speed);
+}
+.logout-btn:hover {
+  background: var(--color-border);
 }
