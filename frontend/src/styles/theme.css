@@ -30,8 +30,8 @@
   --font-size-base: 1rem;
   --font-size-lg: 1.25rem;
   --line-height-base: 1.6;
-  --color-container-bg: rgba(255, 255, 255, 0.1);
-  --color-container-bg-hover: rgba(255, 255, 255, 0.15);
+  --color-container-bg: rgba(0, 0, 0, 0.05);
+  --color-container-bg-hover: rgba(0, 0, 0, 0.1);
   /* Spacing & shape */
   --spacing-xs: 0.25rem;
   --spacing-sm: 0.5rem;
@@ -58,7 +58,8 @@
   --color-info: #81ecec;
   --color-border: #57606f;
   --color-overlay: rgba(0, 0, 0, 0.7);
-
+  --color-container-bg: rgba(255, 255, 255, 0.1);
+  --color-container-bg-hover: rgba(255, 255, 255, 0.15);
 }
 
 /*====================================
