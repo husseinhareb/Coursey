@@ -1,117 +1,133 @@
-<!-- src/app/profile/profile.component.html -->
+<div class="profile-page">
+  <!-- TITLE -->
+  <header class="profile-title">
+    <h2><i class="fas fa-id-badge"></i> {{ 'PROFILE.TITLE' | translate }}</h2>
+  </header>
 
-<div class="profile-container">
-  <!-- Page title -->
-  <h2 class="profile-header">{{ 'PROFILE.TITLE' | translate }}</h2>
-
-  <!-- Loading & error messages -->
-  <div *ngIf="loading" class="message">
+  <!-- STATUS MESSAGES -->
+  <div *ngIf="loading" class="status info">
+    <i class="fas fa-circle-notch fa-spin"></i>
     {{ 'PROFILE.LOADING' | translate }}
   </div>
-  <div *ngIf="error" class="message error">
+  <div *ngIf="error" class="status error">
+    <i class="fas fa-exclamation-triangle"></i>
     {{ error || ('PROFILE.ERROR_LOADING' | translate) }}
   </div>
+  <div *ngIf="success" class="status success">
+    <i class="fas fa-check-circle"></i>
+    {{ 'PROFILE.SUCCESS' | translate }}
+  </div>
 
-  <!-- Form -->
-  <form *ngIf="!loading" [formGroup]="form" (ngSubmit)="onSubmit()">
-    <!-- Avatar -->
-    <div class="avatar-container">
-      <div class="avatar">
+  <!-- MAIN CARD -->
+  <div class="profile-card" *ngIf="!loading && user">
+    <!-- SIDEBAR -->
+    <aside class="profile-sidebar">
+      <div class="avatar-wrapper">
         <img
-          *ngIf="user?.profile?.profilePic; else showInitials"
-          [src]="user!.profile!.profilePic!"
+          *ngIf="user?.profile?.profilePic; else initialsTpl"
+          [src]="user!.profile!.profilePic"
           alt="{{ 'PROFILE.AVATAR_ALT' | translate }}"
         />
-        <ng-template #showInitials>
-          {{ initials }}
+        <ng-template #initialsTpl>
+          <span class="avatar-initials">{{ initials }}</span>
         </ng-template>
       </div>
-    </div>
 
-    <!-- Read-only fields -->
-    <div class="profile-field">
-      <label>{{ 'PROFILE.EMAIL_LABEL' | translate }}</label>
-      <input
-        type="email"
-        [value]="user?.email"
-        disabled
-        placeholder="{{ 'PROFILE.EMAIL_PLACEHOLDER' | translate }}"
-      />
-    </div>
-    <div class="profile-field">
-      <label>{{ 'PROFILE.USERNAME_LABEL' | translate }}</label>
-      <input
-        type="text"
-        [value]="user?.username"
-        disabled
-      />
-    </div>
+      <div class="sidebar-info">
+        <h3 class="full-name">
+          <i class="fas fa-user"></i>
+          {{ user?.profile?.firstName }} {{ user?.profile?.lastName }}
+        </h3>
+        <p class="username">
+          <i class="fas fa-at"></i>
+          {{ user?.username }}
+        </p>
+        <p class="email">
+          <i class="fas fa-envelope"></i>
+          {{ user?.email }}
+        </p>
 
-    <!-- Editable fields -->
-    <div class="profile-field">
-      <label for="firstName">{{ 'PROFILE.FIRST_NAME_LABEL' | translate }}</label>
-      <input
-        id="firstName"
-        formControlName="firstName"
-        placeholder="{{ 'PROFILE.FIRST_NAME_PLACEHOLDER' | translate }}"
-      />
-    </div>
-    <div class="profile-field">
-      <label for="lastName">{{ 'PROFILE.LAST_NAME_LABEL' | translate }}</label>
-      <input
-        id="lastName"
-        formControlName="lastName"
-        placeholder="{{ 'PROFILE.LAST_NAME_PLACEHOLDER' | translate }}"
-      />
-    </div>
-    <div class="profile-field">
-      <label for="phoneNumber">{{ 'PROFILE.PHONE_LABEL' | translate }}</label>
-      <input
-        id="phoneNumber"
-        formControlName="phoneNumber"
-        placeholder="{{ 'PROFILE.PHONE_PLACEHOLDER' | translate }}"
-      />
-    </div>
-    <div class="profile-field">
-      <label for="address">{{ 'PROFILE.ADDRESS_LABEL' | translate }}</label>
-      <input
-        id="address"
-        formControlName="address"
-        placeholder="{{ 'PROFILE.ADDRESS_PLACEHOLDER' | translate }}"
-      />
-    </div>
+        <!-- ROLES (no heading, just tags) -->
+        <div class="roles">
+          <i class="fas fa-user-tag"></i>
+          <ng-container *ngFor="let role of user?.roles; let last = last">
+            <span class="role-badge">{{ role }}</span
+            ><span *ngIf="!last">, </span>
+          </ng-container>
+        </div>
+      </div>
+    </aside>
 
-    <!-- Roles -->
-    <div class="profile-field">
-      <label>{{ 'PROFILE.ROLES_LABEL' | translate }}</label>
-      <ul class="profile-list">
-        <li *ngFor="let role of user?.roles">{{ role }}</li>
-      </ul>
-    </div>
+    <!-- CONTENT / FORM -->
+    <section class="profile-content">
+      <form [formGroup]="form" (ngSubmit)="onSubmit()">
+        <!-- PERSONAL INFO -->
+        <div class="form-section">
+          <h4><i class="fas fa-info-circle"></i> {{ 'PROFILE.PERSONAL_INFO' | translate }}</h4>
 
-    <!-- Enrolled Courses -->
-    <div class="profile-field">
-      <label>{{ 'PROFILE.ENROLLED_LABEL' | translate }}</label>
-      <ul class="profile-list">
-        <li *ngFor="let c of enrolledCourses">
-          {{ c.code }} – {{ c.title }}
-        </li>
-        <li *ngIf="!enrolledCourses.length">
-          {{ 'PROFILE.NO_ENROLLMENTS' | translate }}
-        </li>
-      </ul>
-    </div>
+          <div class="field input-icon">
+            <i class="fas fa-user"></i>
+            <input
+              id="firstName"
+              formControlName="firstName"
+              placeholder="{{ 'PROFILE.FIRST_NAME_PLACEHOLDER' | translate }}"
+            />
+          </div>
 
-    <!-- Submit -->
-    <div class="profile-actions">
-      <button type="submit" [disabled]="form.invalid">
-        {{ 'PROFILE.SAVE' | translate }}
-      </button>
-    </div>
-  </form>
+          <div class="field input-icon">
+            <i class="fas fa-user"></i>
+            <input
+              id="lastName"
+              formControlName="lastName"
+              placeholder="{{ 'PROFILE.LAST_NAME_PLACEHOLDER' | translate }}"
+            />
+          </div>
 
-  <!-- Success banner -->
-  <div *ngIf="success" class="message success">
-    {{ 'PROFILE.SUCCESS' | translate }}
+          <div class="field input-icon">
+            <i class="fas fa-phone-alt"></i>
+            <input
+              id="phoneNumber"
+              formControlName="phoneNumber"
+              placeholder="{{ 'PROFILE.PHONE_PLACEHOLDER' | translate }}"
+            />
+          </div>
+
+          <div class="field input-icon">
+            <i class="fas fa-map-marker-alt"></i>
+            <input
+              id="address"
+              formControlName="address"
+              placeholder="{{ 'PROFILE.ADDRESS_PLACEHOLDER' | translate }}"
+            />
+          </div>
+        </div>
+
+        <!-- ENROLLED COURSES -->
+        <div class="form-section courses-section">
+          <h4><i class="fas fa-book-reader"></i> {{ 'PROFILE.ENROLLED_LABEL' | translate }}</h4>
+          <ul class="course-list">
+            <li *ngFor="let c of enrolledCourses">
+              <i class="fas fa-book"></i>
+              <div class="course-info">
+                <span class="course-code">{{ c.code }}</span>
+                <span class="course-title">{{ c.title }}</span>
+              </div>
+            </li>
+            <li class="no-courses" *ngIf="!enrolledCourses.length">
+              <i class="fas fa-exclamation-circle"></i>
+              {{ 'PROFILE.NO_ENROLLMENTS' | translate }}
+            </li>
+          </ul>
+        </div>
+
+        <!-- SAVE BUTTON -->
+        <div class="actions">
+          <button type="submit" [disabled]="form.invalid">
+            <i class="fas fa-save"></i>
+            {{ 'PROFILE.SAVE' | translate }}
+          </button>
+        </div>
+      </form>
+    </section>
   </div>
 </div>
