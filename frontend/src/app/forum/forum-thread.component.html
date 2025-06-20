@@ -1,4 +1,3 @@
-<!-- src/app/forum/forum-thread.component.html -->
 <div class="chat-wrapper">
   <div class="chat-container">
 
@@ -15,7 +14,7 @@
 
     <!-- Loading / Error -->
     <div *ngIf="loadingTopic" class="chat-status">Loading…</div>
-    <div *ngIf="errorTopic"   class="chat-status error">{{ errorTopic }}</div>
+    <div *ngIf="errorTopic" class="chat-status error">{{ errorTopic }}</div>
 
     <!-- Messages -->
     <section class="messages" *ngIf="topic && !loadingTopic">
@@ -23,9 +22,13 @@
         <div
           *ngFor="let msg of topic.messages"
           class="message"
-          [ngClass]="{ outgoing: isOutgoing(msg.author_id), incoming: !isOutgoing(msg.author_id) }"
+          [ngClass]="{
+            outgoing: isOutgoing(msg.author_id),
+            incoming: !isOutgoing(msg.author_id)
+          }"
         >
           <div class="bubble">
+            <div class="bubble-author">{{ authorNames[msg.author_id] }}</div>
             <img
               *ngIf="msg.image_data"
               [src]="toSafeUrl(msg.image_data)"
@@ -42,18 +45,14 @@
       </ng-template>
     </section>
 
-    <!-- Image preview before send -->
+    <!-- Image preview -->
     <div *ngIf="previewUrl" class="preview-container">
-      <img [src]="previewUrl" alt="Preview" class="preview-image"/>
+      <img [src]="previewUrl" alt="Preview" class="preview-image" />
       <button type="button" class="remove-btn" (click)="removeImage()">✕</button>
     </div>
 
     <!-- Reply form -->
-    <form
-      class="chat-footer"
-      [formGroup]="messageForm"
-      (ngSubmit)="postMessage()"
-    >
+    <form class="chat-footer" [formGroup]="messageForm" (ngSubmit)="postMessage()">
       <textarea
         formControlName="content"
         class="input"
@@ -63,11 +62,7 @@
       ></textarea>
 
       <label class="attach">
-        <input
-          type="file"
-          accept="image/*"
-          (change)="onFileSelected($event)"
-        />
+        <input type="file" accept="image/*" (change)="onFileSelected($event)" />
         📎
       </label>
 

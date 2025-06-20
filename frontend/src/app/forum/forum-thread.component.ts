@@ -1,34 +1,20 @@
-// src/app/forum/forum-thread.component.ts
-import {
-  Component,
-  OnInit,
-} from '@angular/core';
-import {
-  FormBuilder,
-  FormGroup,
-  ReactiveFormsModule,
-} from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
-import {
-  DomSanitizer,
-  SafeUrl,
-} from '@angular/platform-browser';
-import {
-  CommonModule,
-} from '@angular/common';
-import { TranslateModule } from '@ngx-translate/core';
+import { Component, OnInit }     from '@angular/core';
+import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { ActivatedRoute }         from '@angular/router';
+import { DomSanitizer, SafeUrl }  from '@angular/platform-browser';
+import { CommonModule }           from '@angular/common';
+import { TranslateModule }        from '@ngx-translate/core';
+import { forkJoin, of }           from 'rxjs';
+import { catchError, filter, take } from 'rxjs/operators';
 
 import { ForumService, ForumTopic } from '../services/forum.service';
 import { AuthService, Me }          from '../auth/auth.service';
+import { UserService, User }        from '../services/user.service';
 
 @Component({
   selector: 'app-forum-thread',
   standalone: true,
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    TranslateModule,
-  ],
+  imports: [ CommonModule, ReactiveFormsModule, TranslateModule ],
   templateUrl: './forum-thread.component.html',
   styleUrls: ['./forum-thread.component.css'],
 })
@@ -38,20 +24,17 @@ export class ForumThreadComponent implements OnInit {
   topic?: ForumTopic;
   loadingTopic = false;
   errorTopic: string | null = null;
-
-  authorNames: Record<string, string> = {};
-
+  authorNames: Record<string,string> = {};
   messageForm: FormGroup;
   posting = false;
   errorMessage: string | null = null;
-
   selectedFile: File | null = null;
   previewUrl: SafeUrl | null = null;
-
   currentUser: Me | null = null;
 
   constructor(
     private forumSvc: ForumService,
+    private userSvc: UserService,
     private fb: FormBuilder,
     private route: ActivatedRoute,
     private sanitizer: DomSanitizer,
@@ -70,8 +53,16 @@ export class ForumThreadComponent implements OnInit {
     this.courseId = cid;
     this.threadId = tid;
 
-    this.auth.user$.subscribe(u => this.currentUser = u || null);
-    this.loadTopic();
+    // Wait until we have a real user (skip the initial null)…
+    this.auth.user$
+      .pipe(
+        filter((u): u is Me => u !== null),
+        take(1)
+      )
+      .subscribe(u => {
+        this.currentUser = u;
+        this.loadTopic();
+      });
   }
 
   private loadTopic(): void {
@@ -79,8 +70,25 @@ export class ForumThreadComponent implements OnInit {
     this.forumSvc.getTopic(this.courseId, this.threadId).subscribe({
       next: t => {
         this.topic = t;
-        // you’d fill authorNames here as before…
-        this.loadingTopic = false;
+        const ids = Array.from(
+          new Set([t.author_id, ...t.messages.map(m => m.author_id)])
+        );
+        forkJoin(
+          ids.map(id =>
+            this.userSvc.getById(id).pipe(
+              catchError(() => of({ profile: { firstName: '', lastName: '' } } as User))
+            )
+          )
+        ).subscribe(users => {
+          users.forEach((u, i) => {
+            const id = ids[i];
+            this.authorNames[id] = [
+              u.profile.firstName,
+              u.profile.lastName
+            ].filter(Boolean).join(' ') || id;
+          });
+          this.loadingTopic = false;
+        });
       },
       error: err => {
         this.errorTopic = err.error?.detail || 'Failed to load topic';
@@ -103,7 +111,6 @@ export class ForumThreadComponent implements OnInit {
       return;
     }
     this.selectedFile = f;
-    // create a quick preview URL
     this.previewUrl = this.sanitizer.bypassSecurityTrustUrl(
       URL.createObjectURL(f)
     );
@@ -115,7 +122,8 @@ export class ForumThreadComponent implements OnInit {
   }
 
   postMessage(): void {
-    if (!this.messageForm.value.content && !this.selectedFile) {
+    const txt = this.messageForm.value.content?.trim();
+    if (!txt && !this.selectedFile) {
       this.errorMessage = 'Enter text or attach an image';
       return;
     }
@@ -123,12 +131,10 @@ export class ForumThreadComponent implements OnInit {
     this.errorMessage = null;
 
     const formData = new FormData();
-    const txt = this.messageForm.value.content?.trim();
     if (txt) formData.append('content', txt);
     if (this.selectedFile) formData.append('image', this.selectedFile);
 
-    this.forumSvc
-      .addMessage(this.courseId, this.threadId, formData)
+    this.forumSvc.addMessage(this.courseId, this.threadId, formData)
       .subscribe({
         next: () => {
           this.messageForm.reset();
@@ -144,10 +150,12 @@ export class ForumThreadComponent implements OnInit {
   }
 
   toSafeUrl(base64: string): SafeUrl {
-    return this.sanitizer.bypassSecurityTrustUrl(`data:image/png;base64,${base64}`);
+    return this.sanitizer.bypassSecurityTrustUrl(
+      `data:image/png;base64,${base64}`
+    );
   }
 
   isOutgoing(authorId: string): boolean {
-    return !!this.currentUser && this.currentUser.id === authorId;
+    return this.currentUser?.id === authorId;
   }
 }

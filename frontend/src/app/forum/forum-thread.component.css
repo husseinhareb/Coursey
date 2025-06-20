@@ -1,17 +1,15 @@
-/* src/app/forum/forum-thread.component.css */
-
-/* Wrapper: center + constrain */
+/* center + constrain */
 .chat-wrapper {
   display: flex;
   justify-content: center;
   padding: 20px;
 }
+
 .chat-container {
   display: flex;
   flex-direction: column;
   width: 100%;
-  max-width: 600px;
-  max-height: 700px;
+  max-width: 800px;
   background: #fff;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
@@ -19,7 +17,7 @@
   font-family: 'Segoe UI', sans-serif;
 }
 
-/* Header */
+/* header */
 .chat-header {
   padding: 16px;
   background: #f5f5f5;
@@ -35,7 +33,7 @@
   color: #666;
 }
 
-/* Status */
+/* status */
 .chat-status {
   padding: 12px;
   text-align: center;
@@ -45,7 +43,7 @@
   color: #c00;
 }
 
-/* Messages */
+/* messages list */
 .messages {
   flex: 1;
   padding: 16px;
@@ -56,13 +54,19 @@
   gap: 8px;
 }
 
-/* Message bubble */
+/* each message row spans full width and aligns bubble */
 .message {
   display: flex;
+  width: 100%;
 }
-.message.incoming { justify-content: flex-start; }
-.message.outgoing { justify-content: flex-end; }
+.message.incoming {
+  justify-content: flex-start;
+}
+.message.outgoing {
+  justify-content: flex-end;
+}
 
+/* bubble styling */
 .bubble {
   max-width: 75%;
   padding: 10px 14px;
@@ -75,7 +79,19 @@
   color: #fff;
 }
 
-/* Image within bubble */
+/* author inside bubble */
+.bubble-author {
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-bottom: 6px;
+  opacity: 0.85;
+  text-align: left;
+}
+.message.outgoing .bubble-author {
+  text-align: right;
+}
+
+/* image in bubble */
 .bubble-image {
   display: block;
   max-width: 100%;
@@ -85,7 +101,7 @@
   object-fit: cover;
 }
 
-/* Text + time */
+/* text & timestamp */
 .bubble-text {
   white-space: pre-wrap;
 }
@@ -97,14 +113,14 @@
   margin-top: 6px;
 }
 
-/* No messages */
+/* empty state */
 .no-messages {
   text-align: center;
   color: #999;
   margin-top: 20px;
 }
 
-/* Preview above form */
+/* preview */
 .preview-container {
   display: flex;
   align-items: center;
@@ -127,7 +143,7 @@
   color: #900;
 }
 
-/* Footer (form) */
+/* footer (form) */
 .chat-footer {
   display: flex;
   align-items: center;
