@@ -1,24 +1,24 @@
 // src/app/profile/profile.component.ts
 
-import { Component, OnInit }                from '@angular/core';
-import { CommonModule }                     from '@angular/common';
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import {
   ReactiveFormsModule,
   FormBuilder,
   FormGroup,
   Validators
 } from '@angular/forms';
-import { RouterModule }                     from '@angular/router';
-import { forkJoin }                         from 'rxjs';
+import { RouterModule } from '@angular/router';
+import { forkJoin } from 'rxjs';
 
-import { UserService, Profile, User, Enrollment }     from '../services/user.service';
-import { CourseService, Course }                     from '../services/course.service';
+import { UserService, Profile, User, Enrollment } from '../services/user.service';
+import { CourseService, Course } from '../services/course.service';
 import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule,TranslateModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule, TranslateModule],
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.css']
 })
@@ -34,34 +34,34 @@ export class ProfileComponent implements OnInit {
   // compute initials once user is loaded
   get initials(): string {
     const fn = this.user?.profile?.firstName || '';
-    const ln = this.user?.profile?.lastName  || '';
+    const ln = this.user?.profile?.lastName || '';
     return (fn.charAt(0) + ln.charAt(0)).toUpperCase();
   }
 
   constructor(
-    private fb:         FormBuilder,
-    private userSvc:    UserService,
-    private courseSvc:  CourseService
+    private fb: FormBuilder,
+    private userSvc: UserService,
+    private courseSvc: CourseService
   ) {
     this.form = this.fb.group({
-      firstName:   ['', Validators.required],
-      lastName:    ['', Validators.required],
+      firstName: ['', Validators.required],
+      lastName: ['', Validators.required],
       phoneNumber: [''],
-      address:     ['']
+      address: ['']
     });
   }
 
   ngOnInit(): void {
     this.userSvc.getMe().subscribe({
       next: (u: User) => {
-        this.user    = u;
-        this.userId  = u.id;
+        this.user = u;
+        this.userId = u.id;
         this.form.patchValue(u.profile);
         this.loadEnrolled(u.enrollments);
         this.loading = false;
       },
       error: err => {
-        this.error   = err.error?.detail || 'Failed to load profile';
+        this.error = err.error?.detail || 'Failed to load profile';
         this.loading = false;
       }
     });
@@ -72,7 +72,7 @@ export class ProfileComponent implements OnInit {
     const calls = enrolls.map(e => this.courseSvc.get(e.courseId));
     forkJoin(calls).subscribe({
       next: cs => this.enrolledCourses = cs,
-      error: () => {/* swallow or set a message */}
+      error: () => {/* swallow or set a message */ }
     });
   }
 
@@ -81,12 +81,15 @@ export class ProfileComponent implements OnInit {
     const profile: Profile = this.form.value;
     this.userSvc.updateProfile(this.userId, profile).subscribe({
       next: (updated: User) => {
-        this.user    = updated;
+        this.user = updated;
         this.success = true;
-        this.error   = null;
+        this.error = null;
+
+        // mark the form pristine so the Save button hides
+        this.form.markAsPristine();
       },
       error: err => {
-        this.error   = err.error?.detail || 'Update failed';
+        this.error = err.error?.detail || 'Update failed';
         this.success = false;
       }
     });

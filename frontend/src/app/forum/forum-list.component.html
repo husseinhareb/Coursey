@@ -1,17 +1,25 @@
-<!-- src/app/forum/forum-list.component.html -->
 <div class="forum-list">
-  <h3>{{ 'FORUM.LIST_TITLE' | translate }}</h3>
+  <h3>
+    <i class="fas fa-comments"></i>
+    {{ 'FORUM.LIST_TITLE' | translate }}
+  </h3>
 
-  <!-- New Topic button -->
-  <button *ngIf="canCreateTopic" (click)="toggleNewTopicForm()" class="btn btn--toggle">
+  <button
+    *ngIf="canCreateTopic"
+    (click)="toggleNewTopicForm()"
+    class="btn btn--toggle"
+  >
+    <i class="fas" [ngClass]="showNewTopicForm ? 'fa-times' : 'fa-plus'"></i>
     {{ showNewTopicForm ? ('FORUM.CANCEL' | translate) : ('FORUM.NEW_TOPIC' | translate) }}
   </button>
 
-  <!-- New Topic Form -->
   <div *ngIf="showNewTopicForm" class="new-topic-form">
     <form [formGroup]="newTopicForm" (ngSubmit)="createTopic()">
       <div class="form-group">
-        <label for="title">{{ 'FORUM.TITLE_LABEL' | translate }}</label>
+        <label for="title">
+          <i class="fas fa-heading"></i>
+          {{ 'FORUM.TITLE_LABEL' | translate }}
+        </label>
         <input
           id="title"
           formControlName="title"
@@ -21,42 +29,48 @@
           *ngIf="newTopicForm.get('title')?.touched && newTopicForm.get('title')?.invalid"
           class="error"
         >
+          <i class="fas fa-exclamation-circle"></i>
           {{ 'FORUM.TITLE_ERROR' | translate }}
         </div>
       </div>
-      <button type="submit" class="btn btn--submit" [disabled]="newTopicForm.invalid">
+      <button
+        type="submit"
+        class="btn btn--submit"
+        [disabled]="newTopicForm.invalid"
+      >
+        <i class="fas fa-paper-plane"></i>
         {{ 'FORUM.CREATE_BUTTON' | translate }}
       </button>
     </form>
   </div>
 
-  <!-- Info if cannot create -->
-  <div *ngIf="!loading && !canCreateTopic" class="info">
-    {{ 'FORUM.NO_CREATE_PERMISSION' | translate }}
-  </div>
+  <!-- ... loading / error ... -->
 
-  <!-- Loading & Error -->
-  <div *ngIf="loading" class="status">
-    {{ 'FORUM.LOADING' | translate }}
-  </div>
-  <div *ngIf="error" class="status status--error">
-    {{ error || ('FORUM.ERROR_LOADING' | translate) }}
-  </div>
-
-  <!-- Topics List -->
-  <ul *ngIf="!loading && !error">
-    <li *ngFor="let topic of topics" (click)="goToTopic(topic._id)" class="topic-item">
-      <strong>{{ topic.title }}</strong><br />
-      <small>
-        {{ 'FORUM.CREATED_BY' | translate }} {{ topic.author_id }}
-        {{ 'FORUM.ON' | translate }} {{ topic.created_at | date:'short' }}
-        • {{ topic.messages.length || 0 }} {{ 'FORUM.MESSAGES_COUNT' | translate }}
-      </small>
+  <ul *ngIf="!loading && !error" class="topics">
+    <li
+      *ngFor="let topic of topics"
+      (click)="goToTopic(topic._id)"
+      class="topic-item"
+    >
+      <i class="fas fa-comment-alt topic-icon"></i>
+      <div class="topic-body">
+        <strong>{{ topic.title }}</strong>
+        <small>
+          <i class="fas fa-user"></i>
+          {{ topic.author_id }}
+          &nbsp;•&nbsp;
+          <i class="fas fa-calendar-alt"></i>
+          {{ topic.created_at | date:'short' }}
+          &nbsp;•&nbsp;
+          <i class="fas fa-comments"></i>
+          {{ topic.messages.length || 0 }}
+        </small>
+      </div>
     </li>
   </ul>
 
-  <!-- No topics fallback -->
   <div *ngIf="!loading && topics.length === 0" class="no-topics">
+    <i class="fas fa-info-circle"></i>
     <p>{{ 'FORUM.NO_TOPICS' | translate }}</p>
   </div>
 </div>

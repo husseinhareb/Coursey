@@ -19,6 +19,7 @@ import { TranslateModule }       from '@ngx-translate/core';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterModule,TranslateModule],
   templateUrl: './forum-list.component.html',
+  styleUrl: './forum-list.component.css'
 })
 export class ForumListComponent implements OnInit {
   courseId!: string;              

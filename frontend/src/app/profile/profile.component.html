@@ -121,7 +121,7 @@
         </div>
 
         <!-- SAVE BUTTON -->
-        <div class="actions">
+        <div class="actions" *ngIf="form.dirty">
           <button type="submit" [disabled]="form.invalid">
             <i class="fas fa-save"></i>
             {{ 'PROFILE.SAVE' | translate }}
