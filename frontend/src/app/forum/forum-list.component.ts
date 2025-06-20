@@ -1,7 +1,7 @@
 // src/app/forum-list/forum-list.component.ts
 
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule }      from '@angular/common';
 import {
   ReactiveFormsModule,
   FormBuilder,
@@ -9,15 +9,15 @@ import {
   Validators
 } from '@angular/forms';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule }   from '@ngx-translate/core';
 
-import { forkJoin, of } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { forkJoin, of }      from 'rxjs';
+import { catchError }        from 'rxjs/operators';
 
 import { ForumService, ForumTopic, NewTopic } from '../services/forum.service';
-import { AuthService, Me } from '../auth/auth.service';
-import { UserService, User } from '../services/user.service';
-import { Enrollment } from '../services/user.service';
+import { AuthService, Me }                   from '../auth/auth.service';
+import { UserService, User }                 from '../services/user.service';
+import { Enrollment }                        from '../services/user.service';
 
 @Component({
   selector: 'app-forum-list',
@@ -45,6 +45,9 @@ export class ForumListComponent implements OnInit {
 
   /** Map topic.author_id → "First Last" */
   authorNames: Record<string, string> = {};
+
+  /** Map topic._id → message count */
+  messageCounts: Record<string, number> = {};
 
   constructor(
     private forumSvc: ForumService,
@@ -102,16 +105,17 @@ export class ForumListComponent implements OnInit {
 
   loadTopics(): void {
     this.loading = true;
-    this.error = null;
+    this.error   = null;
 
     this.forumSvc.listTopics(this.courseId).subscribe({
       next: topics => {
         this.topics = topics;
         this.populateAuthorNames();
+        this.populateMessageCounts();
         this.loading = false;
       },
       error: err => {
-        this.error = err.error?.detail || 'Failed to load topics';
+        this.error   = err.error?.detail || 'Failed to load topics';
         this.loading = false;
       }
     });
@@ -133,6 +137,24 @@ export class ForumListComponent implements OnInit {
         const id = ids[idx];
         const nameParts = [u.profile.firstName, u.profile.lastName].filter(Boolean);
         this.authorNames[id] = nameParts.join(' ') || id;
+      });
+    });
+  }
+
+  /** Fetch each topic’s full message count */
+  private populateMessageCounts(): void {
+    if (!this.topics.length) return;
+
+    const calls = this.topics.map(t =>
+      this.forumSvc.getTopic(this.courseId, t._id).pipe(
+        catchError(() => of({ messages: [] } as Partial<ForumTopic>))
+      )
+    );
+
+    forkJoin(calls).subscribe(fullTopics => {
+      fullTopics.forEach((full, idx) => {
+        const id = this.topics[idx]._id;
+        this.messageCounts[id] = full.messages?.length ?? 0;
       });
     });
   }

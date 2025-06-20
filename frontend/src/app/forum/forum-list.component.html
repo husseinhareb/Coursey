@@ -63,7 +63,7 @@
           {{ topic.created_at | date:'short' }}
           &nbsp;•&nbsp;
           <i class="fas fa-comments"></i>
-          {{ topic.messages.length || 0 }}
+          {{ messageCounts[topic._id] || 0 }}
         </small>
       </div>
     </li>
