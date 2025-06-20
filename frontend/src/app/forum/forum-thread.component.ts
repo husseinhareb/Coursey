@@ -1,5 +1,4 @@
 // src/app/forum/forum-thread.component.ts
-
 import {
   Component,
   OnInit,
@@ -18,9 +17,12 @@ import {
   CommonModule,
 } from '@angular/common';
 import { TranslateModule } from '@ngx-translate/core';
+import { forkJoin, of } from 'rxjs';
+import { switchMap, tap, catchError } from 'rxjs/operators';
 
 import { ForumService, ForumTopic } from '../services/forum.service';
 import { AuthService, Me }          from '../auth/auth.service';
+import { UserService, User }        from '../services/user.service';
 
 @Component({
   selector: 'app-forum-thread',
@@ -43,6 +45,9 @@ export class ForumThreadComponent implements OnInit {
   loadingTopic = false;
   errorTopic: string | null = null;
 
+  /** map of user-id → full name */
+  authorNames: Record<string, string> = {};
+
   /** form for new messages */
   messageForm: FormGroup;
   posting = false;
@@ -57,6 +62,7 @@ export class ForumThreadComponent implements OnInit {
 
   constructor(
     private forumSvc: ForumService,
+    private userSvc: UserService,
     private fb: FormBuilder,
     private route: ActivatedRoute,
     private sanitizer: DomSanitizer,
@@ -66,7 +72,6 @@ export class ForumThreadComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // 1) grab course/thread from the URL
     const cid = this.route.snapshot.paramMap.get('id');
     const tid = this.route.snapshot.paramMap.get('threadId');
     if (!cid || !tid) {
@@ -76,28 +81,45 @@ export class ForumThreadComponent implements OnInit {
     this.courseId = cid;
     this.threadId = tid;
 
-    // 2) watch current user
     this.auth.user$.subscribe(u => this.currentUser = u || null);
-
-    // 3) load messages
     this.loadTopic();
   }
 
-  /** load topic + its messages */
+  /** load topic + messages and resolve author names */
   private loadTopic(): void {
     this.loadingTopic = true;
-    this.forumSvc
-      .getTopic(this.courseId, this.threadId)
-      .subscribe({
-        next: t => {
-          this.topic = t;
-          this.loadingTopic = false;
-        },
-        error: err => {
-          this.errorTopic = err.error?.detail || 'Failed to load topic';
-          this.loadingTopic = false;
-        }
-      });
+    this.forumSvc.getTopic(this.courseId, this.threadId).pipe(
+      tap(t => this.topic = t),
+      switchMap(t => {
+        // collect unique author IDs
+        const ids = new Set<string>();
+        ids.add(t.author_id);
+        t.messages.forEach(m => ids.add(m.author_id));
+
+        // fetch each user
+        const calls = Array.from(ids).map(id =>
+          this.userSvc.getById(id).pipe(
+            catchError(() => of({ id, profile: { firstName: id, lastName: '' } } as Partial<User> as User))
+          )
+        );
+        return forkJoin(calls);
+      })
+    ).subscribe({
+      next: users => {
+        this.authorNames = {};
+        users.forEach(u => {
+          const name = u.profile?.firstName && u.profile?.lastName
+            ? `${u.profile.firstName} ${u.profile.lastName}`
+            : u.username || u.id;
+          this.authorNames[u.id] = name;
+        });
+        this.loadingTopic = false;
+      },
+      error: err => {
+        this.errorTopic = err.error?.detail || 'Failed to load topic';
+        this.loadingTopic = false;
+      }
+    });
   }
 
   /** handle file picker */
@@ -131,26 +153,23 @@ export class ForumThreadComponent implements OnInit {
     if (txt) formData.append('content', txt);
     if (this.selectedFile) formData.append('image', this.selectedFile);
 
-    this.forumSvc
-      .addMessage(this.courseId, this.threadId, formData)
-      .subscribe({
-        next: () => {
-          this.messageForm.reset();
-          this.selectedFile = null;
-          this.loadTopic();            // reload after post
-          this.posting = false;
-        },
-        error: err => {
-          this.errorMessage = err.error?.detail || 'Failed to send';
-          this.posting = false;
-        }
-      });
+    this.forumSvc.addMessage(this.courseId, this.threadId, formData).subscribe({
+      next: () => {
+        this.messageForm.reset();
+        this.selectedFile = null;
+        this.loadTopic();
+        this.posting = false;
+      },
+      error: err => {
+        this.errorMessage = err.error?.detail || 'Failed to send';
+        this.posting = false;
+      }
+    });
   }
 
   /** convert base64 to SafeUrl */
   toSafeUrl(base64: string): SafeUrl {
-    const url = `data:image/png;base64,${base64}`;
-    return this.sanitizer.bypassSecurityTrustUrl(url);
+    return this.sanitizer.bypassSecurityTrustUrl(`data:image/png;base64,${base64}`);
   }
 
   /** true if this message was sent by the logged-in user */

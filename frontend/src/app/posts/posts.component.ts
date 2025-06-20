@@ -24,6 +24,7 @@ import { TranslateModule } from '@ngx-translate/core';
   styleUrls: ['./posts.component.css']
 })
 export class PostsComponent {
+  //TODO: use a class called posts for redundancy see page 21 course angular components
   @Input() posts!: Post[];
   @Input() loading = false;
   @Input() error: string | null = null;

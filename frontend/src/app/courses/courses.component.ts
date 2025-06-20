@@ -11,7 +11,7 @@ import { AuthService, Me }       from '../auth/auth.service';
   standalone: true,
   imports: [CommonModule, RouterModule, TranslateModule],
   templateUrl: './courses.component.html',
-  styleUrls: ['./courses.component.css']
+  styleUrl: './courses.component.css'
 })
 export class CoursesComponent implements OnInit {
   courses: Course[] = [];

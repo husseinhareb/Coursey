@@ -30,10 +30,7 @@ export const routes: Routes = [
     path: '',
     component: HomeComponent
   },
-  {
-    path: 'register',
-    component: RegisterComponent
-  },
+
   {
     path: 'login',
     component: LoginComponent
@@ -48,6 +45,11 @@ export const routes: Routes = [
   {
     path: 'profile',
     component: ProfileComponent,
+    canActivate: [AuthGuard]
+  },
+    {
+    path: 'register',
+    component: RegisterComponent,
     canActivate: [AuthGuard]
   },
   {

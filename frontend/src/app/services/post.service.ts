@@ -67,7 +67,7 @@ export class PostService {
 
   delete(courseId: string, postId: string): Observable<void> {
     return this.http.delete<void>(
-      `${this.base}/${courseId}/posts/${postId}`
+    `${this.base}/${courseId}/posts/${postId}`
     );
   }
 

@@ -1,19 +1,17 @@
 <!-- src/app/forum/forum-thread.component.html -->
-
 <div class="chat-container">
-  <!-- Header -->
-  <div class="header-chat">
+  <!-- Header (only when topic is loaded) -->
+  <div *ngIf="topic" class="header-chat">
     <i class="icon fa fa-comments"></i>
     <div class="title-container">
-      <p class="name">{{ topic?.title }}</p>
+      <p class="name">{{ topic.title }}</p>
       <p class="created-meta">
         {{ 'FORUM_THREAD.CREATED_BY' | translate }}
-        <strong>{{ authorNames[topic?.author_id] }}</strong>
+        <strong>{{ authorNames[topic.author_id] }}</strong>
         {{ 'FORUM_THREAD.ON' | translate }}
-        {{ topic?.created_at | date:'short' }}
+        {{ topic.created_at | date:'short' }}
       </p>
     </div>
-    <i class="icon fa fa-ellipsis-h right"></i>
   </div>
 
   <!-- Loading / Error -->
