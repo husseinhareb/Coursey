@@ -27,12 +27,16 @@
         >
           <div class="bubble">
             <div class="bubble-author">{{ authorNames[msg.author_id] }}</div>
+
+            <!-- Clickable thumbnail -->
             <img
               *ngIf="msg.image_data"
               [src]="toSafeUrl(msg.image_data)"
               alt="attachment"
               class="bubble-image"
+              (click)="openImageModal(msg.image_data)"
             />
+
             <div class="bubble-text">{{ msg.content }}</div>
             <time class="bubble-time">
               {{ msg.created_at | date:'shortTime' }}
@@ -45,7 +49,7 @@
       </ng-template>
     </section>
 
-    <!-- Image preview -->
+    <!-- Image preview (for new uploads) -->
     <div *ngIf="previewUrl" class="preview-container">
       <img [src]="previewUrl" alt="Preview" class="preview-image" />
       <button type="button" class="remove-btn" (click)="removeImage()">✕</button>
@@ -75,5 +79,17 @@
       </button>
     </form>
 
+  </div>
+</div>
+
+<!-- Full-screen image modal -->
+<div
+  class="image-modal-overlay"
+  *ngIf="modalImageUrl"
+  (click)="closeImageModal()"
+>
+  <div class="image-modal-content" (click)="$event.stopPropagation()">
+    <button class="modal-close" (click)="closeImageModal()">✕</button>
+    <img [src]="modalImageUrl" alt="Enlarged image" />
   </div>
 </div>

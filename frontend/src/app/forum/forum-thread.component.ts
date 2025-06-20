@@ -33,6 +33,9 @@ export class ForumThreadComponent implements OnInit {
   selectedFile: File | null = null;
   previewUrl: SafeUrl | null = null;
 
+  /** Holds the image currently open in the lightbox modal */
+  modalImageUrl: SafeUrl | null = null;
+
   currentUser: Me | null = null;
 
   constructor(
@@ -163,6 +166,9 @@ export class ForumThreadComponent implements OnInit {
     });
   }
 
+  /**
+   * Convert a base64 string to a SafeUrl for use in <img src>
+   */
   toSafeUrl(base64: string): SafeUrl {
     return this.sanitizer.bypassSecurityTrustUrl(
       `data:image/png;base64,${base64}`
@@ -172,5 +178,21 @@ export class ForumThreadComponent implements OnInit {
   /** Compare message author_id against the normalized currentUserId */
   isOutgoing(authorId: string): boolean {
     return this.currentUserId === authorId;
+  }
+
+  /**
+   * Open the clicked image in a full-screen modal/lightbox
+   */
+  openImageModal(base64: string): void {
+    this.modalImageUrl = this.sanitizer.bypassSecurityTrustUrl(
+      `data:image/png;base64,${base64}`
+    );
+  }
+
+  /**
+   * Close the image modal
+   */
+  closeImageModal(): void {
+    this.modalImageUrl = null;
   }
 }
