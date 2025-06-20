@@ -84,7 +84,13 @@ export class NavbarComponent implements OnInit {
     const u = this.auth.user;
     return !!u && u.roles.map(r => r.toLowerCase()).includes('admin');
   }
-
+  
+  get userRole(): string {
+    const roles = this.auth.user?.roles;
+    return roles && roles.length > 0
+      ? roles[0]
+      : 'User';
+  }
   onSearch(): void {
     const q = this.searchQuery.trim().toLowerCase();
     if (!q) {

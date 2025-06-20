@@ -84,7 +84,12 @@
   Navbar Overrides — fix spacing & layout
 ====================================*/
 .navbar {
-  position: relative;
+  position: sticky;
+    top: 0;
+  left: 0;
+  right: 0;
+  height: 60px;        
+  z-index: 1000;      
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -401,4 +406,24 @@
 }
 .logout-btn:hover {
   background: var(--color-border);
+}
+
+/* Wrap name+role in a vertical stack */
+.user-details {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+/* Slightly bolder/larger for the name */
+.user-name {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--color-text);
+}
+
+/* Smaller / muted for the role */
+.user-role {
+  font-size: 0.8rem;
+  color: var(--color-muted);
 }
