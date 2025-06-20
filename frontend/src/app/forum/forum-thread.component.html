@@ -1,76 +1,82 @@
 <!-- src/app/forum/forum-thread.component.html -->
-<div class="chat-container">
-  <!-- Header (only when topic is loaded) -->
-  <div *ngIf="topic" class="header-chat">
-    <i class="icon fa fa-comments"></i>
-    <div class="title-container">
-      <p class="name">{{ topic.title }}</p>
-      <p class="created-meta">
+<div class="chat-wrapper">
+  <div class="chat-container">
+
+    <!-- Header -->
+    <header class="chat-header" *ngIf="topic">
+      <h2 class="chat-title">{{ topic.title }}</h2>
+      <div class="chat-meta">
         {{ 'FORUM_THREAD.CREATED_BY' | translate }}
         <strong>{{ authorNames[topic.author_id] }}</strong>
         {{ 'FORUM_THREAD.ON' | translate }}
         {{ topic.created_at | date:'short' }}
-      </p>
+      </div>
+    </header>
+
+    <!-- Loading / Error -->
+    <div *ngIf="loadingTopic" class="chat-status">Loading…</div>
+    <div *ngIf="errorTopic"   class="chat-status error">{{ errorTopic }}</div>
+
+    <!-- Messages -->
+    <section class="messages" *ngIf="topic && !loadingTopic">
+      <ng-container *ngIf="topic.messages.length; else noMessages">
+        <div
+          *ngFor="let msg of topic.messages"
+          class="message"
+          [ngClass]="{ outgoing: isOutgoing(msg.author_id), incoming: !isOutgoing(msg.author_id) }"
+        >
+          <div class="bubble">
+            <img
+              *ngIf="msg.image_data"
+              [src]="toSafeUrl(msg.image_data)"
+              alt="attachment"
+              class="bubble-image"
+            />
+            <div class="bubble-text">{{ msg.content }}</div>
+            <time class="bubble-time">{{ msg.created_at | date:'shortTime' }}</time>
+          </div>
+        </div>
+      </ng-container>
+      <ng-template #noMessages>
+        <p class="no-messages">No messages yet. Say hello!</p>
+      </ng-template>
+    </section>
+
+    <!-- Image preview before send -->
+    <div *ngIf="previewUrl" class="preview-container">
+      <img [src]="previewUrl" alt="Preview" class="preview-image"/>
+      <button type="button" class="remove-btn" (click)="removeImage()">✕</button>
     </div>
-  </div>
 
-  <!-- Loading / Error -->
-  <div *ngIf="loadingTopic" class="status">Loading…</div>
-  <div *ngIf="errorTopic" class="status status--error">{{ errorTopic }}</div>
+    <!-- Reply form -->
+    <form
+      class="chat-footer"
+      [formGroup]="messageForm"
+      (ngSubmit)="postMessage()"
+    >
+      <textarea
+        formControlName="content"
+        class="input"
+        rows="1"
+        placeholder="Type a message…"
+        (keydown.enter)="postMessage(); $event.preventDefault()"
+      ></textarea>
 
-  <!-- Messages -->
-  <div *ngIf="topic && !loadingTopic" class="messages-chat">
-    <ng-container *ngIf="topic.messages.length; else noMessages">
-      <div
-        *ngFor="let msg of topic.messages"
-        class="message"
-        [ngClass]="{
-          outgoing: isOutgoing(msg.author_id),
-          incoming: !isOutgoing(msg.author_id)
-        }"
-      >
-        <p class="author">
-          {{ authorNames[msg.author_id] || msg.author_id }}
-        </p>
-        <p class="bubble">{{ msg.content }}</p>
-        <em class="time">{{ msg.created_at | date:'short' }}</em>
-
-        <img
-          *ngIf="msg.image_data"
-          [src]="toSafeUrl(msg.image_data)"
-          alt="attached image"
-          class="message-image"
+      <label class="attach">
+        <input
+          type="file"
+          accept="image/*"
+          (change)="onFileSelected($event)"
         />
-      </div>
-    </ng-container>
+        📎
+      </label>
 
-    <ng-template #noMessages>
-      <div class="message text-only">
-        <p class="text">No messages yet.</p>
-      </div>
-    </ng-template>
-  </div>
+      <button
+        type="submit"
+        class="send-btn"
+        [disabled]="posting || (!messageForm.value.content && !selectedFile)"
+      >➤</button>
+    </form>
 
-  <!-- Reply form -->
-  <div class="footer-chat">
-    <textarea
-      formControlName="content"
-      class="write-message"
-      rows="2"
-      placeholder="Type your reply..."
-      (keydown.enter)="postMessage(); $event.preventDefault()"
-    ></textarea>
-
-    <label class="file-input-label">
-      <input type="file" accept="image/*" (change)="onFileSelected($event)" />
-      <i class="fa fa-paperclip"></i>
-      <span>{{ selectedFile?.name || 'Attach image' }}</span>
-    </label>
-
-    <i
-      class="fa fa-paper-plane-o send"
-      (click)="postMessage()"
-      [class.disabled]="posting || (!messageForm.value.content && !selectedFile)"
-    ></i>
   </div>
 </div>
