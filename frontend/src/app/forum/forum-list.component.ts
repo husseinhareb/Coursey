@@ -1,6 +1,7 @@
 // src/app/forum-list/forum-list.component.ts
+
 import { Component, OnInit } from '@angular/core';
-import { CommonModule }      from '@angular/common';
+import { CommonModule } from '@angular/common';
 import {
   ReactiveFormsModule,
   FormBuilder,
@@ -8,21 +9,30 @@ import {
   Validators
 } from '@angular/forms';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
+
+import { forkJoin, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
 import { ForumService, ForumTopic, NewTopic } from '../services/forum.service';
-import { AuthService, Me }         from '../auth/auth.service';
+import { AuthService, Me } from '../auth/auth.service';
+import { UserService, User } from '../services/user.service';
 import { Enrollment } from '../services/user.service';
-import { TranslateModule }       from '@ngx-translate/core';
 
 @Component({
   selector: 'app-forum-list',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule,TranslateModule],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    RouterModule,
+    TranslateModule
+  ],
   templateUrl: './forum-list.component.html',
-  styleUrl: './forum-list.component.css'
+  styleUrls: ['./forum-list.component.css']
 })
 export class ForumListComponent implements OnInit {
-  courseId!: string;              
+  courseId!: string;
   topics: ForumTopic[] = [];
   loading = false;
   error: string | null = null;
@@ -33,28 +43,32 @@ export class ForumListComponent implements OnInit {
   currentUser: Me | null = null;
   canCreateTopic = false;
 
+  /** Map topic.author_id → "First Last" */
+  authorNames: Record<string, string> = {};
+
   constructor(
-    private forumSvc:  ForumService,
-    private fb:         FormBuilder,
-    private router:     Router,
-    private route:      ActivatedRoute,
-    private auth:       AuthService
+    private forumSvc: ForumService,
+    private userSvc: UserService,
+    private fb: FormBuilder,
+    private router: Router,
+    private route: ActivatedRoute,
+    private auth: AuthService
   ) {
     this.newTopicForm = this.fb.group({
       title: ['', Validators.required]
     });
   }
 
-  ngOnInit() {
-    // 1) Récupérer le courseId depuis la route
-    const id = this.route.snapshot.paramMap.get('id');
-    if (!id) {
-      this.error = 'Identifiant de cours manquant';
+  ngOnInit(): void {
+    // 1. Get courseId from URL
+    const cid = this.route.snapshot.paramMap.get('id');
+    if (!cid) {
+      this.error = 'Missing course ID';
       return;
     }
-    this.courseId = id;
+    this.courseId = cid;
 
-    // 2) S'abonner à l'utilisateur courant pour calculer canCreateTopic
+    // 2. Subscribe to current user for permission logic
     this.auth.user$.subscribe({
       next: user => {
         this.currentUser = user;
@@ -66,53 +80,71 @@ export class ForumListComponent implements OnInit {
       }
     });
 
-    // 3) Charger la liste des topics
+    // 3. Load forum topics
     this.loadTopics();
   }
 
-  private computeCanCreateTopic() {
+  private computeCanCreateTopic(): void {
     if (!this.currentUser) {
       this.canCreateTopic = false;
       return;
     }
-    const rolesLower = this.currentUser.roles.map(r => r.toLowerCase());
-    if (!rolesLower.includes('teacher')) {
+    const roles = this.currentUser.roles.map(r => r.toLowerCase());
+    if (!roles.includes('teacher')) {
       this.canCreateTopic = false;
       return;
     }
-    // Vérifier qu'il est bien inscrit à ce cours
-    const found = (this.currentUser.enrollments as Enrollment[]).find(
-      (e: Enrollment) => e.courseId === this.courseId /* && e.role?.toLowerCase() === 'teacher' */
-    );
-    this.canCreateTopic = !!found;
+    // Ensure user is enrolled in this course
+    const enrolled = (this.currentUser.enrollments as Enrollment[])
+      .some(e => e.courseId === this.courseId);
+    this.canCreateTopic = enrolled;
   }
 
-  loadTopics() {
+  loadTopics(): void {
     this.loading = true;
     this.error = null;
 
     this.forumSvc.listTopics(this.courseId).subscribe({
-      next: arr => {
-        this.topics = arr;
+      next: topics => {
+        this.topics = topics;
+        this.populateAuthorNames();
         this.loading = false;
       },
       error: err => {
-        this.error = err.error?.detail || 'Échec du chargement';
+        this.error = err.error?.detail || 'Failed to load topics';
         this.loading = false;
       }
     });
   }
 
-  toggleNewTopicForm() {
+  /** Fetch and cache each topic creator’s display name */
+  private populateAuthorNames(): void {
+    const ids = Array.from(new Set(this.topics.map(t => t.author_id)));
+    if (!ids.length) return;
+
+    forkJoin(
+      ids.map(id =>
+        this.userSvc.getById(id).pipe(
+          catchError(() => of({ profile: { firstName: '', lastName: '' } } as User))
+        )
+      )
+    ).subscribe(users => {
+      users.forEach((u, idx) => {
+        const id = ids[idx];
+        const nameParts = [u.profile.firstName, u.profile.lastName].filter(Boolean);
+        this.authorNames[id] = nameParts.join(' ') || id;
+      });
+    });
+  }
+
+  toggleNewTopicForm(): void {
     this.showNewTopicForm = !this.showNewTopicForm;
   }
 
-  createTopic() {
+  createTopic(): void {
     if (this.newTopicForm.invalid) return;
 
-    const payload: NewTopic = {
-      title: this.newTopicForm.value.title
-    };
+    const payload: NewTopic = { title: this.newTopicForm.value.title };
     this.forumSvc.createTopic(this.courseId, payload).subscribe({
       next: () => {
         this.newTopicForm.reset();
@@ -120,12 +152,12 @@ export class ForumListComponent implements OnInit {
         this.loadTopics();
       },
       error: err => {
-        this.error = err.error?.detail || 'Impossible de créer le sujet';
+        this.error = err.error?.detail || 'Unable to create topic';
       }
     });
   }
 
-  goToTopic(topicId: string) {
+  goToTopic(topicId: string): void {
     this.router.navigate(
       ['/courses', this.courseId, 'forums', topicId],
       { relativeTo: this.route }

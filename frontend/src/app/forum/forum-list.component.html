@@ -57,7 +57,7 @@
         <strong>{{ topic.title }}</strong>
         <small>
           <i class="fas fa-user"></i>
-          {{ topic.author_id }}
+          {{ authorNames[topic.author_id] }}
           &nbsp;•&nbsp;
           <i class="fas fa-calendar-alt"></i>
           {{ topic.created_at | date:'short' }}
