@@ -1,3 +1,4 @@
+<!-- src/app/profile/profile.component.html -->
 <div class="profile-page">
   <!-- TITLE -->
   <header class="profile-title">
@@ -31,20 +32,24 @@
         <ng-template #initialsTpl>
           <span class="avatar-initials">{{ initials }}</span>
         </ng-template>
-      </div>
 
-      <!-- file input + upload button -->
-      <input
-        #fileInput
-        type="file"
-        accept="image/*"
-        hidden
-        (change)="onFileSelected($event)"
-      />
-      <button type="button" class="upload-btn" (click)="fileInput.click()">
-        <i class="fas fa-camera"></i>
-        {{ 'PROFILE.UPLOAD_AVATAR' | translate }}
-      </button>
+        <!-- hidden file input + overlay camera button -->
+        <input
+          #fileInput
+          type="file"
+          accept="image/*"
+          hidden
+          (change)="onFileSelected($event)"
+        />
+        <button
+          type="button"
+          class="upload-btn"
+          (click)="fileInput.click()"
+          [attr.aria-label]="'PROFILE.UPLOAD_AVATAR' | translate"
+        >
+          <i class="fas fa-camera"></i>
+        </button>
+      </div>
 
       <div class="sidebar-info">
         <h3 class="full-name">
@@ -73,13 +78,9 @@
     <!-- CONTENT / FORM -->
     <section class="profile-content">
       <form [formGroup]="form" (ngSubmit)="onSubmit()">
-
         <!-- PERSONAL INFO -->
         <div class="form-section">
-          <h4>
-            <i class="fas fa-info-circle"></i>
-            {{ 'PROFILE.PERSONAL_INFO' | translate }}
-          </h4>
+          <h4><i class="fas fa-info-circle"></i> {{ 'PROFILE.PERSONAL_INFO' | translate }}</h4>
 
           <div class="field input-icon">
             <i class="fas fa-user"></i>
@@ -120,10 +121,7 @@
 
         <!-- ENROLLED COURSES -->
         <div class="form-section courses-section">
-          <h4>
-            <i class="fas fa-book-reader"></i>
-            {{ 'PROFILE.ENROLLED_LABEL' | translate }}
-          </h4>
+          <h4><i class="fas fa-book-reader"></i> {{ 'PROFILE.ENROLLED_LABEL' | translate }}</h4>
           <ul class="course-list">
             <li *ngFor="let c of enrolledCourses">
               <i class="fas fa-book"></i>
