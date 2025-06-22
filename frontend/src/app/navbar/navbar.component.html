@@ -1,3 +1,4 @@
+<!-- src/app/navbar/navbar.component.html -->
 <nav class="navbar">
   <!-- LEFT: brand → lang → theme → home -->
   <div class="navbar-left">
@@ -14,10 +15,6 @@
       </select>
     </div>
 
-    <label id="theme-toggle-button">
-      <input type="checkbox" id="toggle" [checked]="theme.isDark()" (change)="theme.toggle()" />
-      <!-- SVG omitted for brevity -->
-    </label>
     <label id="theme-toggle-button">
       <input type="checkbox" id="toggle" [checked]="theme.isDark()" (change)="theme.toggle()" />
       <svg viewBox="0 0 69.667 44" xmlns="http://www.w3.org/2000/svg">
@@ -71,7 +68,8 @@
 
   <!-- CENTER: search -->
   <div *ngIf="auth.isLoggedIn" class="navbar-center">
-    <div class="search-container">
+    <!-- Added #searchContainer here -->
+    <div class="search-container" #searchContainer>
       <input type="text" class="search-input" [(ngModel)]="searchQuery" (ngModelChange)="onSearch()"
         placeholder="{{ 'NAV.SEARCH_PLACEHOLDER' | translate }}" />
       <div *ngIf="searchResults" class="search-dropdown">
@@ -80,7 +78,9 @@
             <strong>{{ 'NAV.SEARCH_COURSES' | translate }}</strong>
           </li>
           <li *ngFor="let c of searchResults.courses">
-            <a [routerLink]="['/courses', c.id]">{{ c.code }} — {{ c.title }}</a>
+            <a [routerLink]="['/courses', c.id]">
+              {{ c.code }} — {{ c.title }}
+            </a>
           </li>
 
           <li *ngIf="searchResults.users.length" class="mt-sm">
@@ -150,12 +150,8 @@
       </div>
 
       <div class="user-details">
-        <div class="user-name">
-          {{ auth.user?.profile?.firstName }}
-        </div>
-        <div class="user-role">
-          {{ userRole }}
-        </div>
+        <div class="user-name">{{ auth.user?.profile?.firstName }}</div>
+        <div class="user-role">{{ userRole }}</div>
       </div>
 
       <button class="logout-btn" (click)="logout()">

@@ -259,12 +259,11 @@
   position: relative;
   width: 140px;
   height: 140px;
-  border-radius: 50%;       /* keep it a perfect circle */
-  overflow: hidden;          /* clip to that circle */
+  border-radius: 50%;
+  overflow: hidden;        
   background: var(--color-primary);
   margin-bottom: var(--spacing-md);
 
-  /* ensure this circle sits above adjacent elements */
   z-index: 10;
 }
 
