@@ -1,0 +1,123 @@
+/* src/app/posts/posts.component.css */
+
+/* Container & states */
+.loading, .error, .no-posts {
+  text-align: center;
+  margin: 2rem 0;
+  color: var(--color-muted);
+  font-size: 1.1rem;
+}
+.loading i, .error i, .no-posts i {
+  margin-right: 0.5rem;
+}
+
+/* List reset */
+.posts-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: var(--spacing-lg);
+}
+
+/* Card layout */
+.post-card {
+  background: var(--color-surface);
+  border-radius: var(--border-radius);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  padding: var(--spacing-lg);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.post-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+/* Header */
+.post-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-md);
+}
+.post-title {
+  font-size: 1.5rem;
+  margin: 0;
+  display: flex;
+  align-items: center;
+}
+.post-title i {
+  color: var(--color-accent);
+  margin-right: 0.5rem;
+}
+.post-badge {
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+  padding: 0.2em 0.6em;
+  border-radius: var(--border-radius);
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+}
+.post-badge i {
+  margin-right: 0.3rem;
+}
+
+/* Content */
+.post-content p {
+  margin: 0 0 var(--spacing-md);
+  line-height: 1.6;
+  color: var(--color-text);
+}
+
+/* Meta info */
+.post-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm) var(--spacing-lg);
+  font-size: 0.9rem;
+  color: var(--color-muted);
+  margin-bottom: var(--spacing-md);
+}
+.post-meta span {
+  display: flex;
+  align-items: center;
+}
+.post-meta i {
+  margin-right: 0.3rem;
+  color: var(--color-primary);
+}
+
+/* Actions */
+.post-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+}
+.post-actions button {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  background: var(--color-bg-alt);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius);
+  padding: 0.4em 0.8em;
+  transition: background 0.2s, transform 0.2s;
+  cursor: pointer;
+}
+.post-actions button i {
+  font-size: 0.9rem;
+}
+.post-actions button:hover:not(:disabled) {
+  background: var(--color-primary-light);
+  transform: translateY(-1px);
+}
+.post-actions button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Homework-specific */
+.homework-actions {
+  margin-top: var(--spacing-md);
+}

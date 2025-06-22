@@ -1,4 +1,3 @@
-/* The switch container */
 #theme-toggle-button {
   display: inline-flex;
   align-items: center;
@@ -9,7 +8,6 @@
   cursor: pointer;
 }
 
-/* Hide default HTML checkbox */
 #theme-toggle-button #toggle {
   position: absolute;
   top: 0;
@@ -21,7 +19,6 @@
   z-index: 2;
 }
 
-/* Animate all relevant parts */
 #container,
 #patches,
 #stars,
@@ -32,12 +29,10 @@
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Night sky background */
 #theme-toggle-button #toggle:checked + svg #container {
   fill: #2b4360;
 }
 
-/* Move the toggle knob */
 #theme-toggle-button #toggle:checked + svg #button {
   transform: translate(28px, 2.333px);
 }
@@ -97,7 +92,6 @@
   background: var(--color-surface);
 }
 
-/* Left & right containers */
 .navbar-left,
 .navbar-right {
   display: flex;
@@ -105,7 +99,6 @@
   gap: var(--spacing-md);
 }
 
-/* Links on both sides */
 .nav-link {
   font-size: 0.95rem;
   color: var(--color-text);
@@ -120,7 +113,6 @@
   color: var(--color-primary);
 }
 
-/* Language selector inline */
 .language-selector {
   display: flex;
   align-items: center;
@@ -130,7 +122,6 @@
   padding: var(--spacing-xs) var(--spacing-sm);
 }
 
-/* accessible hide-for-visual users */
 .li4-sr-only {
   position: absolute;
   clip: rect(1px, 1px, 1px, 1px);
@@ -141,7 +132,6 @@
   white-space: nowrap;
 }
 
-/* wrapper just for spacing */
 .language-picker {
   position: relative;
   display: inline-block;
@@ -152,20 +142,19 @@
   top: 50%;
   left: var(--spacing-md);
   transform: translateY(-50%);
-  font-size: 1.3rem; /* match your desired icon size */
+  font-size: 1.3rem; 
   color: var(--color-muted);
   pointer-events: none;
   z-index: 1;
 }
-/* style override for the select to use your theme vars */
 .language-picker__select {
-  appearance: none; /* remove native arrow */
+  appearance: none; 
   background: var(--color-surface);
   color: var(--color-text);
   border: 1px solid var(--color-border);
   border-radius: var(--border-radius);
   padding: var(--spacing-xs) var(--spacing-sm);
-  padding-right: var(--spacing-lg); /* room for custom arrow */
+  padding-right: var(--spacing-lg);
   padding-left: calc(var(--spacing-md) + 2em + var(--spacing-xs));
   font-size: 0.9rem;
   cursor: pointer;
@@ -175,14 +164,13 @@
 }
 .language-picker::before {
   position: absolute;
-  left: var(--spacing-sm); /* same as your select’s left padding */
+  left: var(--spacing-sm);
   top: 50%;
   transform: translateY(-50%);
   font-size: 1rem;
   color: var(--color-muted);
-  pointer-events: none; /* so clicks go through to the select */
+  pointer-events: none;
 }
-/* hover & focus look */
 .language-picker__select:hover,
 .language-picker__select:focus {
   border-color: var(--color-primary);
@@ -191,7 +179,6 @@
     0 0 0 3px rgba(var(--color-primary-hover-rgb), 0.2);
 }
 
-/* add a down-arrow via ::after on the wrapper */
 .language-picker::after {
   content: "▾";
   position: absolute;
@@ -203,13 +190,11 @@
   font-size: 0.8rem;
 }
 
-/* helper: convert your primary-hover into an RGB var for focus shadow */
 :root {
-  --color-primary-hover-rgb: 116, 185, 255; /* #74b9ff */
+  --color-primary-hover-rgb: 116, 185, 255;
 }
 [data-theme="dark"] {
-  /* adjust if your dark primary-hover is different */
-  --color-primary-hover-rgb: 164, 196, 255; /* #a4c4ff */
+  --color-primary-hover-rgb: 164, 196, 255;
 }
 
 .navbar-center {
@@ -235,7 +220,7 @@
   width: 300px;
   max-width: 80vw;
   padding: var(--spacing-xs) var(--spacing-sm);
-  padding-right: 2.5rem; /* room for the button */
+  padding-right: 2.5rem;
   border: 1px solid var(--color-border);
   border-radius: var(--border-radius);
   transition: border var(--transition-speed);
@@ -337,7 +322,6 @@
   color: var(--color-muted);
 }
 
-/* wrap avatar + logout into one pill-shaped container */
 .user-container {
   display: flex;
   align-items: center;
@@ -353,7 +337,6 @@
 }
 
 
-/* avatar circle */
 .avatar-wrapper {
   width: 2.5rem;
   height: 2.5rem;
@@ -375,7 +358,6 @@
   display: block;
 }
 
-/* logout icon button */
 .logout-btn {
   background: none;
   border: none;
@@ -394,7 +376,6 @@
   font-size: 1rem;
 }
 
-/* Logout Button */
 .logout-btn {
   background: transparent;
   border: none;
@@ -408,21 +389,18 @@
   background: var(--color-border);
 }
 
-/* Wrap name+role in a vertical stack */
 .user-details {
   display: flex;
   flex-direction: column;
   line-height: 1.1;
 }
 
-/* Slightly bolder/larger for the name */
 .user-name {
   font-weight: 600;
   font-size: 0.95rem;
   color: var(--color-text);
 }
 
-/* Smaller / muted for the role */
 .user-role {
   font-size: 0.8rem;
   color: var(--color-muted);

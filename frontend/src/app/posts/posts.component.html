@@ -1,96 +1,71 @@
 <!-- src/app/posts/posts.component.html -->
-
 <div *ngIf="loading" class="loading">
+  <i class="fas fa-spinner fa-spin"></i>
   {{ 'POSTS.LOADING' | translate }}
 </div>
 <div *ngIf="error" class="error">
+  <i class="fas fa-exclamation-triangle"></i>
   {{ error }}
 </div>
 
 <ul *ngIf="!loading && !error" class="posts-list">
-  <li *ngFor="let p of posts" class="post-item" [id]="p._id">
-    <h3>
-      {{ p.ispinned ? '📌 ' : '' }}
-      {{ p.title }}
-      <span *ngIf="p.type === 'homework'" class="hw-flag">
-        ({{ 'POSTS.HOMEWORK_FLAG' | translate }})
+  <li *ngFor="let p of posts" class="post-card" [id]="p._id">
+    <header class="post-header">
+      <h3 class="post-title">
+        <i class="fas fa-thumbtack" *ngIf="p.ispinned"></i>
+        {{ p.title }}
+      </h3>
+      <span class="post-badge" *ngIf="p.type === 'homework'">
+        <i class="fas fa-book"></i> {{ 'POSTS.HOMEWORK_FLAG' | translate }}
       </span>
-    </h3>
-    <p [innerText]="p.content"></p>
-    <small>
-      {{ 'POSTS.TYPE' | translate }}: {{ p.type }}
-    </small><br />
-    <small>
-      {{ 'POSTS.POSITION' | translate }}: {{ p.position }}
-    </small><br />
-    <small *ngIf="p.ispinned">
-      {{ 'POSTS.PINNED_AT' | translate }}: {{ p.pinnedAt | date:'short' }}
-    </small><br />
+    </header>
 
-    <div *ngIf="p.type === 'homework'">
-      <small>
-        {{ 'POSTS.DUE_DATE' | translate }}: {{ p.due_date | date:'short' }}
-      </small><br />
+    <div class="post-content">
+      <p>{{ p.content }}</p>
     </div>
 
-    <!-- actions for prof/admin -->
-    <div class="admin-actions" *ngIf="canModifyPosts">
-      <button (click)="togglePin.emit(p)">
-        {{ p.ispinned ? ('POSTS.UNPIN' | translate) : ('POSTS.PIN' | translate) }}
-      </button>
-      <button (click)="moveUp.emit(p)" [disabled]="p.position === 1">
-        ▲
-      </button>
-      <button (click)="moveDown.emit(p)" [disabled]="p.position === unpinnedCount">
-        ▼
-      </button>
-      <button (click)="editPost.emit(p)">
-        {{ 'POSTS.EDIT' | translate }}
-      </button>
-      <button (click)="deletePost.emit(p)">
-        {{ 'POSTS.DELETE' | translate }}
-      </button>
-    </div>
+    <footer class="post-meta">
+      <span><i class="fas fa-layer-group"></i> {{ 'POSTS.TYPE' | translate }}: {{ p.type }}</span>
+      <span><i class="fas fa-list-ol"></i> {{ 'POSTS.POSITION' | translate }}: {{ p.position }}</span>
+      <span *ngIf="p.ispinned"><i class="fas fa-clock"></i> {{ 'POSTS.PINNED_AT' | translate }}: {{ p.pinnedAt | date:'short' }}</span>
+      <span *ngIf="p.type==='homework'"><i class="fas fa-calendar-alt"></i> {{ 'POSTS.DUE_DATE' | translate }}: {{ p.due_date | date:'short' }}</span>
+    </footer>
 
-    <!-- student & submission UI -->
-    <div *ngIf="p.type === 'homework'" class="homework-actions">
-      <button
-        *ngIf="isStudentInCourse && !studentSubmissions[p._id] && showSubmissionFormForPostId !== p._id"
-        (click)="toggleSubmissionForm.emit(p._id)"
-      >
-        {{ 'POSTS.SUBMIT_HW' | translate }}
-      </button>
-
-      <div *ngIf="showSubmissionFormForPostId === p._id && isStudentInCourse">
-        <app-submission-form
-          [courseId]="courseId"
-          [postId]="p._id"
-          (submitted)="onSubmitted()"
-          (cancel)="toggleSubmissionForm.emit(null)"
-        ></app-submission-form>
-      </div>
-
-      <button
-        *ngIf="isStudentInCourse && showOwnSubmissionListForPostId !== p._id"
-        (click)="viewOwnSubmission.emit(p._id)"
-      >
-        {{ 'POSTS.VIEW_MY_SUB' | translate }}
-      </button>
-      <div *ngIf="showOwnSubmissionListForPostId === p._id" class="own-submissions">
-        <app-submission-list [courseId]="courseId" [postId]="p._id"></app-submission-list>
-        <button (click)="viewOwnSubmission.emit(null)">
-          {{ 'POSTS.HIDE_MY_SUB' | translate }}
+    <div class="post-actions">
+      <!-- Admin actions -->
+      <div *ngIf="canModifyPosts" class="admin-actions">
+        <button mat-button (click)="togglePin.emit(p)" title="{{ p.ispinned ? ('POSTS.UNPIN' | translate) : ('POSTS.PIN' | translate) }}">
+          <i class="fas" [ngClass]="p.ispinned ? 'fa-thumbtack' : 'fa-thumbtack fa-rotate-180'"></i>
+        </button>
+        <button mat-icon-button (click)="moveUp.emit(p)" [disabled]="p.position===1" title="Move up">
+          <i class="fas fa-arrow-up"></i>
+        </button>
+        <button mat-icon-button (click)="moveDown.emit(p)" [disabled]="p.position===unpinnedCount" title="Move down">
+          <i class="fas fa-arrow-down"></i>
+        </button>
+        <button mat-button (click)="editPost.emit(p)" title="{{ 'POSTS.EDIT' | translate }}">
+          <i class="fas fa-edit"></i>
+        </button>
+        <button mat-button color="warn" (click)="deletePost.emit(p)" title="{{ 'POSTS.DELETE' | translate }}">
+          <i class="fas fa-trash-alt"></i>
         </button>
       </div>
 
-      <button *ngIf="canModifyPosts" (click)="toggleSubmissionList.emit(p._id)">
-        {{ showSubmissionListForPostId === p._id
-            ? ('POSTS.HIDE_ALL_SUB' | translate)
-            : ('POSTS.VIEW_ALL_SUB' | translate)
-        }}
-      </button>
-      <div *ngIf="showSubmissionListForPostId === p._id && canModifyPosts">
-        <app-submission-list [courseId]="courseId" [postId]="p._id"></app-submission-list>
+      <!-- Student actions -->
+      <div *ngIf="p.type==='homework'" class="homework-actions">
+        <button mat-button *ngIf="isStudentInCourse && !studentSubmissions[p._id] && showSubmissionFormForPostId!==p._id"
+                (click)="toggleSubmissionForm.emit(p._id)">
+          <i class="fas fa-upload"></i> {{ 'POSTS.SUBMIT_HW' | translate }}
+        </button>
+        <button mat-button *ngIf="isStudentInCourse && showOwnSubmissionListForPostId!==p._id"
+                (click)="viewOwnSubmission.emit(p._id)">
+          <i class="fas fa-folder-open"></i> {{ 'POSTS.VIEW_MY_SUB' | translate }}
+        </button>
+        <button mat-button *ngIf="canModifyPosts"
+                (click)="toggleSubmissionList.emit(p._id)">
+          <i class="fas fa-users"></i>
+          {{ showSubmissionListForPostId===p._id ? ('POSTS.HIDE_ALL_SUB'|translate) : ('POSTS.VIEW_ALL_SUB'|translate) }}
+        </button>
       </div>
     </div>
 
@@ -98,6 +73,7 @@
   </li>
 </ul>
 
-<div *ngIf="!loading && posts?.length === 0">
+<div *ngIf="!loading && posts?.length===0" class="no-posts">
+  <i class="fas fa-inbox"></i>
   <p>{{ 'POSTS.NO_POSTS' | translate }}</p>
 </div>
