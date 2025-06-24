@@ -4,12 +4,13 @@
     "SELECT_LANGUAGE": "Language",
     "SIGN_UP": "Sign Up",
     "LOG_IN": "Log In",
+    "LOG_OUT": "Log Out",
     "HOME": "Home",
     "USERS": "Users",
     "COURSES": "Courses",
     "ACTIVITY_LOGS": "Activity Logs",
     "PROFILE": "Profile",
-    "LOG_OUT": "Log Out",
+    "DASHBOARD": "Dashboard",
     "SEARCH_PLACEHOLDER": "🔍 Search courses, users…",
     "SEARCH_COURSES": "Courses",
     "SEARCH_USERS": "Users",
@@ -42,6 +43,7 @@
     "LOADING": "Loading profile…",
     "ERROR_LOADING": "Failed to load profile.",
     "AVATAR_ALT": "User avatar",
+    "UPLOAD_AVATAR": "Upload Avatar",
     "EMAIL_LABEL": "Email",
     "EMAIL_PLACEHOLDER": "you@example.com",
     "USERNAME_LABEL": "Username",
@@ -54,6 +56,7 @@
     "ADDRESS_LABEL": "Address",
     "ADDRESS_PLACEHOLDER": "Enter address",
     "ROLES_LABEL": "Roles",
+    "PERSONAL_INFO": "Personal Information",
     "ENROLLED_LABEL": "Enrolled Courses",
     "NO_ENROLLMENTS": "No enrolled courses.",
     "SAVE": "Save Changes",
@@ -93,7 +96,7 @@
     "ROLE_ADMIN": "Admin",
     "ROLE_ERROR": "You must select one role.",
     "SUBMIT": "Sign Up",
-    "SUCCESS": "Signup successful! Redirecting to login…"
+    "SUCCESS": "Signup successful!"
   },
   "POSTS": {
     "LOADING": "Loading posts…",
@@ -166,6 +169,7 @@
     "SENDING": "Sending…"
   },
   "USERS": {
+    "ADD": "Add User",
     "LOADING": "Loading users…",
     "ERROR_LOADING": "Failed to load users.",
     "TABLE": {
@@ -240,5 +244,34 @@
       "SAVING": "Saving…",
       "CANCEL_BUTTON": "Cancel"
     }
+  },
+  "SUBMISSION_FORM": {
+    "TITLE": "New Submission",
+    "CHOOSE_FILE": "Choose File",
+    "SUBMIT": "Submit",
+    "SUBMITTING": "Submitting...",
+    "CANCEL": "Cancel"
+  },
+  "SUBMISSION": {
+    "FORM": {
+      "TITLE": "Submit Assignment",
+      "LABEL": "Choose File",
+      "SENDING": "Sending...",
+      "SUBMIT": "Submit",
+      "CANCEL": "Cancel"
+    }
+  },
+  "DASH": {
+    "LOADING": "Loading…",
+    "MY_COURSES": "My Courses",
+    "NO_COURSES": "No courses enrolled.",
+    "MY_CREATED_COURSES": "My Created Courses",
+    "NO_CREATED_COURSES": "No created courses.",
+    "STUDENTS": "Students",
+    "USERS": "Users",
+    "COURSES": "Courses",
+    "POSTS": "Posts",
+    "SUBMISSIONS": "Submissions",
+    "ACTIVITY_7D": "Activity (Last 7 Days)"
   }
 }
