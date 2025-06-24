@@ -1,10 +1,20 @@
 <!-- src/app/users/users.component.html -->
 
+<!-- Admin “Add User” button -->
+<div class="users-header">
+  <a *ngIf="isAdmin"
+     routerLink="/signup"
+     class="btn btn--add">
+    <i class="fa-solid fa-user-plus"></i>
+    {{ 'USERS.ADD' | translate }}
+  </a>
+</div>
+
 <section *ngIf="loading" class="status">
   {{ 'USERS.LOADING' | translate }}
 </section>
 
-<section *ngIf="error" class="status status--error">
+<section *ngIf="!loading && error" class="status status--error">
   {{ error || ('USERS.ERROR_LOADING' | translate) }}
 </section>
 
@@ -28,22 +38,18 @@
   <tbody>
     <tr *ngFor="let u of users">
       <td>
-        <img
-          *ngIf="u.profile.profilePic"
-          [src]="u.profile.profilePic"
-          alt="{{ 'USERS.TABLE.AVATAR_ALT' | translate }}"
-          class="avatar"
-        />
+        <img *ngIf="u.profile.profilePic"
+             [src]="u.profile.profilePic"
+             alt="{{ 'USERS.TABLE.AVATAR_ALT' | translate }}"
+             class="avatar" />
       </td>
       <td>{{ u.profile.firstName }}</td>
       <td>{{ u.profile.lastName }}</td>
       <td>{{ u.email }}</td>
       <td>{{ u.username }}</td>
       <td>{{ u.profile.phoneNumber || '-' }}</td>
-      <td>{{ u.profile.address || '-' }}</td>
-      <td>
-        {{ u.roles.length ? (u.roles.join(', ')) : '-' }}
-      </td>
+      <td>{{ u.profile.address       || '-' }}</td>
+      <td>{{ u.roles.length ? u.roles.join(', ') : '-' }}</td>
       <td>{{ u.createdAt | date:'short' }}</td>
       <td>{{ u.updatedAt | date:'short' }}</td>
       <td>

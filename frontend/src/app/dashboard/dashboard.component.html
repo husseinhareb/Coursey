@@ -1,7 +1,17 @@
-<!-- src/app/dashboard/dashboard.component.html -->
+<!-- Loading state -->
+<div *ngIf="loading" class="status">
+  <i class="fas fa-spinner fa-spin"></i>
+  {{ 'DASH.LOADING' | translate }}
+</div>
 
-<!-- Render each role‐specific view only once we’ve narrowed `overview` to `o` -->
-<ng-container *ngIf="overview as o; else showError">
+<!-- Error state -->
+<div *ngIf="!loading && error" class="status status--error">
+  <i class="fas fa-exclamation-triangle"></i>
+  {{ error }}
+</div>
+
+<!-- Main content -->
+<ng-container *ngIf="!loading && overview as o">
 
   <!-- STUDENT VIEW -->
   <ng-container *ngIf="o.role === 'student'">
@@ -9,7 +19,15 @@
       <i class="fas fa-graduation-cap"></i>
       {{ 'DASH.MY_COURSES' | translate }}
     </h2>
-    <ul class="student-list">
+
+    <!-- Empty-state -->
+    <div *ngIf="o.enrolledCourses.length === 0" class="empty">
+      <i class="fas fa-book-reader"></i>
+      {{ 'DASH.NO_COURSES' | translate }}
+    </div>
+
+    <!-- List -->
+    <ul *ngIf="o.enrolledCourses.length > 0" class="student-list">
       <li *ngFor="let c of o.enrolledCourses">
         <i class="fas fa-book-open"></i>
         {{ c.code }} — {{ c.title }}
@@ -27,7 +45,11 @@
       <i class="fas fa-chalkboard-teacher"></i>
       {{ 'DASH.MY_CREATED_COURSES' | translate }}
     </h2>
-    <ul class="teacher-list">
+    <div *ngIf="o.coursesCreated.length === 0" class="empty">
+      <i class="fas fa-chalkboard"></i>
+      {{ 'DASH.NO_CREATED_COURSES' | translate }}
+    </div>
+    <ul *ngIf="o.coursesCreated.length > 0" class="teacher-list">
       <li *ngFor="let c of o.coursesCreated">
         <i class="fas fa-book"></i>
         {{ c.code }} — {{ c.title }}
@@ -44,7 +66,6 @@
       <i class="fas fa-tachometer-alt"></i>
       {{ 'NAV.DASHBOARD' | translate }}
     </h2>
-
     <section class="cards">
       <div class="card">
         <i class="fas fa-users fa-2x"></i>
@@ -68,13 +89,9 @@
         </div>
       </div>
     </section>
-
     <section class="charts">
       <div class="chart-card">
-        <h3>
-          <i class="fas fa-file-upload"></i>
-          {{ 'DASH.SUBMISSIONS' | translate }}
-        </h3>
+        <h3><i class="fas fa-file-upload"></i> {{ 'DASH.SUBMISSIONS' | translate }}</h3>
         <canvas
           baseChart
           [data]="submissionsData"
@@ -82,12 +99,8 @@
           chartType="doughnut"
         ></canvas>
       </div>
-
       <div class="chart-card">
-        <h3>
-          <i class="fas fa-chart-bar"></i>
-          {{ 'DASH.ACTIVITY_7D' | translate }}
-        </h3>
+        <h3><i class="fas fa-chart-bar"></i> {{ 'DASH.ACTIVITY_7D' | translate }}</h3>
         <canvas
           baseChart
           [data]="activityChartData"
@@ -99,10 +112,3 @@
   </ng-container>
 
 </ng-container>
-
-<ng-template #showError>
-  <div *ngIf="error" class="status status--error">
-    <i class="fas fa-exclamation-triangle"></i>
-    {{ error }}
-  </div>
-</ng-template>

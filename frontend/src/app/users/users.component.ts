@@ -1,14 +1,15 @@
 // src/app/users/users.component.ts
 
 import { Component, OnInit } from '@angular/core';
-import { CommonModule }           from '@angular/common';
-import { HttpClientModule }       from '@angular/common/http';
-import { RouterModule }           from '@angular/router';
+import { CommonModule }      from '@angular/common';
+import { HttpClientModule }  from '@angular/common/http';
+import { RouterModule }      from '@angular/router';
 import { forkJoin, switchMap, map, of } from 'rxjs';
 
-import { UserService, User, Enrollment } from '../services/user.service';
-import { CourseService, Course }        from '../services/course.service';
-import { TranslateModule }       from '@ngx-translate/core';
+import { UserService, User, Enrollment }   from '../services/user.service';
+import { CourseService, Course }          from '../services/course.service';
+import { TranslateModule }                from '@ngx-translate/core';
+import { AuthService, Me }                from '../auth/auth.service';
 
 @Component({
   selector: 'app-users',
@@ -27,90 +28,78 @@ export class UsersComponent implements OnInit {
   loading = true;
   error: string | null = null;
 
-  /**
-   * After we call listEnrollments(u.id), we store each user’s list of Enrollment[] here.
-   * Key = user ID, Value = array of Enrollment objects
-   */
+  // Map of userId → Enrollment[]
   userEnrollments: Record<string, Enrollment[]> = {};
+  // Map of courseId → course code
+  courseCodeMap: Record<string, string> = {};
 
-  /** 
-   * After we fetch each Course in step #3, we build a lookup:
-   *   courseCodeMap[courseId] = course.code
-   */
-  courseCodeMap: Record<string,string> = {};
+  isAdmin = false;
 
   constructor(
-    private userService: UserService,
-    private courseService: CourseService
+    private userService:   UserService,
+    private courseService: CourseService,
+    private auth:          AuthService
   ) {}
 
   ngOnInit() {
-    // Step 1: Fetch all users
+    // Determine admin status
+    const me: Me | null = this.auth.user;
+    this.isAdmin = !!me && me.roles.map(r => r.toLowerCase()).includes('admin');
+
+    // Fetch all users
     this.userService.getUsers()
       .pipe(
         switchMap(users => {
           this.users = users;
-
           if (!users.length) {
-            // No users → skip directly to “done”
             return of([] as Array<{ userId: string; enrollments: Enrollment[] }>);
           }
-
-          // Step 2: For each user, fetch their enrollments
-          const enrollCalls = users.map(u =>
-            this.userService
-              .listEnrollments(u.id)
+          // For each user, fetch their enrollments
+          const calls = users.map(u =>
+            this.userService.listEnrollments(u.id)
               .pipe(map(enrs => ({ userId: u.id, enrollments: enrs })))
           );
-
-          // forkJoin waits for all listEnrollments(...) to complete
-          return forkJoin(enrollCalls);
+          return forkJoin(calls);
         })
       )
       .subscribe({
-        next: (enrollResults) => {
-          // enrollResults is Array<{ userId, enrollments }>
+        next: enrollResults => {
+          // Store enrollments per user
           enrollResults.forEach(r => {
             this.userEnrollments[r.userId] = r.enrollments || [];
           });
 
-          // Step 3a: Collect every distinct courseId from all users’ Enrollment[]
-          const allCourseIds = new Set<string>();
-          enrollResults.forEach(r => {
-            r.enrollments.forEach(e => {
-              allCourseIds.add(e.courseId);
-            });
-          });
-
-          // If no one is enrolled anywhere, we’re done:
-          if (allCourseIds.size === 0) {
+          // Collect unique courseIds
+          const courseIds = new Set<string>();
+          enrollResults.forEach(r =>
+            r.enrollments.forEach(e => courseIds.add(e.courseId))
+          );
+          if (courseIds.size === 0) {
             this.loading = false;
             return;
           }
 
-          // Step 3b: Fetch each unique course exactly once, to get its “code”
-          const courseCalls = Array.from(allCourseIds).map(cid =>
+          // Fetch each course to get its code
+          const courseCalls = Array.from(courseIds).map(cid =>
             this.courseService.get(cid).pipe(
-              map((course: Course) => ({ id: cid, code: course.code }))
+              map((c: Course) => ({ id: cid, code: c.code }))
             )
           );
-
           forkJoin(courseCalls).subscribe({
-            next: (courseArr) => {
-              // courseArr is Array<{ id, code }>
+            next: courseArr => {
               courseArr.forEach(c => {
                 this.courseCodeMap[c.id] = c.code;
               });
               this.loading = false;
             },
-            error: (err) => {
+            error: err => {
               console.error('Error fetching courses:', err);
               this.error = err.message || 'Failed to load course codes';
               this.loading = false;
             }
           });
         },
-        error: (err) => {
+        error: err => {
           console.error('Error fetching users or enrollments:', err);
           this.error = err.message || 'Failed to load users or enrollments';
           this.loading = false;

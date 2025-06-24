@@ -1,4 +1,3 @@
-// src/app/dashboard/dashboard.component.ts
 import { Component, OnInit } from '@angular/core';
 import { CommonModule }      from '@angular/common';
 import { TranslateModule }   from '@ngx-translate/core';
@@ -6,11 +5,12 @@ import { NgChartsModule }    from 'ng2-charts';
 import { ChartData, ChartOptions } from 'chart.js';
 
 import {
-  DashboardService,
+  DashboardOverview,
   AdminOverview,
   TeacherOverview,
   StudentOverview
 } from '../services/dashboard.service';
+import { DashboardService }  from '../services/dashboard.service';
 import { AuthService, Me }   from '../auth/auth.service';
 
 @Component({
@@ -19,30 +19,24 @@ import { AuthService, Me }   from '../auth/auth.service';
   imports: [
     CommonModule,
     TranslateModule,
-    NgChartsModule    // <-- needed for <canvas baseChart>
+    NgChartsModule
   ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
 })
 export class DashboardComponent implements OnInit {
-  overview?: AdminOverview | TeacherOverview | StudentOverview;
-  error:     string | null = null;
-  role!:     'admin' | 'teacher' | 'student';
+  overview?: DashboardOverview;
+  loading = true;
+  error: string | null = null;
+  role!: 'admin' | 'teacher' | 'student';
 
-  // --- Chart.js bindings for admin view ---
-  submissionsData: ChartData<'doughnut', number[], string> = {
-    labels: [], 
-    datasets: [{ data: [] }]
-  };
+  submissionsData: ChartData<'doughnut', number[], string> = { labels: [], datasets: [{ data: [] }] };
   submissionsOptions: ChartOptions<'doughnut'> = {
     responsive: true,
     plugins: { legend: { position: 'bottom' } }
   };
 
-  activityChartData: ChartData<'bar', number[], string> = {
-    labels: [], 
-    datasets: [{ data: [], label: 'Actions' }]
-  };
+  activityChartData: ChartData<'bar', number[], string> = { labels: [], datasets: [{ data: [], label: 'Actions' }] };
   activityOptions: ChartOptions<'bar'> = {
     responsive: true,
     scales: {
@@ -52,14 +46,15 @@ export class DashboardComponent implements OnInit {
   };
 
   constructor(
-    private svc:  DashboardService,
-    public  auth: AuthService
+    private svc: DashboardService,
+    public auth: AuthService
   ) {}
 
   ngOnInit() {
     const u: Me | null = this.auth.user;
     if (!u) {
       this.error = 'Accès interdit';
+      this.loading = false;
       return;
     }
 
@@ -67,17 +62,21 @@ export class DashboardComponent implements OnInit {
       next: (data) => {
         this.overview = data;
         this.role     = data.role;
+        this.loading  = false;
 
         if (this.role === 'admin') {
-          const admin = data as AdminOverview;
-          this.submissionsData.labels = Object.keys(admin.submissions);
-          this.submissionsData.datasets[0].data = Object.values(admin.submissions);
+          const a = data as AdminOverview;
+          this.submissionsData.labels = Object.keys(a.submissions);
+          this.submissionsData.datasets[0].data = Object.values(a.submissions);
 
-          this.activityChartData.labels = Object.keys(admin.activityLast7Days);
-          this.activityChartData.datasets[0].data = Object.values(admin.activityLast7Days);
+          this.activityChartData.labels = Object.keys(a.activityLast7Days);
+          this.activityChartData.datasets[0].data = Object.values(a.activityLast7Days);
         }
       },
-      error: (err) => this.error = err.message || 'Erreur chargement'
+      error: (err) => {
+        this.error   = err.message || 'Erreur chargement';
+        this.loading = false;
+      }
     });
   }
 }

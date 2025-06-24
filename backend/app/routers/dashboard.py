@@ -54,7 +54,7 @@ async def get_overview(current_user: UserDB = Depends(get_current_active_user)):
             "activityLast7Days": acts
         }
 
-    elif "teacher" in roles:
+    elif "professor" in roles:
         # — Teacher sees courses they created + enrolled counts
         created_cursor = courses_collection.find({"created_by": ObjectId(current_user.id)})
         out: List[Dict[str, Any]] = []
