@@ -1,72 +1,94 @@
-<!-- src/app/users/users.component.html -->
-
-<!-- Admin “Add User” button -->
 <div class="users-header">
-  <a *ngIf="isAdmin"
-     routerLink="/register"
-     class="btn btn--add">
-    <i class="fa-solid fa-user-plus"></i>
+  <a *ngIf="isAdmin" routerLink="/register" class="btn btn--add">
+    <i class="fas fa-user-plus"></i>
     {{ 'USERS.ADD' | translate }}
   </a>
 </div>
 
 <section *ngIf="loading" class="status">
+  <i class="fas fa-spinner fa-spin"></i>
   {{ 'USERS.LOADING' | translate }}
 </section>
 
 <section *ngIf="!loading && error" class="status status--error">
+  <i class="fas fa-exclamation-triangle"></i>
   {{ error || ('USERS.ERROR_LOADING' | translate) }}
 </section>
 
-<table *ngIf="!loading && !error" class="users-table">
-  <thead>
-    <tr>
-      <th>{{ 'USERS.TABLE.AVATAR'       | translate }}</th>
-      <th>{{ 'USERS.TABLE.FIRST_NAME'   | translate }}</th>
-      <th>{{ 'USERS.TABLE.LAST_NAME'    | translate }}</th>
-      <th>{{ 'USERS.TABLE.EMAIL'        | translate }}</th>
-      <th>{{ 'USERS.TABLE.USERNAME'     | translate }}</th>
-      <th>{{ 'USERS.TABLE.PHONE'        | translate }}</th>
-      <th>{{ 'USERS.TABLE.ADDRESS'      | translate }}</th>
-      <th>{{ 'USERS.TABLE.ROLES'        | translate }}</th>
-      <th>{{ 'USERS.TABLE.CREATED_AT'   | translate }}</th>
-      <th>{{ 'USERS.TABLE.UPDATED_AT'   | translate }}</th>
-      <th>{{ 'USERS.TABLE.ENROLLMENTS'  | translate }}</th>
-      <th>{{ 'USERS.TABLE.ACTIONS'      | translate }}</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr *ngFor="let u of users">
-      <td>
-        <img *ngIf="u.profile.profilePic"
-             [src]="u.profile.profilePic"
-             alt="{{ 'USERS.TABLE.AVATAR_ALT' | translate }}"
-             class="avatar" />
-      </td>
-      <td>{{ u.profile.firstName }}</td>
-      <td>{{ u.profile.lastName }}</td>
-      <td>{{ u.email }}</td>
-      <td>{{ u.username }}</td>
-      <td>{{ u.profile.phoneNumber || '-' }}</td>
-      <td>{{ u.profile.address       || '-' }}</td>
-      <td>{{ u.roles.length ? u.roles.join(', ') : '-' }}</td>
-      <td>{{ u.createdAt | date:'short' }}</td>
-      <td>{{ u.updatedAt | date:'short' }}</td>
-      <td>
-        <ul *ngIf="userEnrollments[u.id]?.length; else noEnroll">
-          <li *ngFor="let e of userEnrollments[u.id]">
-            {{ courseCodeMap[e.courseId] || e.courseId }}
-          </li>
-        </ul>
-        <ng-template #noEnroll>
-          <small>{{ 'USERS.TABLE.NO_ENROLLMENTS' | translate }}</small>
-        </ng-template>
-      </td>
-      <td>
-        <a [routerLink]="['/users', u.id, 'enrollments']" class="link">
-          {{ 'USERS.TABLE.MANAGE_ENROLLMENT' | translate }}
-        </a>
-      </td>
-    </tr>
-  </tbody>
-</table>
+<div *ngIf="!loading && !error" class="table-container">
+  <table class="users-table">
+    <thead>
+      <tr>
+        <th></th>
+        <th><i class="fas fa-id-badge"></i> {{ 'USERS.TABLE.FIRST_NAME' | translate }}</th>
+        <th><i class="fas fa-id-badge"></i> {{ 'USERS.TABLE.LAST_NAME'  | translate }}</th>
+        <th><i class="fas fa-envelope"></i> {{ 'USERS.TABLE.EMAIL'      | translate }}</th>
+        <th><i class="fas fa-at"></i> {{ 'USERS.TABLE.USERNAME'     | translate }}</th>
+        <th><i class="fas fa-phone"></i> {{ 'USERS.TABLE.PHONE'      | translate }}</th>
+        <th><i class="fas fa-map-marker-alt"></i> {{ 'USERS.TABLE.ADDRESS'  | translate }}</th>
+        <th><i class="fas fa-user-tag"></i> {{ 'USERS.TABLE.ROLES'      | translate }}</th>
+        <th><i class="fas fa-calendar-plus"></i> {{ 'USERS.TABLE.CREATED_AT' | translate }}</th>
+        <th><i class="fas fa-calendar-check"></i> {{ 'USERS.TABLE.UPDATED_AT' | translate }}</th>
+        <th><i class="fas fa-book-open"></i> {{ 'USERS.TABLE.ENROLLMENTS'| translate }}</th>
+        <th><i class="fas fa-cogs"></i> {{ 'USERS.TABLE.ACTIONS'    | translate }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let u of users">
+        <!-- Avatar / Initials -->
+        <td class="avatar-cell">
+          <div class="avatar-wrapper">
+            <img 
+              *ngIf="u.profile.profilePic; else initialsTpl"
+              [src]="u.profile.profilePic"
+              alt="{{ 'USERS.TABLE.AVATAR_ALT' | translate }}" />
+            <ng-template #initialsTpl>
+              <span class="avatar-initials">
+                {{
+                  (
+                    (u.profile.firstName || '').charAt(0) + 
+                    (u.profile.lastName  || '').charAt(0)
+                  )?.toUpperCase()
+                }}
+              </span>
+            </ng-template>
+          </div>
+        </td>
+
+        <td>{{ u.profile.firstName }}</td>
+        <td>{{ u.profile.lastName }}</td>
+        <td>{{ u.email }}</td>
+        <td>{{ u.username }}</td>
+        <td>{{ u.profile.phoneNumber || '-' }}</td>
+        <td>{{ u.profile.address       || '-' }}</td>
+        <td>{{ u.roles.length ? u.roles.join(', ') : '-' }}</td>
+        <td>{{ u.createdAt  | date:'short' }}</td>
+        <td>{{ u.updatedAt  | date:'short' }}</td>
+
+        <!-- Enrollments -->
+        <td>
+          <ul *ngIf="userEnrollments[u.id]?.length; else noEnroll">
+            <li *ngFor="let e of userEnrollments[u.id]">
+              <i class="fas fa-check-circle"></i>
+              {{ courseCodeMap[e.courseId] || e.courseId }}
+            </li>
+          </ul>
+          <ng-template #noEnroll>
+            <small class="no-enroll">
+              <i class="fas fa-times-circle"></i>
+              {{ 'USERS.TABLE.NO_ENROLLMENTS' | translate }}
+            </small>
+          </ng-template>
+        </td>
+
+        <!-- Actions -->
+        <td class="actions-cell">
+          <a [routerLink]="['/users', u.id, 'enrollments']" class="action-link">
+            <i class="fas fa-user-edit"></i>
+            {{ 'USERS.TABLE.MANAGE_ENROLLMENT' | translate }}
+          </a>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
