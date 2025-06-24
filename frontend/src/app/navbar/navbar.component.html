@@ -68,7 +68,6 @@
 
   <!-- CENTER: search -->
   <div *ngIf="auth.isLoggedIn" class="navbar-center">
-    <!-- Added #searchContainer here -->
     <div class="search-container" #searchContainer>
       <input type="text" class="search-input" [(ngModel)]="searchQuery" (ngModelChange)="onSearch()"
         placeholder="{{ 'NAV.SEARCH_PLACEHOLDER' | translate }}" />
@@ -140,10 +139,12 @@
       {{ 'NAV.PROFILE' | translate }}
     </a>
 
-    <a *ngIf="auth.isLoggedIn && isAdmin" routerLink="/dashboard" routerLinkActive="active" class="nav-link">
+    <!-- Dashboard visible to all authenticated users -->
+    <a *ngIf="auth.isLoggedIn" routerLink="/dashboard" routerLinkActive="active" class="nav-link">
       {{ 'NAV.DASHBOARD' | translate }}
     </a>
-    <!-- user info block -->
+
+    <!-- User info block -->
     <div *ngIf="auth.isLoggedIn" class="user-container">
       <div class="avatar-wrapper">
         <img *ngIf="auth.user?.profile?.profilePic as pic" [src]="pic" alt="Avatar" />

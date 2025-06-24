@@ -1,41 +1,108 @@
 <!-- src/app/dashboard/dashboard.component.html -->
-<div *ngIf="error" class="status status--error">
-  {{ error }}
-</div>
 
-<div *ngIf="overview">
-  <h2>Tableau de bord</h2>
+<!-- Render each role‐specific view only once we’ve narrowed `overview` to `o` -->
+<ng-container *ngIf="overview as o; else showError">
 
-  <section class="cards">
-    <div class="card">
-      <h3>Utilisateurs</h3>
-      <p>{{ overview.totals.users }}</p>
-    </div>
-    <div class="card">
-      <h3>Cours</h3>
-      <p>{{ overview.totals.courses }}</p>
-    </div>
-    <div class="card">
-      <h3>Publications</h3>
-      <p>{{ overview.totals.posts }}</p>
-    </div>
-  </section>
-
-  <section>
-    <h3>Soumissions</h3>
-    <ul>
-      <li *ngFor="let s of overview.submissions | keyvalue">
-        {{ s.key }}: {{ s.value }}
+  <!-- STUDENT VIEW -->
+  <ng-container *ngIf="o.role === 'student'">
+    <h2>
+      <i class="fas fa-graduation-cap"></i>
+      {{ 'DASH.MY_COURSES' | translate }}
+    </h2>
+    <ul class="student-list">
+      <li *ngFor="let c of o.enrolledCourses">
+        <i class="fas fa-book-open"></i>
+        {{ c.code }} — {{ c.title }}
+        <div class="progress-bar">
+          <div class="fill" [style.width.%]="c.progress"></div>
+        </div>
+        <small>{{ c.progress }}%</small>
       </li>
     </ul>
-  </section>
+  </ng-container>
 
-  <section>
-    <h3>Activités (7 derniers jours)</h3>
-    <ul>
-      <li *ngFor="let a of overview.activityLast7Days | keyvalue">
-        {{ a.key }}: {{ a.value }}
+  <!-- TEACHER VIEW -->
+  <ng-container *ngIf="o.role === 'teacher'">
+    <h2>
+      <i class="fas fa-chalkboard-teacher"></i>
+      {{ 'DASH.MY_CREATED_COURSES' | translate }}
+    </h2>
+    <ul class="teacher-list">
+      <li *ngFor="let c of o.coursesCreated">
+        <i class="fas fa-book"></i>
+        {{ c.code }} — {{ c.title }}
+        <span class="badge">
+          {{ c.enrolledCount }} {{ 'DASH.STUDENTS' | translate }}
+        </span>
       </li>
     </ul>
-  </section>
-</div>
+  </ng-container>
+
+  <!-- ADMIN VIEW -->
+  <ng-container *ngIf="o.role === 'admin'">
+    <h2>
+      <i class="fas fa-tachometer-alt"></i>
+      {{ 'NAV.DASHBOARD' | translate }}
+    </h2>
+
+    <section class="cards">
+      <div class="card">
+        <i class="fas fa-users fa-2x"></i>
+        <div class="card-info">
+          <h3>{{ 'DASH.USERS' | translate }}</h3>
+          <p>{{ o.totals.users }}</p>
+        </div>
+      </div>
+      <div class="card">
+        <i class="fas fa-book fa-2x"></i>
+        <div class="card-info">
+          <h3>{{ 'DASH.COURSES' | translate }}</h3>
+          <p>{{ o.totals.courses }}</p>
+        </div>
+      </div>
+      <div class="card">
+        <i class="fas fa-file-alt fa-2x"></i>
+        <div class="card-info">
+          <h3>{{ 'DASH.POSTS' | translate }}</h3>
+          <p>{{ o.totals.posts }}</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="charts">
+      <div class="chart-card">
+        <h3>
+          <i class="fas fa-file-upload"></i>
+          {{ 'DASH.SUBMISSIONS' | translate }}
+        </h3>
+        <canvas
+          baseChart
+          [data]="submissionsData"
+          [options]="submissionsOptions"
+          chartType="doughnut"
+        ></canvas>
+      </div>
+
+      <div class="chart-card">
+        <h3>
+          <i class="fas fa-chart-bar"></i>
+          {{ 'DASH.ACTIVITY_7D' | translate }}
+        </h3>
+        <canvas
+          baseChart
+          [data]="activityChartData"
+          [options]="activityOptions"
+          chartType="bar"
+        ></canvas>
+      </div>
+    </section>
+  </ng-container>
+
+</ng-container>
+
+<ng-template #showError>
+  <div *ngIf="error" class="status status--error">
+    <i class="fas fa-exclamation-triangle"></i>
+    {{ error }}
+  </div>
+</ng-template>
