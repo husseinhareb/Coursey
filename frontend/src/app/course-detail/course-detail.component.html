@@ -2,42 +2,49 @@
 
 <!-- Loading & Error -->
 <div *ngIf="loadingCourse" class="loading">
+  <i class="fas fa-spinner fa-spin"></i>
   {{ 'COURSE_DETAIL.LOADING' | translate }}
 </div>
 <div *ngIf="courseError" class="error">
+  <i class="fas fa-exclamation-triangle"></i>
   {{ courseError || ('COURSE_DETAIL.ERROR' | translate) }}
 </div>
 
 <!-- Course Info -->
-<div *ngIf="course">
-  <h2>{{ course.title }}</h2>
-  <p>{{ course.description }}</p>
+<div *ngIf="course" class="course-header">
+  <div class="course-title-wrapper">
+    <h2 class="course-title"><i class="fas fa-graduation-cap"></i> {{ course.title }}</h2>
+    <button
+      class="btn btn--forum"
+      [routerLink]="['/courses', courseId, 'forums']"
+    >
+      <i class="fas fa-comments"></i>
+      {{ 'COURSE_DETAIL.VIEW_FORUM' | translate }}
+    </button>
+  </div>
+  <p class="course-description">{{ course.description }}</p>
+</div>
 
-  <!-- forum button -->
+
+<!-- Add / Edit Post -->
+<div class="post-controls" *ngIf="canModifyPosts">
   <button
-    class="forum-link btn"
-    [routerLink]="['/courses', courseId, 'forums']"
+    class="btn btn--add-post"
+    (click)="toggleForm()"
   >
-    {{ 'COURSE_DETAIL.VIEW_FORUM' | translate }}
+    <i class="fas" [ngClass]="editing ? 'fa-edit' : 'fa-plus-circle'"></i>
+    {{ editing
+       ? ('COURSE_DETAIL.EDIT_POST'   | translate)
+       : ('COURSE_DETAIL.ADD_POST'    | translate)
+    }}
   </button>
 </div>
 
-<hr />
-
-<!-- Add / Edit Post -->
-<button
-  *ngIf="canModifyPosts"
-  class="btn btn--add-post"
-  (click)="toggleForm()"
->
-  {{ editing ? ('COURSE_DETAIL.EDIT_POST' | translate) : ('COURSE_DETAIL.ADD_POST' | translate) }}
-</button>
-
 <div *ngIf="showForm && canModifyPosts" class="post-form">
-  <!-- …your existing <form> here (unchanged)… -->
+  <!-- …your existing <form> here… -->
 </div>
 
-<hr />
+<hr class="section-divider" />
 
 <!-- Posts list -->
 <app-posts

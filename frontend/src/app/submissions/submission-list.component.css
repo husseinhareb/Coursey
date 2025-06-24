@@ -1,0 +1,184 @@
+/* src/app/submissions/submission-list.component.css */
+
+/* Card container */
+.submission-list-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius);
+  padding: var(--spacing-lg);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+/* Header */
+.submission-list-header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  margin-bottom: var(--spacing-md);
+}
+.submission-list-header h4 {
+  margin: 0;
+  font-size: 1.25rem;
+}
+.submission-list-header i {
+  color: var(--color-primary);
+  font-size: 1.2rem;
+}
+
+/* Status messages */
+.status {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  margin: var(--spacing-md) 0;
+  font-size: 1rem;
+}
+.status--loading i { color: var(--color-primary); }
+.status--error { color: var(--color-error); }
+
+/* Table wrapper for responsive overflow */
+.table-wrapper {
+  overflow-x: auto;
+}
+
+/* Table styling */
+.submissions-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  margin-bottom: var(--spacing-lg);
+}
+.submissions-table th,
+.submissions-table td {
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-bottom: 1px solid var(--color-border);
+  text-align: left;
+  white-space: nowrap;
+}
+.submissions-table th {
+  background: var(--color-bg-alt);
+  color: var(--color-muted);
+  font-weight: 600;
+}
+.no-rows {
+  text-align: center;
+  color: var(--color-muted);
+}
+.no-rows i {
+  margin-right: var(--spacing-xs);
+}
+
+/* Badges */
+.badge {
+  display: inline-block;
+  padding: 0.2em 0.6em;
+  border-radius: var(--border-radius);
+  font-weight: 600;
+}
+.badge--submitted { background: #d1ecf1; color: #0c5460; }
+.badge--late      { background: #f8d7da; color: #721c24; }
+.badge--graded    { background: #d4edda; color: #155724; }
+
+/* Action button */
+.action-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: var(--spacing-xs);
+  font-size: 0.9rem;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  color: var(--color-primary);
+  transition: color 0.2s;
+}
+.action-btn i { font-size: 1rem; }
+.action-btn:hover { color: var(--color-primary-dark); }
+.action-btn:disabled { color: var(--color-muted); cursor: not-allowed; }
+
+/* Grading form */
+.grading-form-card {
+  background: var(--color-bg-alt);
+  border-radius: var(--border-radius);
+  padding: var(--spacing-lg);
+  margin-top: var(--spacing-lg);
+}
+.grading-form-card header h5 {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  margin: 0 0 var(--spacing-md);
+  font-size: 1.1rem;
+}
+.grading-form-card header i {
+  color: var(--color-accent);
+}
+
+/* Form groups */
+.grading-form .form-group {
+  margin-bottom: var(--spacing-md);
+}
+.grading-form label {
+  display: block;
+  margin-bottom: var(--spacing-xs);
+  font-weight: 600;
+}
+.grading-form input,
+.grading-form textarea {
+  width: 100%;
+  padding: var(--spacing-sm);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius);
+  font-size: 1rem;
+}
+.grading-form textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+/* Form actions */
+.grading-form .form-actions {
+  display: flex;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-md);
+}
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  border: none;
+  border-radius: var(--border-radius);
+  padding: var(--spacing-sm) var(--spacing-md);
+  cursor: pointer;
+  transition: background var(--transition-speed), transform var(--transition-speed);
+}
+.btn i { font-size: 1rem; }
+.btn--primary {
+  background: var(--color-primary);
+  color: var(--color-surface);
+}
+.btn--primary:hover:not(:disabled) {
+  background: var(--color-primary-dark);
+  transform: translateY(-1px);
+}
+.btn--primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.btn--secondary {
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+.btn--secondary:hover {
+  background: var(--color-border);
+}
+
+/* Error text */
+.error {
+  color: var(--color-error);
+  font-size: 0.9rem;
+  margin-top: var(--spacing-sm);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}

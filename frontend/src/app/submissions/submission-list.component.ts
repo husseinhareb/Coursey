@@ -25,6 +25,7 @@ import { TranslateModule } from '@ngx-translate/core';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule,TranslateModule],
   templateUrl: `./submission-list.component.html`,
+  styleUrl: './submission-list.component.css'
 
 
 })

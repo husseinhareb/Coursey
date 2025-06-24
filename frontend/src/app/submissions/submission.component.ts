@@ -5,13 +5,14 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 
 import { SubmissionService, SubmissionCreate } from '../services/submission.service';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-submission-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule,TranslateModule],
   templateUrl: `./submission.component.html`,
-
+  styleUrl: './submission.component.css'
 })
 export class SubmissionFormComponent {
   @Input() courseId!: string;

@@ -1,17 +1,38 @@
-<div class="submission-form">
-    <h4>Submit Homework</h4>
-    <form (ngSubmit)="onSubmit()">
-        <div>
-            <label for="file">Choose file to upload:</label>
-            <input id="file" type="file" (change)="onFileSelected($event)" required />
-        </div>
+<!-- src/app/submissions/submission-form.component.html -->
+<div class="submission-form-card">
+  <header class="submission-header">
+    <i class="fas fa-upload"></i>
+    <h4>{{ 'SUBMISSION_FORM.TITLE' | translate }}</h4>
+  </header>
 
-        <div style="margin-top: 0.5rem;">
-            <button type="submit" [disabled]="!selectedFile || loading">
-                {{ loading ? 'Submitting…' : 'Submit' }}
-            </button>
-            <button type="button" (click)="cancel.emit()">Cancel</button>
-        </div>
-    </form>
-    <div *ngIf="error" class="error">{{ error }}</div>
+  <form (ngSubmit)="onSubmit()" class="submission-form">
+    <div class="form-group">
+      <label for="file">
+        <i class="fas fa-file-upload"></i>
+        {{ 'SUBMISSION_FORM.CHOOSE_FILE' | translate }}
+      </label>
+      <input
+        id="file"
+        type="file"
+        (change)="onFileSelected($event)"
+        required
+      />
+    </div>
+
+    <div class="form-actions">
+      <button class="btn btn--primary" type="submit" [disabled]="!selectedFile || loading">
+        <i class="fas" [ngClass]="loading ? 'fa-spinner fa-spin' : 'fa-paper-plane'"></i>
+        {{ loading ? ('SUBMISSION_FORM.SUBMITTING'|translate) : ('SUBMISSION_FORM.SUBMIT'|translate) }}
+      </button>
+      <button class="btn btn--secondary" type="button" (click)="cancel.emit()">
+        <i class="fas fa-times"></i>
+        {{ 'SUBMISSION_FORM.CANCEL' | translate }}
+      </button>
+    </div>
+
+    <div *ngIf="error" class="submission-error">
+      <i class="fas fa-exclamation-circle"></i>
+      {{ error }}
+    </div>
+  </form>
 </div>

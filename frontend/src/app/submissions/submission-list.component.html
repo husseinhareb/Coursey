@@ -1,135 +1,123 @@
 <!-- src/app/submissions/submission-list.component.html -->
+<div class="submission-list-card">
+  <header class="submission-list-header">
+    <h4>
+      <i class="fas" [ngClass]="canViewAll ? 'fa-users' : 'fa-user'"></i>
+      {{ canViewAll 
+          ? ('SUBMISSIONS.LIST.TITLE_ALL'  | translate)
+          : ('SUBMISSIONS.LIST.TITLE_MINE' | translate)
+      }}
+    </h4>
+  </header>
 
-<div class="submission-list">
-  <h4 *ngIf="canViewAll">
-    {{ 'SUBMISSIONS.LIST.TITLE_ALL' | translate }}
-  </h4>
-  <h4 *ngIf="!canViewAll">
-    {{ 'SUBMISSIONS.LIST.TITLE_MINE' | translate }}
-  </h4>
-
-  <div *ngIf="loading" class="status">
+  <div *ngIf="loading" class="status status--loading">
+    <i class="fas fa-spinner fa-spin"></i>
     {{ 'SUBMISSIONS.LIST.LOADING' | translate }}
   </div>
   <div *ngIf="error" class="status status--error">
+    <i class="fas fa-exclamation-circle"></i>
     {{ error }}
   </div>
 
-  <table *ngIf="!loading && !error" class="submissions-table">
-    <thead>
-      <tr>
-        <th *ngIf="canViewAll">
-          {{ 'SUBMISSIONS.LIST.TABLE.STUDENT' | translate }}
-        </th>
-        <th>{{ 'SUBMISSIONS.LIST.TABLE.FILE' | translate }}</th>
-        <th>{{ 'SUBMISSIONS.LIST.TABLE.SUBMITTED_AT' | translate }}</th>
-        <th>{{ 'SUBMISSIONS.LIST.TABLE.DUE_DATE' | translate }}</th>
-        <th>{{ 'SUBMISSIONS.LIST.TABLE.STATUS' | translate }}</th>
-        <th>{{ 'SUBMISSIONS.LIST.TABLE.GRADE' | translate }}</th>
-        <th>{{ 'SUBMISSIONS.LIST.TABLE.COMMENT' | translate }}</th>
-        <th *ngIf="canGrade">
-          {{ 'SUBMISSIONS.LIST.TABLE.ACTIONS' | translate }}
-        </th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let s of displayedSubmissions">
-        <td *ngIf="canViewAll">
-          {{ s.firstName || '—' }} {{ s.lastName || '' }}
-        </td>
-        <td>
-          <ng-container *ngIf="s.file_name && s.file_id; else noFile">
-            <a [href]="getFileUrl(s.file_id)" target="_blank" rel="noopener">
-              {{ s.file_name }}
-            </a>
-          </ng-container>
-          <ng-template #noFile>—</ng-template>
-        </td>
-        <td>{{ s.created_at | date:'short' }}</td>
-        <td>
-          <ng-container *ngIf="postDueDate; else noDue">
-            {{ postDueDate | date:'short' }}
-          </ng-container>
-          <ng-template #noDue>—</ng-template>
-        </td>
-        <td>
-          <span [ngClass]="{
-              'badge-submitted': s.status==='submitted',
-              'badge-late':      s.status==='late',
-              'badge-graded':    s.status==='graded'
-            }">
-            {{ ('SUBMISSIONS.STATUS.' + s.status.toUpperCase()) | translate }}
-          </span>
-        </td>
-        <td>{{ s.grade!=null ? s.grade : '—' }}</td>
-        <td>{{ s.comment!=null ? s.comment : '—' }}</td>
-        <td *ngIf="canGrade">
-          <button
-            *ngIf="s.status!=='graded'"
-            (click)="startGrading(s._id)"
-          >
-            {{ 'SUBMISSIONS.LIST.GRADE_BUTTON' | translate }}
-          </button>
-        </td>
-      </tr>
-      <tr *ngIf="displayedSubmissions.length===0">
-        <td [attr.colspan]="canViewAll ? 8 : 7">
-          {{ canViewAll
-             ? ('SUBMISSIONS.LIST.NO_ALL' | translate)
-             : ('SUBMISSIONS.LIST.NO_MINE' | translate)
-          }}
-        </td>
-      </tr>
-    </tbody>
-  </table>
+  <div *ngIf="!loading && !error" class="table-wrapper">
+    <table class="submissions-table">
+      <thead>
+        <tr>
+          <th *ngIf="canViewAll">{{ 'SUBMISSIONS.LIST.TABLE.STUDENT'  | translate }}</th>
+          <th>{{ 'SUBMISSIONS.LIST.TABLE.FILE'        | translate }}</th>
+          <th>{{ 'SUBMISSIONS.LIST.TABLE.SUBMITTED_AT'| translate }}</th>
+          <th>{{ 'SUBMISSIONS.LIST.TABLE.DUE_DATE'   | translate }}</th>
+          <th>{{ 'SUBMISSIONS.LIST.TABLE.STATUS'     | translate }}</th>
+          <th>{{ 'SUBMISSIONS.LIST.TABLE.GRADE'      | translate }}</th>
+          <th>{{ 'SUBMISSIONS.LIST.TABLE.COMMENT'    | translate }}</th>
+          <th *ngIf="canGrade">{{ 'SUBMISSIONS.LIST.TABLE.ACTIONS' | translate }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let s of displayedSubmissions">
+          <td *ngIf="canViewAll">{{ s.firstName }} {{ s.lastName }}</td>
+          <td>
+            <ng-container *ngIf="s.file_name && s.file_id; else noFile">
+              <a [href]="getFileUrl(s.file_id)" target="_blank">
+                <i class="fas fa-file-pdf"></i> {{ s.file_name }}
+              </a>
+            </ng-container>
+            <ng-template #noFile>—</ng-template>
+          </td>
+          <td>{{ s.created_at | date:'short' }}</td>
+          <td>
+            <ng-container *ngIf="postDueDate; else noDue">{{ postDueDate | date:'short' }}</ng-container>
+            <ng-template #noDue>—</ng-template>
+          </td>
+          <td>
+            <span class="badge"
+                  [ngClass]="{
+                    'badge--submitted': s.status==='submitted',
+                    'badge--late':      s.status==='late',
+                    'badge--graded':    s.status==='graded'
+                  }">
+              {{ ('SUBMISSIONS.STATUS.' + s.status.toUpperCase()) | translate }}
+            </span>
+          </td>
+          <td>{{ s.grade != null ? s.grade : '—' }}</td>
+          <td>{{ s.comment != null ? s.comment : '—' }}</td>
+          <td *ngIf="canGrade">
+            <button class="action-btn"
+                    *ngIf="s.status !== 'graded'"
+                    (click)="startGrading(s._id)">
+              <i class="fas fa-pen"></i>
+              {{ 'SUBMISSIONS.LIST.GRADE_BUTTON' | translate }}
+            </button>
+          </td>
+        </tr>
+        <tr *ngIf="displayedSubmissions.length === 0">
+          <td [attr.colspan]="canViewAll ? 8 : 7" class="no-rows">
+            <i class="fas fa-inbox"></i>
+            {{ canViewAll
+               ? ('SUBMISSIONS.LIST.NO_ALL'  | translate)
+               : ('SUBMISSIONS.LIST.NO_MINE' | translate)
+            }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 
-  <div *ngIf="gradingSubmissionId && canGrade" class="grading-form">
-    <h5>{{ 'SUBMISSIONS.GRADING.TITLE' | translate }}</h5>
-    <form [formGroup]="gradeForm" (ngSubmit)="submitGrade()">
-      <div>
+  <div *ngIf="gradingSubmissionId && canGrade" class="grading-form-card">
+    <header>
+      <h5><i class="fas fa-star"></i> {{ 'SUBMISSIONS.GRADING.TITLE' | translate }}</h5>
+    </header>
+    <form [formGroup]="gradeForm" (ngSubmit)="submitGrade()" class="grading-form">
+      <div class="form-group">
         <label for="grade">{{ 'SUBMISSIONS.GRADING.GRADE_LABEL' | translate }}</label>
-        <input
-          id="grade"
-          type="number"
-          formControlName="grade"
-          placeholder="{{ 'SUBMISSIONS.GRADING.GRADE_PLACEHOLDER' | translate }}"
-        />
-        <div
-          *ngIf="gradeForm.get('grade')?.touched && gradeForm.get('grade')?.invalid"
-          class="error"
-        >
+        <input id="grade" type="number" formControlName="grade" />
+        <div *ngIf="gradeForm.get('grade')?.invalid && gradeForm.get('grade')?.touched" class="error">
           {{ 'SUBMISSIONS.GRADING.GRADE_ERROR' | translate }}
         </div>
       </div>
-      <div>
+      <div class="form-group">
         <label for="comment">{{ 'SUBMISSIONS.GRADING.COMMENT_LABEL' | translate }}</label>
-        <textarea
-          id="comment"
-          formControlName="comment"
-          placeholder="{{ 'SUBMISSIONS.GRADING.COMMENT_PLACEHOLDER' | translate }}"
-        ></textarea>
-        <div
-          *ngIf="gradeForm.get('comment')?.touched && gradeForm.get('comment')?.invalid"
-          class="error"
-        >
+        <textarea id="comment" formControlName="comment"></textarea>
+        <div *ngIf="gradeForm.get('comment')?.invalid && gradeForm.get('comment')?.touched" class="error">
           {{ 'SUBMISSIONS.GRADING.COMMENT_ERROR' | translate }}
         </div>
       </div>
-      <button
-        type="submit"
-        [disabled]="gradeForm.invalid || gradingLoading"
-      >
-        {{ gradingLoading
-           ? ('SUBMISSIONS.GRADING.SAVING' | translate)
-           : ('SUBMISSIONS.GRADING.SAVE_BUTTON' | translate)
-        }}
-      </button>
-      <button type="button" (click)="cancelGrading()">
-        {{ 'SUBMISSIONS.GRADING.CANCEL_BUTTON' | translate }}
-      </button>
+      <div class="form-actions">
+        <button class="btn btn--primary" type="submit" [disabled]="gradeForm.invalid || gradingLoading">
+          <i class="fas" [ngClass]="gradingLoading ? 'fa-spinner fa-spin' : 'fa-save'"></i>
+          {{ gradingLoading 
+             ? ('SUBMISSIONS.GRADING.SAVING'       | translate)
+             : ('SUBMISSIONS.GRADING.SAVE_BUTTON' | translate)
+          }}
+        </button>
+        <button class="btn btn--secondary" type="button" (click)="cancelGrading()">
+          <i class="fas fa-times"></i>
+          {{ 'SUBMISSIONS.GRADING.CANCEL_BUTTON' | translate }}
+        </button>
+      </div>
+      <div *ngIf="gradingError" class="error">
+        <i class="fas fa-exclamation-circle"></i> {{ gradingError }}
+      </div>
     </form>
-    <div *ngIf="gradingError" class="error">
-      {{ gradingError }}
-    </div>
   </div>
 </div>
