@@ -1,34 +1,28 @@
-<!-- Loading state -->
+<!-- Loading -->
 <div *ngIf="loading" class="status">
   <i class="fas fa-spinner fa-spin"></i>
   {{ 'DASH.LOADING' | translate }}
 </div>
 
-<!-- Error state -->
+<!-- Error -->
 <div *ngIf="!loading && error" class="status status--error">
   <i class="fas fa-exclamation-triangle"></i>
   {{ error }}
 </div>
 
-<!-- Main content -->
-<ng-container *ngIf="!loading && overview as o">
+<ng-container *ngIf="!loading && overview">
 
   <!-- STUDENT VIEW -->
-  <ng-container *ngIf="o.role === 'student'">
-    <h2>
-      <i class="fas fa-graduation-cap"></i>
-      {{ 'DASH.MY_COURSES' | translate }}
-    </h2>
+  <ng-container *ngIf="role === 'student'">
+    <h2><i class="fas fa-graduation-cap"></i> {{ 'DASH.MY_COURSES' | translate }}</h2>
 
-    <!-- Empty-state -->
-    <div *ngIf="o.enrolledCourses.length === 0" class="empty">
+    <div *ngIf="enrolledCourses.length === 0" class="empty">
       <i class="fas fa-book-reader"></i>
       {{ 'DASH.NO_COURSES' | translate }}
     </div>
 
-    <!-- List -->
-    <ul *ngIf="o.enrolledCourses.length > 0" class="student-list">
-      <li *ngFor="let c of o.enrolledCourses">
+    <ul *ngIf="enrolledCourses.length > 0" class="student-list">
+      <li *ngFor="let c of enrolledCourses">
         <i class="fas fa-book-open"></i>
         {{ c.code }} — {{ c.title }}
         <div class="progress-bar">
@@ -40,17 +34,16 @@
   </ng-container>
 
   <!-- TEACHER VIEW -->
-  <ng-container *ngIf="o.role === 'teacher'">
-    <h2>
-      <i class="fas fa-chalkboard-teacher"></i>
-      {{ 'DASH.MY_CREATED_COURSES' | translate }}
-    </h2>
-    <div *ngIf="o.coursesCreated.length === 0" class="empty">
+  <ng-container *ngIf="role === 'teacher'">
+    <h2><i class="fas fa-chalkboard-teacher"></i> {{ 'DASH.MY_CREATED_COURSES' | translate }}</h2>
+
+    <div *ngIf="teacherCourses.length === 0" class="empty">
       <i class="fas fa-chalkboard"></i>
       {{ 'DASH.NO_CREATED_COURSES' | translate }}
     </div>
-    <ul *ngIf="o.coursesCreated.length > 0" class="teacher-list">
-      <li *ngFor="let c of o.coursesCreated">
+
+    <ul *ngIf="teacherCourses.length > 0" class="teacher-list">
+      <li *ngFor="let c of teacherCourses">
         <i class="fas fa-book"></i>
         {{ c.code }} — {{ c.title }}
         <span class="badge">
@@ -61,34 +54,33 @@
   </ng-container>
 
   <!-- ADMIN VIEW -->
-  <ng-container *ngIf="o.role === 'admin'">
-    <h2>
-      <i class="fas fa-tachometer-alt"></i>
-      {{ 'NAV.DASHBOARD' | translate }}
-    </h2>
+  <ng-container *ngIf="role === 'admin'">
+    <h2><i class="fas fa-tachometer-alt"></i> {{ 'NAV.DASHBOARD' | translate }}</h2>
+
     <section class="cards">
       <div class="card">
         <i class="fas fa-users fa-2x"></i>
         <div class="card-info">
           <h3>{{ 'DASH.USERS' | translate }}</h3>
-          <p>{{ o.totals.users }}</p>
+          <p>{{ adminTotals.users }}</p>
         </div>
       </div>
       <div class="card">
         <i class="fas fa-book fa-2x"></i>
         <div class="card-info">
           <h3>{{ 'DASH.COURSES' | translate }}</h3>
-          <p>{{ o.totals.courses }}</p>
+          <p>{{ adminTotals.courses }}</p>
         </div>
       </div>
       <div class="card">
         <i class="fas fa-file-alt fa-2x"></i>
         <div class="card-info">
           <h3>{{ 'DASH.POSTS' | translate }}</h3>
-          <p>{{ o.totals.posts }}</p>
+          <p>{{ adminTotals.posts }}</p>
         </div>
       </div>
     </section>
+
     <section class="charts">
       <div class="chart-card">
         <h3><i class="fas fa-file-upload"></i> {{ 'DASH.SUBMISSIONS' | translate }}</h3>
@@ -96,8 +88,8 @@
           baseChart
           [data]="submissionsData"
           [options]="submissionsOptions"
-          chartType="doughnut"
-        ></canvas>
+          chartType="doughnut">
+        </canvas>
       </div>
       <div class="chart-card">
         <h3><i class="fas fa-chart-bar"></i> {{ 'DASH.ACTIVITY_7D' | translate }}</h3>
@@ -105,8 +97,8 @@
           baseChart
           [data]="activityChartData"
           [options]="activityOptions"
-          chartType="bar"
-        ></canvas>
+          chartType="bar">
+        </canvas>
       </div>
     </section>
   </ng-container>
