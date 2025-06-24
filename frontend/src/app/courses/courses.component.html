@@ -23,9 +23,10 @@
 <div *ngIf="!loading && !error" class="courses-grid">
   <div *ngFor="let c of courses" class="course-card">
     <!-- Header: image or color via helper -->
-    <div class="course-card__header"
-         [ngStyle]="getHeaderStyle(c)">
-    </div>
+    <div
+      class="course-card__header"
+      [ngStyle]="getHeaderStyle(c)"
+    ></div>
 
     <!-- Body -->
     <div class="course-card__body">

@@ -1,44 +1,50 @@
 <!-- src/app/activity-log-list/activity-log-list.component.html -->
+
 <div class="activity-log-container">
-  <!-- Component title (translated) -->
   <h3>{{ 'ACTIVITY_LOG.TITLE' | translate }}</h3>
 
-  <!-- Loading indicator -->
-  <div *ngIf="loading" class="loading">
+  <div *ngIf="loading" class="status status--loading">
+    <i class="fas fa-spinner fa-spin"></i>
     {{ 'ACTIVITY_LOG.LOADING' | translate }}
   </div>
-
-  <!-- Error message (assumes error text is already translated or passed in) -->
-  <div *ngIf="error" class="error">
+  <div *ngIf="error" class="status status--error">
+    <i class="fas fa-exclamation-circle"></i>
     {{ error }}
   </div>
 
-  <!-- Table of logs -->
-  <table *ngIf="!loading && !error" class="activity-log-table">
-    <thead>
-      <tr>
-        <th>{{ 'ACTIVITY_LOG.TABLE.DATE_TIME' | translate }}</th>
-        <th>{{ 'ACTIVITY_LOG.TABLE.USER' | translate }}</th>
-        <th>{{ 'ACTIVITY_LOG.TABLE.ACTION' | translate }}</th>
-        <th>{{ 'ACTIVITY_LOG.TABLE.DETAILS' | translate }}</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let log of logs">
-        <td>{{ log.timestamp | date: 'short' }}</td>
-        <td>{{ log.userName }}</td>
-        <td>{{ log.actionLabel }}</td>
-        <td>
-          <ul class="details-list">
-            <li *ngFor="let d of log.details">{{ d }}</li>
-          </ul>
-        </td>
-      </tr>
-    </tbody>
-  </table>
+  <ul *ngIf="!loading && !error" class="user-group-list">
+    <li *ngFor="let g of groups; let i = index" class="user-group">
+      <div class="group-header" (click)="toggleGroup(i)">
+        <i class="fas"
+           [ngClass]="g.expanded ? 'fa-folder-open' : 'fa-folder'"></i>
+        {{ g.userName }}
+      </div>
 
-  <!-- “No logs” message when list is empty -->
-  <div *ngIf="!loading && logs.length === 0" class="no-logs">
+      <table *ngIf="g.expanded" class="activity-log-table">
+        <thead>
+          <tr>
+            <th>{{ 'ACTIVITY_LOG.TABLE.DATE_TIME' | translate }}</th>
+            <th>{{ 'ACTIVITY_LOG.TABLE.ACTION'    | translate }}</th>
+            <th>{{ 'ACTIVITY_LOG.TABLE.DETAILS'   | translate }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let log of g.logs">
+            <td>{{ log.timestamp | date:'short' }}</td>
+            <td>{{ log.actionLabel }}</td>
+            <td>
+              <ul class="details-list">
+                <li *ngFor="let d of log.details">{{ d }}</li>
+              </ul>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </li>
+  </ul>
+
+  <div *ngIf="!loading && groups.length === 0" class="no-logs">
+    <i class="fas fa-inbox"></i>
     {{ 'ACTIVITY_LOG.NO_LOGS' | translate }}
   </div>
 </div>

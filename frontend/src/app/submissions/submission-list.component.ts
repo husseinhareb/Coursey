@@ -23,7 +23,7 @@ import { TranslateModule } from '@ngx-translate/core';
 @Component({
   selector: 'app-submission-list',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule,TranslateModule],
+  imports: [CommonModule, ReactiveFormsModule, TranslateModule],
   templateUrl: `./submission-list.component.html`,
   styleUrl: './submission-list.component.css'
 
@@ -228,6 +228,26 @@ export class SubmissionListComponent implements OnInit {
           this.gradingLoading = false;
         }
       });
+  }
+
+  getFileIconClass(filename: string): string {
+    const ext = filename.split('.').pop()?.toLowerCase();
+    switch (ext) {
+      case 'pdf': return 'fa-file-pdf';
+      case 'doc':
+      case 'docx': return 'fa-file-word';
+      case 'xls':
+      case 'xlsx': return 'fa-file-excel';
+      case 'png':
+      case 'jpg':
+      case 'jpeg':
+      case 'gif': return 'fa-file-image';
+      case 'zip':
+      case 'rar':
+      case '7z': return 'fa-file-archive';
+      case 'txt': return 'fa-file-alt';
+      default: return 'fa-file';
+    }
   }
 
   /** Build the file download URL from the file ID */

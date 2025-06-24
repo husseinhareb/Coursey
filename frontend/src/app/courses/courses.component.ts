@@ -1,7 +1,9 @@
+// src/app/courses/courses.component.ts
 import { Component, OnInit }    from '@angular/core';
 import { CommonModule }          from '@angular/common';
 import { RouterModule, Router }  from '@angular/router';
 import { TranslateModule }       from '@ngx-translate/core';
+import { environment }           from '../environments/environment';
 
 import { CourseService, Course } from '../services/course.service';
 import { AuthService, Me }       from '../auth/auth.service';
@@ -11,7 +13,7 @@ import { AuthService, Me }       from '../auth/auth.service';
   standalone: true,
   imports: [CommonModule, RouterModule, TranslateModule],
   templateUrl: './courses.component.html',
-  styleUrl: './courses.component.css'
+  styleUrls: ['./courses.component.css']
 })
 export class CoursesComponent implements OnInit {
   courses: Course[] = [];
@@ -28,9 +30,9 @@ export class CoursesComponent implements OnInit {
   ngOnInit(): void {
     // Determine admin status
     const user: Me | null = this.auth.user;
-    this.isAdmin = user?.roles
+    this.isAdmin = !!user && user.roles
       .map(r => r.toLowerCase())
-      .includes('admin') || false;
+      .includes('admin');
 
     // Load courses
     this.fetch();
@@ -54,21 +56,31 @@ export class CoursesComponent implements OnInit {
     });
   }
 
-  /** 
-   * If background looks like an image URL → use as background-image,
-   * otherwise treat as solid color
+  /**
+   * If background is a “true” image URL (absolute or root-relative),
+   * use it as background-image (and prefix root-relative with API base).
+   * Otherwise fall back to a solid color.
    */
   getHeaderStyle(c: Course): { [key: string]: string } {
     const b = c.background || '';
-    const looksLikeImage = /\.(jpe?g|png|gif|svg)$/i.test(b)
-                         || b.startsWith('http');
-    if (looksLikeImage) {
+    const isAbsolute  = b.startsWith('http://') || b.startsWith('https://');
+    const isRelative  = b.startsWith('/');
+    const hasExt      = /\.(jpe?g|png|gif|svg)$/i.test(b);
+
+    if (isAbsolute || isRelative || hasExt) {
+      // build a proper URL:
+      const imageUrl = isRelative
+        ? `${environment.apiUrl}${b}`  // prefix with your API host
+        : b;
+
       return {
-        'background-image': `url(${b})`,
-        'background-size':  'cover',
+        'background-image'   : `url('${imageUrl}')`,
+        'background-size'    : 'cover',
         'background-position': 'center'
       };
     }
+
+    // not an image → treat as color
     return {
       'background-color': b || 'var(--color-primary)'
     };
