@@ -23,6 +23,7 @@ import { ForumThreadComponent } from './forum/forum-thread.component';
 
 import { AuthGuard } from './auth/auth.guard';
 import { UserDetailComponent } from './user-detail/user-detail.component';
+import { DashboardComponent } from './dashboard/dashboard.component';
 
 export const routes: Routes = [
   // Public landing & auth
@@ -47,7 +48,7 @@ export const routes: Routes = [
     component: ProfileComponent,
     canActivate: [AuthGuard]
   },
-    {
+  {
     path: 'register',
     component: RegisterComponent,
     canActivate: [AuthGuard]
@@ -128,6 +129,10 @@ export const routes: Routes = [
     path: 'users/:id',
     component: UserDetailComponent,
     canActivate: [AuthGuard]
+  },
+  //Dashboard
+  {
+    path: 'dashboard', component: DashboardComponent
   },
   // Fallback
   { path: '**', redirectTo: '' }

@@ -140,7 +140,10 @@
       {{ 'NAV.PROFILE' | translate }}
     </a>
 
-    <!-- New user info block -->
+    <a *ngIf="auth.isLoggedIn && isAdmin" routerLink="/dashboard" routerLinkActive="active" class="nav-link">
+      {{ 'NAV.DASHBOARD' | translate }}
+    </a>
+    <!-- user info block -->
     <div *ngIf="auth.isLoggedIn" class="user-container">
       <div class="avatar-wrapper">
         <img *ngIf="auth.user?.profile?.profilePic as pic" [src]="pic" alt="Avatar" />

@@ -1,0 +1,41 @@
+<!-- src/app/dashboard/dashboard.component.html -->
+<div *ngIf="error" class="status status--error">
+  {{ error }}
+</div>
+
+<div *ngIf="overview">
+  <h2>Tableau de bord</h2>
+
+  <section class="cards">
+    <div class="card">
+      <h3>Utilisateurs</h3>
+      <p>{{ overview.totals.users }}</p>
+    </div>
+    <div class="card">
+      <h3>Cours</h3>
+      <p>{{ overview.totals.courses }}</p>
+    </div>
+    <div class="card">
+      <h3>Publications</h3>
+      <p>{{ overview.totals.posts }}</p>
+    </div>
+  </section>
+
+  <section>
+    <h3>Soumissions</h3>
+    <ul>
+      <li *ngFor="let s of overview.submissions | keyvalue">
+        {{ s.key }}: {{ s.value }}
+      </li>
+    </ul>
+  </section>
+
+  <section>
+    <h3>Activités (7 derniers jours)</h3>
+    <ul>
+      <li *ngFor="let a of overview.activityLast7Days | keyvalue">
+        {{ a.key }}: {{ a.value }}
+      </li>
+    </ul>
+  </section>
+</div>

@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.routers import auth, course, user, post, submission, files
 from app.routers.activity import router as activity_router
 from app.routers.forum import router as forum_router
-
+from app.routers.dashboard import router as dashboard_router
 app = FastAPI()
 
 origins = [
@@ -29,3 +29,4 @@ app.include_router(submission.router)
 app.include_router(files.router)
 app.include_router(activity_router)
 app.include_router(forum_router) 
+app.include_router(dashboard_router)
