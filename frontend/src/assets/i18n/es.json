@@ -4,12 +4,13 @@
     "SELECT_LANGUAGE": "Idioma",
     "SIGN_UP": "Registrarse",
     "LOG_IN": "Iniciar sesión",
+    "LOG_OUT": "Cerrar sesión",
     "HOME": "Inicio",
     "USERS": "Usuarios",
     "COURSES": "Cursos",
-    "ACTIVITY_LOGS": "Registro de actividad",
+    "ACTIVITY_LOGS": "Registros de actividad",
     "PROFILE": "Perfil",
-    "LOG_OUT": "Cerrar sesión",
+    "DASHBOARD": "Panel de control",
     "SEARCH_PLACEHOLDER": "🔍 Buscar cursos, usuarios…",
     "SEARCH_COURSES": "Cursos",
     "SEARCH_USERS": "Usuarios",
@@ -30,8 +31,8 @@
   "LOGIN": {
     "TITLE": "Iniciar sesión",
     "EMAIL_LABEL": "Correo electrónico",
-    "EMAIL_PLACEHOLDER": "tú@ejemplo.com",
-    "EMAIL_ERROR": "Se requiere un correo válido.",
+    "EMAIL_PLACEHOLDER": "you@example.com",
+    "EMAIL_ERROR": "Correo electrónico inválido.",
     "PASSWORD_LABEL": "Contraseña",
     "PASSWORD_PLACEHOLDER": "••••••••",
     "PASSWORD_ERROR": "La contraseña es obligatoria.",
@@ -41,23 +42,25 @@
     "TITLE": "Mi perfil",
     "LOADING": "Cargando perfil…",
     "ERROR_LOADING": "Error al cargar el perfil.",
-    "AVATAR_ALT": "Avatar del usuario",
+    "AVATAR_ALT": "Avatar de usuario",
+    "UPLOAD_AVATAR": "Subir avatar",
     "EMAIL_LABEL": "Correo electrónico",
-    "EMAIL_PLACEHOLDER": "tú@ejemplo.com",
+    "EMAIL_PLACEHOLDER": "you@example.com",
     "USERNAME_LABEL": "Nombre de usuario",
     "FIRST_NAME_LABEL": "Nombre",
-    "FIRST_NAME_PLACEHOLDER": "Introducir nombre",
+    "FIRST_NAME_PLACEHOLDER": "Ingrese el nombre",
     "LAST_NAME_LABEL": "Apellido",
-    "LAST_NAME_PLACEHOLDER": "Introducir apellido",
+    "LAST_NAME_PLACEHOLDER": "Ingrese el apellido",
     "PHONE_LABEL": "Teléfono",
-    "PHONE_PLACEHOLDER": "Introducir número de teléfono",
+    "PHONE_PLACEHOLDER": "Ingrese el teléfono",
     "ADDRESS_LABEL": "Dirección",
-    "ADDRESS_PLACEHOLDER": "Introducir dirección",
+    "ADDRESS_PLACEHOLDER": "Ingrese la dirección",
     "ROLES_LABEL": "Roles",
+    "PERSONAL_INFO": "Información personal",
     "ENROLLED_LABEL": "Cursos inscritos",
-    "NO_ENROLLMENTS": "No hay cursos inscritos.",
+    "NO_ENROLLMENTS": "No estás inscrito en ningún curso.",
     "SAVE": "Guardar cambios",
-    "SUCCESS": "Perfil actualizado con éxito.",
+    "SUCCESS": "Perfil actualizado correctamente.",
     "UPDATE_ERROR": "Error al actualizar."
   },
   "COURSES": {
@@ -73,45 +76,45 @@
     },
     "EDIT": "Editar",
     "DELETE": "Eliminar",
-    "INFO": "Información"
+    "INFO": "Info"
   },
   "SIGNUP": {
     "TITLE": "Registrarse",
     "EMAIL_LABEL": "Correo electrónico",
-    "EMAIL_PLACEHOLDER": "tú@ejemplo.com",
-    "EMAIL_ERROR": "Se requiere un correo válido.",
+    "EMAIL_PLACEHOLDER": "you@example.com",
+    "EMAIL_ERROR": "Correo electrónico inválido.",
     "FIRST_NAME_LABEL": "Nombre",
-    "FIRST_NAME_PLACEHOLDER": "Introducir nombre",
+    "FIRST_NAME_PLACEHOLDER": "Ingrese el nombre",
     "FIRST_NAME_ERROR": "El nombre es obligatorio.",
     "LAST_NAME_LABEL": "Apellido",
-    "LAST_NAME_PLACEHOLDER": "Introducir apellido",
+    "LAST_NAME_PLACEHOLDER": "Ingrese el apellido",
     "LAST_NAME_ERROR": "El apellido es obligatorio.",
     "ROLE_LABEL": "Rol",
-    "ROLE_PLACEHOLDER": "Seleccionar un rol",
+    "ROLE_PLACEHOLDER": "Seleccione un rol",
     "ROLE_STUDENT": "Estudiante",
     "ROLE_PROFESSOR": "Profesor",
     "ROLE_ADMIN": "Administrador",
     "ROLE_ERROR": "Debe seleccionar un rol.",
     "SUBMIT": "Registrarse",
-    "SUCCESS": "¡Registro exitoso! Redirigiendo a inicio de sesión…"
+    "SUCCESS": "¡Registro exitoso!"
   },
   "POSTS": {
     "LOADING": "Cargando publicaciones…",
     "HOMEWORK_FLAG": "Tarea",
     "TYPE": "Tipo",
     "POSITION": "Posición",
-    "PINNED_AT": "Fijado el",
-    "DUE_DATE": "Fecha límite",
+    "PINNED_AT": "Fijado en",
+    "DUE_DATE": "Fecha de entrega",
     "PIN": "Fijar",
     "UNPIN": "Desfijar",
     "EDIT": "Editar",
     "DELETE": "Eliminar",
-    "SUBMIT_HW": "Enviar tarea",
-    "VIEW_MY_SUB": "Ver mi envío",
-    "HIDE_MY_SUB": "Ocultar mi envío",
+    "SUBMIT_HW": "Entregar tarea",
+    "VIEW_MY_SUB": "Ver mi entrega",
+    "HIDE_MY_SUB": "Ocultar mi entrega",
     "VIEW_ALL_SUB": "Ver todas las entregas",
     "HIDE_ALL_SUB": "Ocultar entregas",
-    "NO_POSTS": "No hay publicaciones disponibles."
+    "NO_POSTS": "No hay publicaciones."
   },
   "COURSE_DETAIL": {
     "LOADING": "Cargando curso…",
@@ -124,15 +127,15 @@
     "ADD_TITLE": "Agregar curso",
     "EDIT_TITLE": "Editar curso",
     "TITLE_LABEL": "Título",
-    "TITLE_PLACEHOLDER": "Introducir título del curso",
+    "TITLE_PLACEHOLDER": "Ingrese el título del curso",
     "CODE_LABEL": "Código",
     "CODE_PLACEHOLDER": "p.ej. CS101",
     "DESCRIPTION_LABEL": "Descripción",
-    "DESCRIPTION_PLACEHOLDER": "Introducir una breve descripción",
+    "DESCRIPTION_PLACEHOLDER": "Ingrese una descripción breve",
     "BACKGROUND_LABEL": "Fondo",
-    "BACKGROUND_PLACEHOLDER": "URL de imagen o color hexadecimal",
+    "BACKGROUND_PLACEHOLDER": "URL de imagen o color",
     "CREATE": "Crear curso",
-    "SAVE": "Guardar",
+    "SAVE": "Guardar cambios",
     "ERROR": "Error al guardar el curso."
   },
   "FORUM": {
@@ -140,41 +143,42 @@
     "NEW_TOPIC": "+ Nuevo tema",
     "CANCEL": "Cancelar",
     "TITLE_LABEL": "Título del tema",
-    "TITLE_PLACEHOLDER": "Introducir título",
+    "TITLE_PLACEHOLDER": "Ingrese el título",
     "TITLE_ERROR": "El título es obligatorio.",
     "CREATE_BUTTON": "Crear",
     "NO_CREATE_PERMISSION": "Solo los instructores inscritos pueden crear temas.",
     "LOADING": "Cargando temas…",
     "ERROR_LOADING": "Error al cargar temas.",
     "CREATED_BY": "Creado por",
-    "ON": "el",
+    "ON": "en",
     "MESSAGES_COUNT": "mensajes",
-    "NO_TOPICS": "Aún no hay temas."
+    "NO_TOPICS": "No hay temas aún."
   },
   "FORUM_THREAD": {
     "LOADING": "Cargando tema…",
     "ERROR": "Error al cargar el tema.",
     "CREATED_BY": "Creado por",
-    "ON": "el",
+    "ON": "en",
     "NO_MESSAGES": "No hay mensajes en este tema.",
     "ADD_REPLY": "Agregar respuesta",
     "CONTENT_PLACEHOLDER": "Tu mensaje…",
-    "CONTENT_ERROR": "El contenido es obligatorio si no se adjunta imagen.",
+    "CONTENT_ERROR": "El contenido es obligatorio si no hay imagen.",
     "ATTACH_IMAGE": "Adjuntar imagen…",
     "IMG_ALT": "Imagen adjunta",
     "SEND": "Enviar",
     "SENDING": "Enviando…"
   },
   "USERS": {
+    "ADD": "Agregar usuario",
     "LOADING": "Cargando usuarios…",
     "ERROR_LOADING": "Error al cargar usuarios.",
     "TABLE": {
       "AVATAR": "Avatar",
-      "AVATAR_ALT": "Avatar del usuario",
+      "AVATAR_ALT": "Avatar de usuario",
       "FIRST_NAME": "Nombre",
       "LAST_NAME": "Apellido",
-      "EMAIL": "Correo electrónico",
-      "USERNAME": "Nombre de usuario",
+      "EMAIL": "Correo",
+      "USERNAME": "Usuario",
       "PHONE": "Teléfono",
       "ADDRESS": "Dirección",
       "ROLES": "Roles",
@@ -189,7 +193,7 @@
       "TITLE": "Gestionar inscripciones",
       "LOADING": "Cargando…",
       "ERROR": "Error al cargar inscripciones.",
-      "CANNOT_ENROLL_ADMIN": "No se puede inscribir a un administrador en ningún curso.",
+      "CANNOT_ENROLL_ADMIN": "No se puede inscribir a un administrador.",
       "TABLE": {
         "COURSE": "Curso",
         "ENROLLED": "Inscrito"
@@ -199,20 +203,20 @@
   "USER_DETAIL": {
     "LOADING": "Cargando usuario…",
     "ERROR": "Error al cargar usuario.",
-    "AVATAR_ALT": "Avatar del usuario",
-    "EMAIL_LABEL": "Correo electrónico:",
+    "AVATAR_ALT": "Avatar de usuario",
+    "EMAIL_LABEL": "Correo:",
     "ROLES_LABEL": "Roles:",
     "ENROLLED_TITLE": "Cursos inscritos"
   },
   "SUBMISSIONS": {
     "LIST": {
       "TITLE_ALL": "Todas las entregas",
-      "TITLE_MINE": "Tus entregas",
+      "TITLE_MINE": "Mis entregas",
       "LOADING": "Cargando entregas…",
       "TABLE": {
         "STUDENT": "Estudiante",
         "FILE": "Archivo",
-        "SUBMITTED_AT": "Enviado el",
+        "SUBMITTED_AT": "Entregado el",
         "DUE_DATE": "Fecha límite",
         "STATUS": "Estado",
         "GRADE": "Calificación",
@@ -220,12 +224,12 @@
         "ACTIONS": "Acciones",
         "GRADE_BUTTON": "Calificar"
       },
-      "NO_ALL": "Aún no hay entregas.",
-      "NO_MINE": "No has enviado nada."
+      "NO_ALL": "No hay entregas aún.",
+      "NO_MINE": "No has entregado nada."
     },
     "STATUS": {
-      "SUBMITTED": "Enviado",
-      "LATE": "Atrasado",
+      "SUBMITTED": "Entregado",
+      "LATE": "Tarde",
       "GRADED": "Calificado"
     },
     "GRADING": {
@@ -240,5 +244,34 @@
       "SAVING": "Guardando…",
       "CANCEL_BUTTON": "Cancelar"
     }
+  },
+  "SUBMISSION_FORM": {
+    "TITLE": "Nueva entrega",
+    "CHOOSE_FILE": "Seleccionar archivo",
+    "SUBMIT": "Enviar",
+    "SUBMITTING": "Enviando…",
+    "CANCEL": "Cancelar"
+  },
+  "SUBMISSION": {
+    "FORM": {
+      "TITLE": "Entregar tarea",
+      "LABEL": "Seleccionar archivo",
+      "SENDING": "Enviando…",
+      "SUBMIT": "Enviar",
+      "CANCEL": "Cancelar"
+    }
+  },
+  "DASH": {
+    "LOADING": "Cargando…",
+    "MY_COURSES": "Mis cursos",
+    "NO_COURSES": "No estás inscrito en ningún curso.",
+    "MY_CREATED_COURSES": "Cursos creados",
+    "NO_CREATED_COURSES": "No has creado cursos.",
+    "STUDENTS": "Estudiantes",
+    "USERS": "Usuarios",
+    "COURSES": "Cursos",
+    "POSTS": "Publicaciones",
+    "SUBMISSIONS": "Entregas",
+    "ACTIVITY_7D": "Actividad (últimos 7 días)"
   }
 }

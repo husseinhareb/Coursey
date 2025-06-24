@@ -4,12 +4,13 @@
     "SELECT_LANGUAGE": "语言",
     "SIGN_UP": "注册",
     "LOG_IN": "登录",
+    "LOG_OUT": "登出",
     "HOME": "首页",
     "USERS": "用户",
     "COURSES": "课程",
     "ACTIVITY_LOGS": "活动日志",
     "PROFILE": "个人资料",
-    "LOG_OUT": "登出",
+    "DASHBOARD": "仪表板",
     "SEARCH_PLACEHOLDER": "🔍 搜索课程、用户…",
     "SEARCH_COURSES": "课程",
     "SEARCH_USERS": "用户",
@@ -17,8 +18,8 @@
     "SEARCH_NONE": "未找到结果"
   },
   "ACTIVITY_LOG": {
-    "TITLE": "活动记录",
-    "LOADING": "加载日志…",
+    "TITLE": "活动历史",
+    "LOADING": "正在加载日志…",
     "TABLE": {
       "DATE_TIME": "日期和时间",
       "USER": "用户",
@@ -30,34 +31,36 @@
   "LOGIN": {
     "TITLE": "登录",
     "EMAIL_LABEL": "电子邮件",
-    "EMAIL_PLACEHOLDER": "你@例子.com",
-    "EMAIL_ERROR": "需要有效的电子邮件。",
+    "EMAIL_PLACEHOLDER": "you@example.com",
+    "EMAIL_ERROR": "无效的电子邮件。",
     "PASSWORD_LABEL": "密码",
     "PASSWORD_PLACEHOLDER": "••••••••",
-    "PASSWORD_ERROR": "需要输入密码。",
+    "PASSWORD_ERROR": "密码为必填项。",
     "SUBMIT": "登录"
   },
   "PROFILE": {
     "TITLE": "我的资料",
-    "LOADING": "加载资料…",
-    "ERROR_LOADING": "资料加载失败。",
+    "LOADING": "正在加载资料…",
+    "ERROR_LOADING": "加载个人资料失败。",
     "AVATAR_ALT": "用户头像",
+    "UPLOAD_AVATAR": "上传头像",
     "EMAIL_LABEL": "电子邮件",
-    "EMAIL_PLACEHOLDER": "你@例子.com",
+    "EMAIL_PLACEHOLDER": "you@example.com",
     "USERNAME_LABEL": "用户名",
     "FIRST_NAME_LABEL": "名",
-    "FIRST_NAME_PLACEHOLDER": "输入名字",
+    "FIRST_NAME_PLACEHOLDER": "输入名",
     "LAST_NAME_LABEL": "姓",
-    "LAST_NAME_PLACEHOLDER": "输入姓氏",
+    "LAST_NAME_PLACEHOLDER": "输入姓",
     "PHONE_LABEL": "电话",
-    "PHONE_PLACEHOLDER": "输入电话号码",
+    "PHONE_PLACEHOLDER": "输入电话",
     "ADDRESS_LABEL": "地址",
     "ADDRESS_PLACEHOLDER": "输入地址",
     "ROLES_LABEL": "角色",
-    "ENROLLED_LABEL": "已选课程",
-    "NO_ENROLLMENTS": "暂无已选课程。",
-    "SAVE": "保存",
-    "SUCCESS": "资料更新成功。",
+    "PERSONAL_INFO": "个人信息",
+    "ENROLLED_LABEL": "已注册课程",
+    "NO_ENROLLMENTS": "未注册任何课程。",
+    "SAVE": "保存更改",
+    "SUCCESS": "个人资料更新成功。",
     "UPDATE_ERROR": "更新失败。"
   },
   "COURSES": {
@@ -66,37 +69,37 @@
     "LOADING": "加载中…",
     "TABLE": {
       "TITLE": "标题",
-      "CODE": "编号",
+      "CODE": "代码",
       "DESCRIPTION": "描述",
       "BACKGROUND": "背景",
       "ACTIONS": "操作"
     },
     "EDIT": "编辑",
     "DELETE": "删除",
-    "INFO": "信息"
+    "INFO": "详情"
   },
   "SIGNUP": {
     "TITLE": "注册",
     "EMAIL_LABEL": "电子邮件",
-    "EMAIL_PLACEHOLDER": "你@例子.com",
-    "EMAIL_ERROR": "需要有效的电子邮件。",
+    "EMAIL_PLACEHOLDER": "you@example.com",
+    "EMAIL_ERROR": "无效的电子邮件。",
     "FIRST_NAME_LABEL": "名",
-    "FIRST_NAME_PLACEHOLDER": "输入名字",
-    "FIRST_NAME_ERROR": "名不能为空。",
+    "FIRST_NAME_PLACEHOLDER": "输入名",
+    "FIRST_NAME_ERROR": "名为必填项。",
     "LAST_NAME_LABEL": "姓",
-    "LAST_NAME_PLACEHOLDER": "输入姓氏",
-    "LAST_NAME_ERROR": "姓不能为空。",
+    "LAST_NAME_PLACEHOLDER": "输入姓",
+    "LAST_NAME_ERROR": "姓为必填项。",
     "ROLE_LABEL": "角色",
-    "ROLE_PLACEHOLDER": "请选择角色",
+    "ROLE_PLACEHOLDER": "选择角色",
     "ROLE_STUDENT": "学生",
     "ROLE_PROFESSOR": "教师",
     "ROLE_ADMIN": "管理员",
     "ROLE_ERROR": "必须选择一个角色。",
     "SUBMIT": "注册",
-    "SUCCESS": "注册成功！正在跳转到登录…"
+    "SUCCESS": "注册成功！"
   },
   "POSTS": {
-    "LOADING": "加载帖子…",
+    "LOADING": "正在加载帖子…",
     "HOMEWORK_FLAG": "作业",
     "TYPE": "类型",
     "POSITION": "位置",
@@ -110,12 +113,12 @@
     "VIEW_MY_SUB": "查看我的提交",
     "HIDE_MY_SUB": "隐藏我的提交",
     "VIEW_ALL_SUB": "查看所有提交",
-    "HIDE_ALL_SUB": "隐藏所有提交",
+    "HIDE_ALL_SUB": "隐藏提交",
     "NO_POSTS": "暂无帖子。"
   },
   "COURSE_DETAIL": {
-    "LOADING": "加载课程…",
-    "ERROR": "课程加载失败。",
+    "LOADING": "正在加载课程…",
+    "ERROR": "加载课程失败。",
     "VIEW_FORUM": "查看课程论坛",
     "ADD_POST": "+ 添加帖子",
     "EDIT_POST": "编辑帖子"
@@ -125,40 +128,40 @@
     "EDIT_TITLE": "编辑课程",
     "TITLE_LABEL": "标题",
     "TITLE_PLACEHOLDER": "输入课程标题",
-    "CODE_LABEL": "编号",
+    "CODE_LABEL": "代码",
     "CODE_PLACEHOLDER": "例如 CS101",
     "DESCRIPTION_LABEL": "描述",
-    "DESCRIPTION_PLACEHOLDER": "输入简要描述",
+    "DESCRIPTION_PLACEHOLDER": "输入简短描述",
     "BACKGROUND_LABEL": "背景",
-    "BACKGROUND_PLACEHOLDER": "图片 URL 或 十六进制颜色",
+    "BACKGROUND_PLACEHOLDER": "图像 URL 或颜色",
     "CREATE": "创建课程",
-    "SAVE": "保存",
-    "ERROR": "课程保存失败。"
+    "SAVE": "保存更改",
+    "ERROR": "保存课程失败。"
   },
   "FORUM": {
-    "LIST_TITLE": "论坛 / 主题",
-    "NEW_TOPIC": "+ 新主题",
+    "LIST_TITLE": "论坛 / 话题",
+    "NEW_TOPIC": "+ 新建话题",
     "CANCEL": "取消",
-    "TITLE_LABEL": "主题标题",
+    "TITLE_LABEL": "话题标题",
     "TITLE_PLACEHOLDER": "输入标题",
     "TITLE_ERROR": "标题为必填项。",
     "CREATE_BUTTON": "创建",
-    "NO_CREATE_PERMISSION": "只有已选教师可创建主题。",
-    "LOADING": "加载主题…",
-    "ERROR_LOADING": "主题加载失败。",
+    "NO_CREATE_PERMISSION": "仅已注册的教师可创建话题。",
+    "LOADING": "加载话题中…",
+    "ERROR_LOADING": "加载话题失败。",
     "CREATED_BY": "创建者",
     "ON": "于",
     "MESSAGES_COUNT": "条消息",
-    "NO_TOPICS": "暂无主题。"
+    "NO_TOPICS": "暂无话题。"
   },
   "FORUM_THREAD": {
-    "LOADING": "加载主题…",
-    "ERROR": "主题加载失败。",
+    "LOADING": "加载话题…",
+    "ERROR": "加载话题失败。",
     "CREATED_BY": "创建者",
     "ON": "于",
-    "NO_MESSAGES": "该主题暂无消息。",
+    "NO_MESSAGES": "此话题暂无消息。",
     "ADD_REPLY": "添加回复",
-    "CONTENT_PLACEHOLDER": "你的消息…",
+    "CONTENT_PLACEHOLDER": "您的消息…",
     "CONTENT_ERROR": "若未附加图片，内容为必填项。",
     "ATTACH_IMAGE": "附加图片…",
     "IMG_ALT": "附加图片",
@@ -166,8 +169,9 @@
     "SENDING": "发送中…"
   },
   "USERS": {
-    "LOADING": "加载用户…",
-    "ERROR_LOADING": "用户加载失败。",
+    "ADD": "添加用户",
+    "LOADING": "加载用户中…",
+    "ERROR_LOADING": "加载用户失败。",
     "TABLE": {
       "AVATAR": "头像",
       "AVATAR_ALT": "用户头像",
@@ -180,40 +184,40 @@
       "ROLES": "角色",
       "CREATED_AT": "创建于",
       "UPDATED_AT": "更新于",
-      "ENROLLMENTS": "已选课程",
-      "NO_ENROLLMENTS": "— 无已选课程 —",
+      "ENROLLMENTS": "注册情况",
+      "NO_ENROLLMENTS": "— 暂无注册 —",
       "ACTIONS": "操作",
-      "MANAGE_ENROLLMENT": "管理选课"
+      "MANAGE_ENROLLMENT": "管理注册"
     },
     "MANAGE_ENROLLMENTS": {
-      "TITLE": "管理选课",
+      "TITLE": "管理注册",
       "LOADING": "加载中…",
-      "ERROR": "选课加载失败。",
-      "CANNOT_ENROLL_ADMIN": "管理员无法选课。",
+      "ERROR": "加载注册失败。",
+      "CANNOT_ENROLL_ADMIN": "无法为管理员添加课程。",
       "TABLE": {
         "COURSE": "课程",
-        "ENROLLED": "已选"
+        "ENROLLED": "已注册"
       }
     }
   },
   "USER_DETAIL": {
     "LOADING": "加载用户…",
-    "ERROR": "用户加载失败。",
+    "ERROR": "加载用户失败。",
     "AVATAR_ALT": "用户头像",
     "EMAIL_LABEL": "电子邮件：",
     "ROLES_LABEL": "角色：",
-    "ENROLLED_TITLE": "已选课程"
+    "ENROLLED_TITLE": "已注册课程"
   },
   "SUBMISSIONS": {
     "LIST": {
       "TITLE_ALL": "所有提交",
       "TITLE_MINE": "我的提交",
-      "LOADING": "加载提交…",
+      "LOADING": "加载提交中…",
       "TABLE": {
         "STUDENT": "学生",
         "FILE": "文件",
         "SUBMITTED_AT": "提交于",
-        "DUE_DATE": "截止日期",
+        "DUE_DATE": "截止于",
         "STATUS": "状态",
         "GRADE": "分数",
         "COMMENT": "评论",
@@ -221,11 +225,11 @@
         "GRADE_BUTTON": "评分"
       },
       "NO_ALL": "暂无提交。",
-      "NO_MINE": "你还未提交任何内容。"
+      "NO_MINE": "您尚未提交任何内容。"
     },
     "STATUS": {
       "SUBMITTED": "已提交",
-      "LATE": "已迟交",
+      "LATE": "迟交",
       "GRADED": "已评分"
     },
     "GRADING": {
@@ -234,11 +238,40 @@
       "GRADE_PLACEHOLDER": "例如 85",
       "GRADE_ERROR": "分数必须在 0 到 100 之间。",
       "COMMENT_LABEL": "评论：",
-      "COMMENT_PLACEHOLDER": "你的评论…",
+      "COMMENT_PLACEHOLDER": "您的评论…",
       "COMMENT_ERROR": "评论为必填项。",
       "SAVE_BUTTON": "保存评分",
       "SAVING": "保存中…",
       "CANCEL_BUTTON": "取消"
     }
+  },
+  "SUBMISSION_FORM": {
+    "TITLE": "新提交",
+    "CHOOSE_FILE": "选择文件",
+    "SUBMIT": "提交",
+    "SUBMITTING": "提交中…",
+    "CANCEL": "取消"
+  },
+  "SUBMISSION": {
+    "FORM": {
+      "TITLE": "提交作业",
+      "LABEL": "选择文件",
+      "SENDING": "发送中…",
+      "SUBMIT": "发送",
+      "CANCEL": "取消"
+    }
+  },
+  "DASH": {
+    "LOADING": "加载中…",
+    "MY_COURSES": "我的课程",
+    "NO_COURSES": "暂无注册课程。",
+    "MY_CREATED_COURSES": "我创建的课程",
+    "NO_CREATED_COURSES": "您尚未创建任何课程。",
+    "STUDENTS": "学生",
+    "USERS": "用户",
+    "COURSES": "课程",
+    "POSTS": "帖子",
+    "SUBMISSIONS": "提交",
+    "ACTIVITY_7D": "活动（过去7天）"
   }
 }
