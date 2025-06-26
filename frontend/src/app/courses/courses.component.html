@@ -1,9 +1,21 @@
-<!-- Page header -->
+<!-- Page header with title, search, and Add button -->
 <div class="courses-header">
   <h2>{{ 'COURSES.TITLE' | translate }}</h2>
-  <a *ngIf="isAdmin"
-     routerLink="/courses/add"
-     class="btn btn--add">
+
+  <div class="search-wrapper">
+    <input
+      type="text"
+      class="search-input"
+      [(ngModel)]="searchQuery"
+      placeholder="{{ 'COURSES.SEARCH_PLACEHOLDER' | translate }}"
+    />
+  </div>
+
+  <a
+    *ngIf="isAdmin"
+    routerLink="/courses/add"
+    class="btn btn--add"
+  >
     <i class="fa-solid fa-plus"></i>
     {{ 'COURSES.ADD' | translate }}
   </a>
@@ -19,27 +31,20 @@
 
 <!-- Courses grid -->
 <div *ngIf="!loading && !error" class="courses-grid">
-  <div *ngFor="let c of courses" class="course-card">
-    <!-- Entire header+body clickable -->
-    <a
-      class="course-card__link"
-      [routerLink]="['/courses', c.id]"
-    >
-      <!-- Header (image/color) -->
+  <div
+    *ngFor="let c of filteredCourses"
+    class="course-card"
+  >
+    <a class="course-card__link" [routerLink]="['/courses', c.id]">
       <div
         class="course-card__header"
         [ngStyle]="getHeaderStyle(c)"
       ></div>
-
-      <!-- Body -->
       <div class="course-card__body">
         <h3 class="course-card__title">{{ c.title }}</h3>
         <p class="course-card__code">{{ c.code }}</p>
-        <p class="course-card__desc">{{ c.description }}</p>
       </div>
     </a>
-
-    <!-- Action buttons -->
     <div class="course-card__actions">
       <button
         class="btn btn--info"

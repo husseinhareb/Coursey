@@ -1,40 +1,176 @@
-/* student */
-.student-list, .teacher-list {
-  list-style: none;
-  padding: 0;
+/*====================================
+  Dashboard Component Styles
+====================================*/
+
+/* Container & Status */
+:host {
+  display: block;
+  padding: var(--spacing-lg) var(--spacing-md);
+  background: var(--color-bg);
+  color: var(--color-text);
 }
-.student-list li, .teacher-list li {
+.status {
   display: flex;
   align-items: center;
-  gap: .5rem;
-  margin: .75rem 0;
+  gap: var(--spacing-xs);
+  margin-bottom: var(--spacing-md);
+  font-size: var(--font-size-base);
+  color: var(--color-muted);
 }
-.progress-bar {
-  flex: 1;
-  background: #eee;
-  border-radius: 4px;
-  overflow: hidden;
-  margin: 0 .5rem;
-  height: 8px;
+.status i {
+  font-size: 1.2rem;
 }
-.progress-bar .fill {
-  background: var(--color-primary);
-  height: 100%;
-  transition: width .3s;
-}
-.badge {
-  background: var(--color-primary);
-  color: white;
-  padding: .25rem .5rem;
-  border-radius: 12px;
-  font-size: .85rem;
+.status--error {
+  color: var(--color-error);
 }
 
-/* teacher/student headings */
+/* Section Headings */
 h2 {
   display: flex;
   align-items: center;
-  gap: .5rem;
-  margin-bottom: 1rem;
-  font-size: 1.25rem;
+  gap: var(--spacing-xs);
+  font-size: var(--font-size-lg);
+  margin: var(--spacing-lg) 0 var(--spacing-md);
+  color: var(--color-primary);
+}
+h2 i {
+  font-size: 1.5rem;
+}
+
+/* Empty State */
+.empty {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md);
+  background: var(--color-surface);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--border-radius);
+  color: var(--color-muted);
+}
+.empty i {
+  font-size: 1.5rem;
+}
+
+/* Student List */
+.student-list,
+.teacher-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--spacing-md);
+}
+.student-list li,
+.teacher-list li {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--color-surface);
+  border-radius: var(--border-radius);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+.student-list li i,
+.teacher-list li i {
+  font-size: 1.2rem;
+  color: var(--color-primary);
+}
+.student-list small {
+  margin-left: auto;
+  font-size: var(--font-size-sm);
+  color: var(--color-muted);
+}
+
+/* Progress Bar */
+.progress-bar {
+  flex: 1;
+  height: 0.5rem;
+  background: var(--color-border);
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  margin: 0 var(--spacing-sm);
+}
+.progress-bar .fill {
+  height: 100%;
+  background: var(--color-success);
+  transition: width 0.3s ease;
+}
+
+/* Teacher Badge */
+.teacher-list .badge {
+  margin-left: auto;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background: var(--color-secondary);
+  color: #fff;
+  border-radius: var(--border-radius);
+  font-size: var(--font-size-sm);
+}
+
+/* Admin Cards Section */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+}
+.card {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  background: var(--color-surface);
+  border-radius: var(--border-radius);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  transition: transform var(--transition-speed), box-shadow var(--transition-speed);
+}
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+.card i {
+  color: var(--color-primary);
+}
+.card-info h3 {
+  margin: 0;
+  font-size: 1rem;
+  color: var(--color-text);
+}
+.card-info p {
+  margin: var(--spacing-xs) 0 0;
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  color: var(--color-secondary);
+}
+
+/* Charts Section */
+.charts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--spacing-lg);
+}
+.chart-card {
+  padding: var(--spacing-md);
+  background: var(--color-surface);
+  border-radius: var(--border-radius);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+.chart-card h3 {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  margin: 0 0 var(--spacing-md);
+  font-size: var(--font-size-base);
+  color: var(--color-text);
+}
+.chart-card h3 i {
+  font-size: 1.2rem;
+  color: var(--color-info);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .cards, .charts, .student-list, .teacher-list {
+    grid-template-columns: 1fr;
+  }
 }

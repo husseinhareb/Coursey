@@ -65,7 +65,7 @@
   },
   "COURSES": {
     "TITLE": "课程",
-    "ADD": "+ 添加课程",
+    "ADD": "添加课程",
     "LOADING": "加载中…",
     "TABLE": {
       "TITLE": "标题",

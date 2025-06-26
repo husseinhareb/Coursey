@@ -65,7 +65,7 @@
   },
   "COURSES": {
     "TITLE": "Cours",
-    "ADD": "+ Ajouter un cours",
+    "ADD": "Ajouter un cours",
     "LOADING": "Chargement…",
     "TABLE": {
       "TITLE": "Titre",
