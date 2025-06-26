@@ -1,36 +1,47 @@
-<!-- src/app/users/manage-enrollments.component.html -->
-
 <h2>{{ 'USERS.MANAGE_ENROLLMENTS.TITLE' | translate }}</h2>
 
 <div *ngIf="loading" class="status">
+  <i class="fas fa-spinner fa-spin"></i>
   {{ 'USERS.MANAGE_ENROLLMENTS.LOADING' | translate }}
 </div>
+
 <div *ngIf="error" class="status status--error">
+  <i class="fas fa-exclamation-triangle"></i>
   {{ error }}
 </div>
 
 <div *ngIf="!loading && isTargetAdmin" class="warning">
+  <i class="fas fa-user-shield"></i>
   {{ 'USERS.MANAGE_ENROLLMENTS.CANNOT_ENROLL_ADMIN' | translate }}
 </div>
 
-<table *ngIf="!loading && !isTargetAdmin" class="enroll-table">
-  <thead>
-    <tr>
-      <th>{{ 'USERS.MANAGE_ENROLLMENTS.TABLE.COURSE'   | translate }}</th>
-      <th>{{ 'USERS.MANAGE_ENROLLMENTS.TABLE.ENROLLED' | translate }}</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr *ngFor="let c of courses">
-      <td>{{ c.title }}</td>
-      <td>
-        <input
-          type="checkbox"
-          #cb
-          [checked]="enrollments.has(c.id)"
-          (change)="toggle(c.id, cb.checked)"
-        />
-      </td>
-    </tr>
-  </tbody>
-</table>
+<div *ngIf="!loading && !isTargetAdmin" class="enroll-grid">
+  <div
+    *ngFor="let c of courses"
+    class="course-card"
+    [class.enrolled]="enrollments.has(c.id)"
+  >
+    <div class="course-info">
+      <span class="course-code">{{ c.code }}</span>
+      <span class="course-title">{{ c.title }}</span>
+    </div>
+    <button
+      class="btn btn--chip"
+      (click)="toggle(c.id, !enrollments.has(c.id))"
+    >
+      <i
+        class="fas"
+        [ngClass]="
+          enrollments.has(c.id)
+            ? 'fa-user-minus'
+            : 'fa-user-plus'
+        "
+      ></i>
+      {{
+        enrollments.has(c.id)
+          ? ('USERS.MANAGE_ENROLLMENTS.TABLE.ENROLLED' | translate)
+          : ('USERS.MANAGE_ENROLLMENTS.ENROLL'        | translate)
+      }}
+    </button>
+  </div>
+</div>
