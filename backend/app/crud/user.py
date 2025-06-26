@@ -185,3 +185,12 @@ async def list_users_by_course(course_id: str) -> List[EnrollmentUser]:
         out.append(EnrollmentUser(**raw))
 
     return out
+
+async def delete_user(user_id: str) -> bool:
+    """Remove a user document entirely."""
+    try:
+        oid = ObjectId(user_id)
+    except Exception:
+        return False
+    res = await users_collection.delete_one({"_id": oid})
+    return res.deleted_count == 1

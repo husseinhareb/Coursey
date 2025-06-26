@@ -71,7 +71,7 @@ export class UserService {
   unenroll(userId: string, courseId: string): Observable<any> {
     return this.http.delete(`${this.base}/${userId}/enrollments/${courseId}`);
   }
-    getById(userId: string): Observable<User> {
+  getById(userId: string): Observable<User> {
     return this.http
       .get<any>(`${this.base}/${userId}`)
       .pipe(
@@ -85,4 +85,9 @@ export class UserService {
         })
       );
   }
+  deleteUser(userId: string): Observable<void> {
+    // Calls DELETE /users/{userId}
+    return this.http.delete<void>(`${this.base}/${userId}`);
+  }
+
 }

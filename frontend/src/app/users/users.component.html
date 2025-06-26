@@ -19,18 +19,18 @@
   <table class="users-table">
     <thead>
       <tr>
-        <th></th>
-        <th><i class="fas fa-id-badge"></i> {{ 'USERS.TABLE.FIRST_NAME'   | translate }}</th>
-        <th><i class="fas fa-id-badge"></i> {{ 'USERS.TABLE.LAST_NAME'    | translate }}</th>
-        <th><i class="fas fa-envelope"></i> {{ 'USERS.TABLE.EMAIL'        | translate }}</th>
-        <th><i class="fas fa-at"></i> {{ 'USERS.TABLE.USERNAME'     | translate }}</th>
-        <th><i class="fas fa-phone"></i> {{ 'USERS.TABLE.PHONE'        | translate }}</th>
-        <th><i class="fas fa-map-marker-alt"></i> {{ 'USERS.TABLE.ADDRESS'      | translate }}</th>
-        <th><i class="fas fa-user-tag"></i> {{ 'USERS.TABLE.ROLES'        | translate }}</th>
-        <th><i class="fas fa-calendar-plus"></i> {{ 'USERS.TABLE.CREATED_AT'   | translate }}</th>
-        <th><i class="fas fa-calendar-check"></i> {{ 'USERS.TABLE.UPDATED_AT'   | translate }}</th>
-        <th><i class="fas fa-book-open"></i> {{ 'USERS.TABLE.ENROLLMENTS'  | translate }}</th>
-        <th><i class="fas fa-cogs"></i> {{ 'USERS.TABLE.ACTIONS'      | translate }}</th>
+        <th><i class="fa-solid fa-user"></i></th>
+        <th><i class="fas fa-id-badge"></i> {{ 'USERS.TABLE.FIRST_NAME' | translate }}</th>
+        <th><i class="fas fa-id-badge"></i> {{ 'USERS.TABLE.LAST_NAME' | translate }}</th>
+        <th><i class="fas fa-envelope"></i> {{ 'USERS.TABLE.EMAIL' | translate }}</th>
+        <th><i class="fas fa-at"></i> {{ 'USERS.TABLE.USERNAME' | translate }}</th>
+        <th><i class="fas fa-phone"></i> {{ 'USERS.TABLE.PHONE' | translate }}</th>
+        <th><i class="fas fa-map-marker-alt"></i> {{ 'USERS.TABLE.ADDRESS' | translate }}</th>
+        <th><i class="fas fa-user-tag"></i> {{ 'USERS.TABLE.ROLES' | translate }}</th>
+        <th><i class="fas fa-calendar-plus"></i> {{ 'USERS.TABLE.CREATED_AT' | translate }}</th>
+        <th><i class="fas fa-calendar-check"></i> {{ 'USERS.TABLE.UPDATED_AT' | translate }}</th>
+        <th><i class="fas fa-book-open"></i> {{ 'USERS.TABLE.ENROLLMENTS' | translate }}</th>
+        <th><i no enroll class="fas fa-cogs"></i> {{ 'USERS.TABLE.ACTIONS' | translate }}</th>
       </tr>
     </thead>
     <tbody>
@@ -38,17 +38,15 @@
         <!-- Avatar / Initials -->
         <td class="avatar-cell">
           <div class="avatar-wrapper">
-            <img
-              *ngIf="u.profile.profilePic; else initialsTpl"
-              [src]="u.profile.profilePic"
+            <img *ngIf="u.profile.profilePic; else initialsTpl" [src]="u.profile.profilePic"
               alt="{{ 'USERS.TABLE.AVATAR_ALT' | translate }}" />
             <ng-template #initialsTpl>
               <span class="avatar-initials">
                 {{
-                  (
-                    (u.profile.firstName || '').charAt(0) +
-                    (u.profile.lastName  || '').charAt(0)
-                  ).toUpperCase()
+                (
+                (u.profile.firstName || '').charAt(0) +
+                (u.profile.lastName || '').charAt(0)
+                ).toUpperCase()
                 }}
               </span>
             </ng-template>
@@ -60,10 +58,10 @@
         <td>{{ u.email }}</td>
         <td>{{ u.username }}</td>
         <td>{{ u.profile.phoneNumber || '-' }}</td>
-        <td>{{ u.profile.address       || '-' }}</td>
+        <td>{{ u.profile.address || '-' }}</td>
         <td>{{ u.roles.length ? u.roles.join(', ') : '-' }}</td>
-        <td>{{ u.createdAt  | date:'short' }}</td>
-        <td>{{ u.updatedAt  | date:'short' }}</td>
+        <td>{{ u.createdAt | date:'short' }}</td>
+        <td>{{ u.updatedAt | date:'short' }}</td>
 
         <!-- Enrollments -->
         <td>
@@ -87,6 +85,11 @@
             <i class="fas fa-user-edit"></i>
             {{ 'USERS.TABLE.MANAGE_ENROLLMENT' | translate }}
           </a>
+          <button *ngIf="isAdmin" class="action-link btn--delete-user"
+            (click)="onDeleteUser(u.id); $event.stopPropagation()">
+            <i class="fas fa-user-slash"></i>
+            {{ 'USERS.TABLE.DELETE_USER' | translate }}
+          </button>
         </td>
       </tr>
     </tbody>

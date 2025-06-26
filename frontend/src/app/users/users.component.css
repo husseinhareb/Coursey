@@ -15,6 +15,7 @@
   padding: var(--spacing-sm) var(--spacing-md);
   border-radius: var(--border-radius);
   font-weight: 600;
+  margin: 10px;
   text-decoration: none;
   transition: background-color var(--transition-speed), transform var(--transition-speed);
 }

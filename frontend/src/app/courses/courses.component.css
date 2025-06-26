@@ -4,6 +4,7 @@
 
 /* Header: title, search, add */
 .courses-header {
+  position: relative;       
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -11,16 +12,19 @@
   gap: var(--spacing-md);
 }
 
+
 .courses-header h2 {
   margin: 10px;
   font-size: var(--font-size-lg);
   color: var(--color-primary);
 }
 
-/* Search input */
 .search-wrapper {
-  flex: 1;
-  max-width: 300px;
+  position: absolute;     
+  left: 50%;                
+  transform: translateX(-50%); 
+  width: 300px;              
+  max-width: 100%;          
 }
 
 .search-input {

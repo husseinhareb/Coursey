@@ -10,7 +10,8 @@ from app.crud.user import (
     update_user,
     list_enrollments,
     add_enrollment,
-    remove_enrollment
+    remove_enrollment,
+    delete_user
 )
 from app.schemas.user import UserOut, Profile, Enrollment
 from app.services.auth import get_current_active_user
@@ -18,6 +19,7 @@ from app.schemas.user import UserDB
 
 from app.schemas.activity import ActivityLogCreate
 from app.crud.activity import create_activity_log
+from fastapi import status
 
 router = APIRouter(
     prefix="/users",
@@ -182,3 +184,23 @@ async def unenroll_course(
     await create_activity_log(log)
 
     return {"un-enrolled": True}
+
+
+@router.delete(
+    "/{user_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    response_model=None
+)
+async def delete_user_endpoint(
+    user_id: str,
+    current_user: UserDB = Depends(get_current_active_user)
+):
+    # Only allow admins to delete other users
+    if "admin" not in [r.lower() for r in current_user.roles]:
+        raise HTTPException(status_code=403, detail="Only admins can delete users")
+
+    success = await delete_user(user_id)
+    if not success:
+        raise HTTPException(status_code=404, detail="User not found")
+    # 204 No Content on success
+    return
