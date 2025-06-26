@@ -12,11 +12,13 @@ import {
 import { DashboardService }  from '../services/dashboard.service';
 import { AuthService, Me }   from '../auth/auth.service';
 
-import { UserService, Enrollment } from '../services/user.service';
-import { CourseService, Course }   from '../services/course.service';
+import { UserService, Enrollment }    from '../services/user.service';
+import { CourseService, Course }      from '../services/course.service';
+import { ForumService }               from '../services/forum.service';
+import { PostService, Post }          from '../services/post.service';
 
-import { forkJoin, of } from 'rxjs';
-import { switchMap, map } from 'rxjs/operators';
+import { forkJoin, of }    from 'rxjs';
+import { switchMap, map, catchError } from 'rxjs/operators';
 
 @Component({
   selector: 'app-dashboard',
@@ -37,22 +39,26 @@ export class DashboardComponent implements OnInit {
 
   // STUDENT view
   enrolledCourses: Array<{ code: string; title: string; progress: number }> = [];
+  homeworksDue = 0;
+  avgCompletion = 0;
+  studentProgressChartData: ChartData<'pie', number[], string> = {
+    labels: [], datasets: [{ data: [] }]
+  };
 
   // TEACHER view
   teacherCourses: Array<{ code: string; title: string; enrolledCount: number }> = [];
+  teacherForumsCount = 0;
+  teacherForumMessagesCount = 0;
+  teacherEnrollChartData: ChartData<'bar', number[], string> = { labels: [], datasets: [{ data: [], label: 'Students' }] };
+  teacherEnrollOptions: ChartOptions<'bar'> = { responsive: true, scales: { y: { beginAtZero: true } } };
 
   // ADMIN view
   adminTotals = { users: 0, courses: 0, posts: 0 };
-  submissionsData: ChartData<'doughnut', number[], string> = {
-    labels: [], datasets: [{ data: [] }]
-  };
-  submissionsOptions: ChartOptions<'doughnut'> = {
-    responsive: true,
-    plugins: { legend: { position: 'bottom' } }
-  };
-  activityChartData: ChartData<'bar', number[], string> = {
-    labels: [], datasets: [{ data: [], label: 'Actions' }]
-  };
+  adminForumsCount = 0;
+  adminForumMessagesCount = 0;
+  submissionsData: ChartData<'doughnut', number[], string> = { labels: [], datasets: [{ data: [] }] };
+  submissionsOptions: ChartOptions<'doughnut'> = { responsive: true, plugins: { legend: { position: 'bottom' } } };
+  activityChartData: ChartData<'bar', number[], string> = { labels: [], datasets: [{ data: [], label: 'Actions' }] };
   activityOptions: ChartOptions<'bar'> = {
     responsive: true,
     scales: {
@@ -63,83 +69,174 @@ export class DashboardComponent implements OnInit {
 
   constructor(
     private svc: DashboardService,
-    public auth: AuthService,
+    public  auth: AuthService,
     private userService: UserService,
-    private courseService: CourseService
+    private courseService: CourseService,
+    private forumService: ForumService,
+    private postService: PostService
   ) {}
 
   ngOnInit() {
     const u: Me | null = this.auth.user;
     if (!u) {
-      this.error = 'Accès interdit';
+      this.error = 'Access denied';
       this.loading = false;
       return;
     }
 
-    // figure out the real user‐ID field (common backends use `_id`)
     const userId = (u as any)._id || (u as any).id;
     if (!userId) {
-      console.error('DashboardComponent: no user id found on auth.user', u);
-      this.error = 'Impossible de déterminer l’identifiant utilisateur';
+      this.error = 'Unable to determine user ID';
       this.loading = false;
       return;
     }
 
     this.svc.getOverview().subscribe({
-      next: data => {
-        this.overview = data;
-        this.role     = data.role;
+      next: overview => {
+        this.overview = overview;
+        this.role     = overview.role;
         this.loading  = false;
 
-        // STUDENT: load their enrollments → fetch each course
-        if (this.role === 'student') {
-          this.userService.listEnrollments(userId).pipe(
-            switchMap((enrs: Enrollment[]) => {
-              if (!enrs.length) return of([]);
-              const calls = enrs.map(e =>
-                this.courseService.get(e.courseId).pipe(
-                  map((c: Course) => ({
-                    code: c.code,
-                    title: c.title,
-                    progress: (e as any).progress ?? 0
-                  }))
-                )
-              );
-              return forkJoin(calls);
-            })
-          ).subscribe({
-            next: courses => this.enrolledCourses = courses,
-            error: err     => {
-              console.error('Failed loading student courses', err);
-              // optionally set this.error here
-            }
-          });
-        }
-
-        // TEACHER: map coursesCreated into a simple array
-        if (this.role === 'teacher') {
-          const t = data as TeacherOverview;
-          this.teacherCourses = t.coursesCreated.map(c => ({
-            code: c.code,
-            title: c.title,
-            enrolledCount: c.enrolledCount
-          }));
-        }
-
-        // ADMIN: totals + chart data
         if (this.role === 'admin') {
-          const a = data as AdminOverview;
-          this.adminTotals = { ...a.totals };
-          this.submissionsData.labels = Object.keys(a.submissions);
-          this.submissionsData.datasets[0].data = Object.values(a.submissions);
-          this.activityChartData.labels = Object.keys(a.activityLast7Days);
-          this.activityChartData.datasets[0].data = Object.values(a.activityLast7Days);
+          this.setupAdmin(overview as AdminOverview);
+        } else if (this.role === 'teacher') {
+          this.setupTeacher(overview as TeacherOverview);
+        } else {
+          this.setupStudent(userId);
         }
       },
       error: err => {
-        this.error   = err.message || 'Erreur chargement';
+        console.error(err);
+        this.error = err.message || 'Error loading dashboard';
         this.loading = false;
       }
     });
+  }
+
+  private setupAdmin(a: AdminOverview) {
+    this.adminTotals = { ...a.totals };
+    this.submissionsData = {
+      labels: Object.keys(a.submissions),
+      datasets: [{ data: Object.values(a.submissions) }]
+    };
+    this.activityChartData = {
+      labels: Object.keys(a.activityLast7Days),
+      datasets: [{ data: Object.values(a.activityLast7Days), label: 'Actions' }]
+    };
+
+    // count forums and messages across all courses
+    this.courseService.list().pipe(
+      switchMap(courses => {
+        const forumCount$ = forkJoin(
+          courses.map(c => this.forumService.listTopics(c.id).pipe(
+            map(topics => topics.length),
+            catchError(() => of(0))
+          ))
+        ).pipe(map(arr => arr.reduce((sum, n) => sum + n, 0)));
+
+        const messageCount$ = forkJoin(
+          courses.map(c => this.forumService.listTopics(c.id).pipe(
+            switchMap(topics => topics.length
+              ? forkJoin(topics.map(t =>
+                  this.forumService.getTopic(c.id, t._id).pipe(
+                    map(f => f.messages.length),
+                    catchError(() => of(0))
+                  )
+                ))
+              : of([] as number[])
+            ),
+            map(arr => arr.reduce((sum, n) => sum + n, 0)),
+            catchError(() => of(0))
+          ))
+        ).pipe(map(arr => arr.reduce((sum, n) => sum + n, 0)));
+
+        return forkJoin([forumCount$, messageCount$]);
+      })
+    ).subscribe(([fCount, mCount]) => {
+      this.adminForumsCount = fCount;
+      this.adminForumMessagesCount = mCount;
+    }, err => console.error(err));
+  }
+
+  private setupTeacher(t: TeacherOverview) {
+    this.teacherCourses = t.coursesCreated.map(c => ({
+      code: c.code,
+      title: c.title,
+      enrolledCount: c.enrolledCount
+    }));
+
+    this.teacherEnrollChartData = {
+      labels: this.teacherCourses.map(c => c.code),
+      datasets: [{ label: 'Students', data: this.teacherCourses.map(c => c.enrolledCount) }]
+    };
+
+    forkJoin([
+      // total forums
+      forkJoin(this.teacherCourses.map(c =>
+        this.forumService.listTopics(c.code).pipe(
+          map(topics => topics.length),
+          catchError(() => of(0))
+        )
+      )).pipe(map(arr => arr.reduce((s, n) => s + n, 0))),
+      // total messages
+      forkJoin(this.teacherCourses.map(c =>
+        this.forumService.listTopics(c.code).pipe(
+          switchMap(topics => topics.length
+            ? forkJoin(topics.map(tpc =>
+                this.forumService.getTopic(c.code, tpc._id).pipe(
+                  map(th => th.messages.length),
+                  catchError(() => of(0))
+                )
+              ))
+            : of([] as number[])
+          ),
+          map(arr => arr.reduce((s, n) => s + n, 0)),
+          catchError(() => of(0))
+        )
+      )).pipe(map(arr => arr.reduce((s, n) => s + n, 0)))
+    ]).subscribe(([fCount, mCount]) => {
+      this.teacherForumsCount = fCount;
+      this.teacherForumMessagesCount = mCount;
+    }, err => console.error(err));
+  }
+
+  private setupStudent(userId: string) {
+    this.userService.listEnrollments(userId).pipe(
+      switchMap(enrs => {
+        if (!enrs.length) return of([] as Array<{ due: number; progress: number; courseId: string }>);
+        return forkJoin(
+          enrs.map(e =>
+            this.postService.list(e.courseId).pipe(
+              map(posts => ({
+                due: posts.filter(p => p.type === 'homework' && p.due_date && new Date(p.due_date) > new Date()).length,
+                progress: (e as any).progress ?? 0,
+                courseId: e.courseId
+              })),
+              catchError(() => of({ due: 0, progress: 0, courseId: e.courseId }))
+            )
+          )
+        );
+      })
+    ).subscribe(items => {
+      // items: array of {due,progress,courseId}
+      this.homeworksDue = items.reduce((sum, x) => sum + x.due, 0);
+      this.avgCompletion = items.length
+        ? items.reduce((sum, x) => sum + x.progress, 0) / items.length
+        : 0;
+      this.studentProgressChartData = {
+        labels: items.map((_, i) => `#${i + 1}`),
+        datasets: [{ data: items.map(x => x.progress) }]
+      };
+
+      // fetch course details
+      if (!items.length) return;
+      forkJoin(items.map(x => this.courseService.get(x.courseId))).subscribe(courses => {
+        this.enrolledCourses = courses.map((c, i) => ({
+          code: c.code,
+          title: c.title,
+          progress: items[i].progress
+        }));
+      }, err => console.error(err));
+    }, err => console.error(err));
   }
 }

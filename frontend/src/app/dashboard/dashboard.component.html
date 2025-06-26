@@ -1,10 +1,8 @@
-<!-- Loading -->
+<!-- Loading / Error (unchanged) -->
 <div *ngIf="loading" class="status">
   <i class="fas fa-spinner fa-spin"></i>
   {{ 'DASH.LOADING' | translate }}
 </div>
-
-<!-- Error -->
 <div *ngIf="!loading && error" class="status status--error">
   <i class="fas fa-exclamation-triangle"></i>
   {{ error }}
@@ -16,12 +14,33 @@
   <ng-container *ngIf="role === 'student'">
     <h2><i class="fas fa-graduation-cap"></i> {{ 'DASH.MY_COURSES' | translate }}</h2>
 
-    <div *ngIf="enrolledCourses.length === 0" class="empty">
-      <i class="fas fa-book-reader"></i>
-      {{ 'DASH.NO_COURSES' | translate }}
-    </div>
+    <!-- Student Stats Cards -->
+    <section class="stats cards">
+      <div class="stat-card">
+        <i class="fas fa-book-open"></i>
+        <div>
+          <h3>{{ enrolledCourses.length }}</h3>
+          <p>{{ 'DASH.TOTAL_COURSES' | translate }}</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <i class="fas fa-tasks"></i>
+        <div>
+          <h3>{{ homeworksDue }}</h3>
+          <p>{{ 'DASH.HOMEWORKS_DUE' | translate }}</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <i class="fas fa-chart-pie"></i>
+        <div>
+          <h3>{{ avgCompletion | number:'1.0-0' }}%</h3>
+          <p>{{ 'DASH.AVG_COMPLETION' | translate }}</p>
+        </div>
+      </div>
+    </section>
 
-    <ul *ngIf="enrolledCourses.length > 0" class="student-list">
+    <!-- Per‐course Progress -->
+    <ul *ngIf="enrolledCourses.length" class="student-list">
       <li *ngFor="let c of enrolledCourses">
         <i class="fas fa-book-open"></i>
         {{ c.code }} — {{ c.title }}
@@ -31,18 +50,44 @@
         <small>{{ c.progress }}%</small>
       </li>
     </ul>
+
+    <div *ngIf="!enrolledCourses.length" class="empty">
+      <i class="fas fa-book-reader"></i> {{ 'DASH.NO_COURSES' | translate }}
+    </div>
   </ng-container>
+
 
   <!-- TEACHER VIEW -->
   <ng-container *ngIf="role === 'teacher'">
     <h2><i class="fas fa-chalkboard-teacher"></i> {{ 'DASH.MY_CREATED_COURSES' | translate }}</h2>
 
-    <div *ngIf="teacherCourses.length === 0" class="empty">
-      <i class="fas fa-chalkboard"></i>
-      {{ 'DASH.NO_CREATED_COURSES' | translate }}
-    </div>
+    <!-- Teacher Stats Cards -->
+    <section class="stats cards">
+      <div class="stat-card">
+        <i class="fas fa-book"></i>
+        <div>
+          <h3>{{ teacherCourses.length }}</h3>
+          <p>{{ 'DASH.TOTAL_COURSES' | translate }}</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <i class="fas fa-folder"></i>
+        <div>
+          <h3>{{ teacherForumsCount }}</h3>
+          <p>{{ 'DASH.TOTAL_FORUMS' | translate }}</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <i class="fas fa-comments"></i>
+        <div>
+          <h3>{{ teacherForumMessagesCount }}</h3>
+          <p>{{ 'DASH.TOTAL_MESSAGES' | translate }}</p>
+        </div>
+      </div>
+    </section>
 
-    <ul *ngIf="teacherCourses.length > 0" class="teacher-list">
+    <!-- Teacher List -->
+    <ul *ngIf="teacherCourses.length" class="teacher-list">
       <li *ngFor="let c of teacherCourses">
         <i class="fas fa-book"></i>
         {{ c.code }} — {{ c.title }}
@@ -51,36 +96,66 @@
         </span>
       </li>
     </ul>
+
+    <!-- Simple Bar Chart of Enrollments -->
+    <section class="charts">
+      <div class="chart-card">
+        <h3><i class="fas fa-chart-bar"></i> {{ 'DASH.ENROLLMENTS' | translate }}</h3>
+        <canvas
+          baseChart
+          [data]="teacherEnrollChartData"
+          [options]="teacherEnrollOptions"
+          chartType="bar">
+        </canvas>
+      </div>
+    </section>
   </ng-container>
+
 
   <!-- ADMIN VIEW -->
   <ng-container *ngIf="role === 'admin'">
     <h2><i class="fas fa-tachometer-alt"></i> {{ 'NAV.DASHBOARD' | translate }}</h2>
 
-    <section class="cards">
-      <div class="card">
-        <i class="fas fa-users fa-2x"></i>
-        <div class="card-info">
-          <h3>{{ 'DASH.USERS' | translate }}</h3>
-          <p>{{ adminTotals.users }}</p>
+    <!-- Admin Stats Cards -->
+    <section class="stats cards">
+      <div class="stat-card">
+        <i class="fas fa-users"></i>
+        <div>
+          <h3>{{ adminTotals.users }}</h3>
+          <p>{{ 'DASH.USERS' | translate }}</p>
         </div>
       </div>
-      <div class="card">
-        <i class="fas fa-book fa-2x"></i>
-        <div class="card-info">
-          <h3>{{ 'DASH.COURSES' | translate }}</h3>
-          <p>{{ adminTotals.courses }}</p>
+      <div class="stat-card">
+        <i class="fas fa-book"></i>
+        <div>
+          <h3>{{ adminTotals.courses }}</h3>
+          <p>{{ 'DASH.COURSES' | translate }}</p>
         </div>
       </div>
-      <div class="card">
-        <i class="fas fa-file-alt fa-2x"></i>
-        <div class="card-info">
-          <h3>{{ 'DASH.POSTS' | translate }}</h3>
-          <p>{{ adminTotals.posts }}</p>
+      <div class="stat-card">
+        <i class="fas fa-file-alt"></i>
+        <div>
+          <h3>{{ adminTotals.posts }}</h3>
+          <p>{{ 'DASH.POSTS' | translate }}</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <i class="fas fa-folder"></i>
+        <div>
+          <h3>{{ adminForumsCount }}</h3>
+          <p>{{ 'DASH.FORUMS' | translate }}</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <i class="fas fa-comments"></i>
+        <div>
+          <h3>{{ adminForumMessagesCount }}</h3>
+          <p>{{ 'DASH.MESSAGES' | translate }}</p>
         </div>
       </div>
     </section>
 
+    <!-- Existing Charts -->
     <section class="charts">
       <div class="chart-card">
         <h3><i class="fas fa-file-upload"></i> {{ 'DASH.SUBMISSIONS' | translate }}</h3>

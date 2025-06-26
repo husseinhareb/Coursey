@@ -1,0 +1,156 @@
+/*====================================
+  Activity Log List Styles
+====================================*/
+
+/* Container */
+.activity-log-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: var(--spacing-lg) var(--spacing-md);
+  background: var(--color-surface);
+  border-radius: var(--border-radius);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+/* Title */
+.activity-log-container > h3 {
+  margin: 0 0 var(--spacing-md);
+  font-size: var(--font-size-lg);
+  color: var(--color-primary);
+}
+
+/* Status Messages */
+.status {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--border-radius);
+  margin-bottom: var(--spacing-md);
+  font-size: var(--font-size-base);
+}
+.status--loading {
+  background: var(--color-container-bg);
+  color: var(--color-muted);
+}
+.status--error {
+  background: rgba(214,48,49,0.1);
+  color: var(--color-error);
+}
+.status i {
+  font-size: 1.2rem;
+}
+
+/* No Logs */
+.no-logs {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  justify-content: center;
+  padding: var(--spacing-md);
+  color: var(--color-muted);
+  font-size: var(--font-size-base);
+}
+.no-logs i {
+  font-size: 1.5rem;
+}
+
+/* User Group List */
+.user-group-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.user-group {
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius);
+  margin-bottom: var(--spacing-md);
+  overflow: hidden;
+  transition: box-shadow var(--transition-speed);
+}
+.user-group:hover {
+  box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+}
+
+/* Group Header */
+.group-header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  background: var(--color-container-bg);
+  padding: var(--spacing-sm) var(--spacing-md);
+  cursor: pointer;
+  user-select: none;
+  font-weight: 600;
+  color: var(--color-text);
+}
+.group-header i {
+  font-size: 1rem;
+  color: var(--color-primary);
+}
+
+/* Activity Log Table */
+.activity-log-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.activity-log-table thead {
+  background: var(--color-bg);
+}
+.activity-log-table th,
+.activity-log-table td {
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-bottom: 1px solid var(--color-border);
+  text-align: left;
+  font-size: var(--font-size-base);
+}
+.activity-log-table th {
+  font-weight: 600;
+  color: var(--color-text);
+}
+.activity-log-table tbody tr:hover {
+  background: var(--color-container-bg-hover);
+}
+
+/* Details List inside table cells */
+.details-list {
+  margin: 0;
+  padding-left: var(--spacing-md);
+}
+.details-list li {
+  margin-bottom: var(--spacing-xs);
+  font-size: var(--font-size-sm);
+  color: var(--color-muted);
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .activity-log-table,
+  .activity-log-table thead,
+  .activity-log-table tbody,
+  .activity-log-table th,
+  .activity-log-table td,
+  .activity-log-table tr {
+    display: block;
+  }
+  .activity-log-table thead {
+    display: none;
+  }
+  .activity-log-table tr {
+    margin-bottom: var(--spacing-md);
+  }
+  .activity-log-table td {
+    padding: var(--spacing-sm);
+    position: relative;
+    text-align: right;
+  }
+  .activity-log-table td::before {
+    content: attr(data-label);
+    position: absolute;
+    left: var(--spacing-md);
+    width: calc(50% - var(--spacing-md));
+    font-weight: 600;
+    text-align: left;
+    color: var(--color-text);
+  }
+}
