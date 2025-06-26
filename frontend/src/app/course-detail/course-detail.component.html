@@ -17,13 +17,20 @@
       <i class="fas fa-graduation-cap"></i>
       {{ course.title }}
     </h2>
-    <button
-      class="btn btn--forum"
-      [routerLink]="['/courses', courseId, 'forums']"
-    >
+
+    <!-- always available: view existing forum -->
+    <button class="btn btn--forum" [routerLink]="['/courses', courseId, 'forums']">
       <i class="fas fa-comments"></i>
       {{ 'COURSE_DETAIL.VIEW_FORUM' | translate }}
     </button>
+
+    <!-- only admins & professors: create a new forum -->
+    <button *ngIf="canModifyPosts" class="btn btn--forum btn--primary"
+      [routerLink]="['/courses', courseId, 'forums', 'create']">
+      <i class="fas fa-plus-circle"></i>
+      {{ 'COURSE_DETAIL.CREATE_FORUM' | translate }}
+    </button>
+
   </div>
   <p class="course-description">{{ course.description }}</p>
 </div>
@@ -32,17 +39,11 @@
 
 <!-- Add / Edit Post -->
 <div class="post-controls" *ngIf="canModifyPosts">
-  <button
-    class="btn btn--add-post"
-    (click)="toggleForm()"
-  >
-    <i
-      class="fas"
-      [ngClass]="editing ? 'fa-edit' : 'fa-plus-circle'"
-    ></i>
+  <button class="btn btn--add-post" (click)="toggleForm()">
+    <i class="fas" [ngClass]="editing ? 'fa-edit' : 'fa-plus-circle'"></i>
     {{ editing
-       ? ('COURSE_DETAIL.EDIT_POST'   | translate)
-       : ('COURSE_DETAIL.ADD_POST'    | translate)
+    ? ('COURSE_DETAIL.EDIT_POST' | translate)
+    : ('COURSE_DETAIL.ADD_POST' | translate)
     }}
   </button>
 </div>
@@ -86,29 +87,13 @@
 <hr class="section-divider" />
 
 <!-- Posts List -->
-<app-posts
-  [posts]="posts"
-  [loading]="loadingPosts"
-  [error]="postsError"
-  [courseId]="courseId"
-  [isStudentInCourse]="isStudentInCourse"
-  [studentSubmissions]="studentSubmissions"
-  [canModifyPosts]="canModifyPosts"
+<app-posts [posts]="posts" [loading]="loadingPosts" [error]="postsError" [courseId]="courseId"
+  [isStudentInCourse]="isStudentInCourse" [studentSubmissions]="studentSubmissions" [canModifyPosts]="canModifyPosts"
   [showSubmissionFormForPostId]="showSubmissionFormForPostId"
   [showOwnSubmissionListForPostId]="showOwnSubmissionListForPostId"
-  [showSubmissionListForPostId]="showSubmissionListForPostId"
-  [completions]="completions"
-
-  (toggleSubmissionForm)="toggleSubmissionForm($event)"
-  (viewOwnSubmission)="showOwnSubmissionListForPostId = $event"
-  (toggleSubmissionList)="toggleSubmissionList($event)"
-
-  (togglePin)="togglePin($event)"
-  (moveUp)="moveUp($event)"
-  (moveDown)="moveDown($event)"
-  (editPost)="toggleForm($event)"
-  (deletePost)="deletePost($event)"
-
-  (toggleComplete)="onToggleComplete($event)"
->
+  [showSubmissionListForPostId]="showSubmissionListForPostId" [completions]="completions"
+  (toggleSubmissionForm)="toggleSubmissionForm($event)" (viewOwnSubmission)="showOwnSubmissionListForPostId = $event"
+  (toggleSubmissionList)="toggleSubmissionList($event)" (togglePin)="togglePin($event)" (moveUp)="moveUp($event)"
+  (moveDown)="moveDown($event)" (editPost)="toggleForm($event)" (deletePost)="deletePost($event)"
+  (toggleComplete)="onToggleComplete($event)">
 </app-posts>

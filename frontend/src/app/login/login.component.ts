@@ -1,5 +1,3 @@
-// src/app/login/login.component.ts
-
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
@@ -12,6 +10,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { RouterModule, Router } from '@angular/router';
 import { AuthService } from '../auth/auth.service';
 import { TranslateModule } from '@ngx-translate/core';
+
 @Component({
   selector: 'app-login',
   standalone: true,
@@ -29,6 +28,9 @@ export class LoginComponent {
   form: FormGroup;
   error: string | null = null;
 
+  /** Whether to show password text */
+  showPassword = false;
+
   constructor(
     private fb: FormBuilder,
     private auth: AuthService,
@@ -38,6 +40,10 @@ export class LoginComponent {
       email: ['', [Validators.required, Validators.email]],
       password: ['', Validators.required]
     });
+  }
+
+  toggleShowPassword() {
+    this.showPassword = !this.showPassword;
   }
 
   onSubmit() {

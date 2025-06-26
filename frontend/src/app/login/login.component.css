@@ -211,3 +211,36 @@
     max-width: 60px;
   }
 }
+
+.input-with-icon {
+  position: relative;
+}
+
+.input-with-icon .input-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-muted);
+}
+
+.input-with-icon input {
+  padding-left: 2.5rem;
+}
+
+/* Toggle button */
+.password-toggle {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: var(--color-muted);
+  font-size: 1rem;
+}
+
+.password-toggle:focus {
+  outline: none;
+}

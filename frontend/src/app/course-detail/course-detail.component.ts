@@ -120,17 +120,21 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
   }
 
   private computePermissions() {
-    const u = this.currentUser;
-    this.isAdmin = !!u && u.roles.map(r => r.toLowerCase()).includes('admin');
-    if (u && u.enrollments) {
-      const found = (u.enrollments as Enrollment[]).find(e => e.courseId === this.courseId);
-      this.isProfessorInCourse = !!found && u.roles.map(r => r.toLowerCase()).includes('teacher');
-      this.isStudentInCourse = !!found && u.roles.map(r => r.toLowerCase()).includes('student');
-    } else {
-      this.isProfessorInCourse = false;
-      this.isStudentInCourse = false;
-    }
+  const u = this.currentUser;
+  this.isAdmin = !!u && u.roles.map(r => r.toLowerCase()).includes('admin');
+
+  if (u && u.enrollments) {
+    const found = (u.enrollments as Enrollment[]).find(e => e.courseId === this.courseId);
+    const roles = u.roles.map(r => r.toLowerCase());
+    // allow either "teacher" or "professor"
+    this.isProfessorInCourse = !!found && (roles.includes('teacher') || roles.includes('professor'));
+    this.isStudentInCourse   = !!found && roles.includes('student');
+  } else {
+    this.isProfessorInCourse = false;
+    this.isStudentInCourse   = false;
   }
+}
+
 
   get canModifyPosts(): boolean {
     return this.isAdmin || this.isProfessorInCourse;

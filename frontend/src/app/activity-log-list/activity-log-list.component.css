@@ -4,11 +4,12 @@
 
 /* Container */
 .activity-log-container {
-  max-width: 900px;
+  max-width: 90%;
   margin: 0 auto;
   padding: var(--spacing-lg) var(--spacing-md);
   background: var(--color-surface);
   border-radius: var(--border-radius);
+  margin-top: 40px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 

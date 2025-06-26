@@ -24,7 +24,7 @@
               [ngClass]="{ invalid: form.get('email')?.invalid && form.get('email')?.touched }"
               placeholder="{{ 'LOGIN.EMAIL_PLACEHOLDER' | translate }}"
             />
-            <i class="fas fa-envelope input-icon" aria-hidden="true"></i>
+            <i class="fas fa-envelope input-icon"></i>
           </div>
           <span
             class="error-message"
@@ -40,13 +40,27 @@
           <div class="input-with-icon">
             <input
               id="password"
-              type="password"
+              [type]="showPassword ? 'text' : 'password'"
               formControlName="password"
               class="form-control"
               [ngClass]="{ invalid: form.get('password')?.invalid && form.get('password')?.touched }"
               placeholder="{{ 'LOGIN.PASSWORD_PLACEHOLDER' | translate }}"
             />
-            <i class="fas fa-lock input-icon" aria-hidden="true"></i>
+            <i class="fas fa-lock input-icon"></i>
+            <!-- Toggle button -->
+            <button
+              type="button"
+              class="password-toggle"
+              (click)="toggleShowPassword()"
+              [attr.aria-label]="
+                showPassword ? 'Hide password' : 'Show password'
+              "
+            >
+              <i
+                class="fas"
+                [ngClass]="showPassword ? 'fa-eye-slash' : 'fa-eye'"
+              ></i>
+            </button>
           </div>
           <span
             class="error-message"
