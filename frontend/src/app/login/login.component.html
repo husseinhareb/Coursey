@@ -1,12 +1,19 @@
-<!-- src/app/login/login.component.html -->
 <div class="login-container">
+
+  <!-- Logo sits above the card entirely -->
+  <img src="assets/images/logo.png" alt="Coursey Logo" class="login-logo-outside" />
+
   <div class="login-card">
+
+    <!-- Header now only contains the “Log In” title -->
     <div class="login-header">
       <h2>{{ 'LOGIN.TITLE' | translate }}</h2>
     </div>
+
+    <!-- Body with form -->
     <div class="login-body">
       <form [formGroup]="form" (ngSubmit)="onSubmit()">
-
+        <!-- Email Field -->
         <div class="form-group">
           <label for="email">{{ 'LOGIN.EMAIL_LABEL' | translate }}</label>
           <div class="input-with-icon">
@@ -15,7 +22,7 @@
               type="email"
               formControlName="email"
               class="form-control"
-              [ngClass]="{ 'invalid': form.get('email')?.invalid && form.get('email')?.touched }"
+              [ngClass]="{ invalid: form.get('email')?.invalid && form.get('email')?.touched }"
               placeholder="{{ 'LOGIN.EMAIL_PLACEHOLDER' | translate }}"
             />
             <i class="fas fa-envelope input-icon" aria-hidden="true"></i>
@@ -28,6 +35,7 @@
           </span>
         </div>
 
+        <!-- Password Field -->
         <div class="form-group">
           <label for="password">{{ 'LOGIN.PASSWORD_LABEL' | translate }}</label>
           <div class="input-with-icon">
@@ -36,7 +44,7 @@
               type="password"
               formControlName="password"
               class="form-control"
-              [ngClass]="{ 'invalid': form.get('password')?.invalid && form.get('password')?.touched }"
+              [ngClass]="{ invalid: form.get('password')?.invalid && form.get('password')?.touched }"
               placeholder="{{ 'LOGIN.PASSWORD_PLACEHOLDER' | translate }}"
             />
             <i class="fas fa-lock input-icon" aria-hidden="true"></i>
@@ -49,11 +57,13 @@
           </span>
         </div>
 
+        <!-- Submit Button -->
         <button type="submit" class="submit-btn" [disabled]="form.invalid">
           {{ 'LOGIN.SUBMIT' | translate }}
         </button>
       </form>
 
+      <!-- Global Error -->
       <div *ngIf="error" class="global-error">
         {{ error }}
       </div>

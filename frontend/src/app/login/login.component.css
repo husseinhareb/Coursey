@@ -1,6 +1,6 @@
-/* ====================================
-  Login Page Styles
-==================================== */
+/*------------------------------------
+  Container & page background
+------------------------------------*/
 .login-container {
   display: flex;
   flex-direction: column;
@@ -11,15 +11,24 @@
   background-color: var(--color-bg);
 }
 
+/* Logo above the card */
+.login-logo-outside {
+  max-width: 120px;
+  margin-bottom: calc(-1 * var(--spacing-lg));
+  z-index: 1;
+  position: relative;
+}
+
+/* Card wrapper */
 .login-card {
   width: 100%;
-  max-width: 400px;
-  background-color: var(--color-surface);
+  max-width: 360px;
   border-radius: calc(var(--border-radius) * 2);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
   overflow: hidden;
-  transform: translateY(0);
-  transition: transform 0.4s ease, box-shadow 0.4s ease;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  background-color: var(--color-surface);
+  transition: transform var(--transition-speed),
+              box-shadow var(--transition-speed);
 }
 
 .login-card:hover {
@@ -27,145 +36,170 @@
   box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
 }
 
+/* Header: only the “Log In” title on blue background */
 .login-header {
-  padding: var(--spacing-lg);
-  text-align: center;
   background-color: var(--color-primary);
-  color: white;
+  text-align: center;
+  padding: var(--spacing-lg) var(--spacing-md);
 }
 
 .login-header h2 {
   margin: 0;
-  font-size: 1.8rem;
+  color: #fff;
+  font-size: 1.5rem;
   font-weight: 600;
-  letter-spacing: 0.5px;
 }
 
+/* Body panel */
 .login-body {
   padding: var(--spacing-lg);
 }
 
+/*------------------------------------
+  Form fields
+------------------------------------*/
 .form-group {
   margin-bottom: var(--spacing-md);
   position: relative;
 }
 
-label {
+.form-group label {
   display: block;
   margin-bottom: var(--spacing-xs);
-  font-weight: 500;
   color: var(--color-muted);
-  transition: color var(--transition-speed) ease;
+  font-weight: 500;
 }
 
-input[type='email'],
-input[type='password'] {
+/* Inputs with icons */
+.input-with-icon {
+  position: relative;
+}
+
+.input-with-icon .form-control {
+  width: 100%;
   padding: var(--spacing-sm) var(--spacing-sm) var(--spacing-sm) 40px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius);
   background-color: var(--color-bg);
-  transition: all var(--transition-speed) ease;
+  transition: border-color var(--transition-speed),
+              box-shadow var(--transition-speed),
+              background-color var(--transition-speed);
 }
 
-input:focus {
+.input-with-icon .form-control:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-container-bg-hover);
   background-color: var(--color-surface);
-  box-shadow: 0 0 0 3px rgba(116, 185, 255, 0.2);
 }
 
 .input-icon {
   position: absolute;
   left: 12px;
-  bottom: 12px;
+  top: 50%;
+  transform: translateY(-50%);
   color: var(--color-muted);
-  transition: color var(--transition-speed) ease;
+  transition: color var(--transition-speed);
 }
 
-input:focus + .input-icon {
+.input-with-icon .form-control:focus + .input-icon {
   color: var(--color-primary);
 }
 
+/* Inline error text */
 .error-message {
   display: block;
   margin-top: var(--spacing-xs);
-  font-size: 0.85rem;
+  font-size: var(--font-size-sm);
   color: var(--color-error);
   opacity: 0;
-  height: 0;
-  transition: all 0.3s ease;
+  max-height: 0;
+  overflow: hidden;
+  transition: opacity var(--transition-speed),
+              max-height var(--transition-speed);
 }
 
 .form-control.invalid + .error-message {
   opacity: 1;
-  height: auto;
+  max-height: 100px;
 }
 
+/*------------------------------------
+  Submit button
+------------------------------------*/
 .submit-btn {
   width: 100%;
   padding: var(--spacing-sm);
-  font-weight: 600;
-  letter-spacing: 0.5px;
   margin-top: var(--spacing-md);
+  background-color: var(--color-primary-hover);
+  color: #fff;
+  border: none;
+  border-radius: var(--border-radius);
+  font-weight: 600;
+  cursor: pointer;
   position: relative;
   overflow: hidden;
+  transition: background-color var(--transition-speed),
+              transform var(--transition-speed);
 }
 
-.submit-btn:after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.2),
-    transparent
-  );
-  transition: 0.5s;
+.submit-btn:hover:not(:disabled) {
+  background-color: var(--color-primary);
+  transform: translateY(-1px);
 }
 
-.submit-btn:hover:after {
-  left: 100%;
+.submit-btn:disabled {
+  background-color: var(--color-border);
+  cursor: not-allowed;
 }
 
+/*------------------------------------
+  Global error banner
+------------------------------------*/
 .global-error {
-  padding: var(--spacing-sm);
   margin-top: var(--spacing-md);
+  padding: var(--spacing-sm) var(--spacing-md);
   background-color: rgba(214, 48, 49, 0.1);
   border-left: 3px solid var(--color-error);
   border-radius: 0 var(--border-radius) var(--border-radius) 0;
-  animation: fadeIn 0.4s ease;
+  color: var(--color-error);
+  animation: fadeIn var(--transition-speed) ease-in;
 }
 
+/* Fade-in keyframes */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-/* Dark theme adjustments */
-[data-theme='dark'] .login-card {
+/* Dark theme tweaks */
+[data-theme="dark"] .login-card {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
-
-[data-theme='dark'] .login-card:hover {
-  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
-}
-
-[data-theme='dark'] input[type='email'],
-[data-theme='dark'] input[type='password'] {
+[data-theme="dark"] .input-with-icon .form-control {
   background-color: rgba(255, 255, 255, 0.05);
 }
+[data-theme="dark"] .submit-btn {
+  background-color: var(--color-primary);
+}
+[data-theme="dark"] .submit-btn:hover:not(:disabled) {
+  background-color: var(--color-primary-hover);
+}
 
-/* Responsive design */
+/* Responsive adjustments */
 @media (max-width: 480px) {
   .login-card {
     max-width: 100%;
   }
-  
-  .login-header {
-    padding: var(--spacing-md);
-  }
-  
-  .login-body {
-    padding: var(--spacing-md);
-  }
+  .login-logo-outside {
+  max-width: 120px;
+  margin-bottom: calc(-1 * var(--spacing-xl));
+  z-index: 1;
+  position: relative;
+}
 }
