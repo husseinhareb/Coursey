@@ -10,7 +10,6 @@ from app.schemas.user import UserDB, Profile, Enrollment, Access, Alert
 from app.schemas.user import UserOut
 from app.schemas.user import EnrollmentUser
 
-
 def _normalize_user_doc(doc: dict) -> UserDB:
     """Convert ObjectId fields to str and return a UserDB."""
     doc["_id"] = str(doc["_id"])
@@ -194,3 +193,36 @@ async def delete_user(user_id: str) -> bool:
         return False
     res = await users_collection.delete_one({"_id": oid})
     return res.deleted_count == 1
+
+
+async def change_user_password(
+    user_id: str, old_password: str, new_password: str
+) -> bool:
+    """
+    Verify the old password, then update to the new hashed password.
+    Returns True on success, False otherwise.
+    """
+    try:
+        oid = ObjectId(user_id)
+    except Exception:
+        return False
+
+    # 1) Fetch only the passwordHash
+    doc = await users_collection.find_one({"_id": oid}, {"passwordHash": 1})
+    if not doc:
+        return False
+
+    # 2) Import here to break the circular dependency
+    from app.services.auth import verify_password, hash_password
+
+    # 3) Verify old password
+    if not verify_password(old_password, doc.get("passwordHash", "")):
+        return False
+
+    # 4) Hash new password and update
+    new_hash = hash_password(new_password)
+    res = await users_collection.update_one(
+        {"_id": oid},
+        {"$set": {"passwordHash": new_hash, "updatedAt": datetime.utcnow()}}
+    )
+    return res.modified_count == 1

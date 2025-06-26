@@ -1,11 +1,10 @@
-<!-- src/app/profile/profile.component.html -->
 <div class="profile-page">
   <!-- TITLE -->
   <header class="profile-title">
     <h2><i class="fas fa-id-badge"></i> {{ 'PROFILE.TITLE' | translate }}</h2>
   </header>
 
-  <!-- STATUS MESSAGES -->
+  <!-- STATUS -->
   <div *ngIf="loading" class="status info">
     <i class="fas fa-circle-notch fa-spin"></i>
     {{ 'PROFILE.LOADING' | translate }}
@@ -33,7 +32,6 @@
           <span class="avatar-initials">{{ initials }}</span>
         </ng-template>
 
-        <!-- hidden file input + overlay camera button -->
         <input
           #fileInput
           type="file"
@@ -65,11 +63,11 @@
           {{ u.email }}
         </p>
 
-        <!-- ROLES -->
         <div class="roles">
           <i class="fas fa-user-tag"></i>
           <ng-container *ngFor="let role of u.roles; let last = last">
-            <span class="role-badge">{{ role }}</span><span *ngIf="!last">, </span>
+            <span class="role-badge">{{ role }}</span
+            ><span *ngIf="!last">, </span>
           </ng-container>
         </div>
       </div>
@@ -77,51 +75,84 @@
 
     <!-- CONTENT / FORM -->
     <section class="profile-content">
-      <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <form [formGroup]="profileForm" (ngSubmit)="onSubmit()">
         <!-- PERSONAL INFO -->
         <div class="form-section">
-          <h4><i class="fas fa-info-circle"></i> {{ 'PROFILE.PERSONAL_INFO' | translate }}</h4>
-
+          <h4>
+            <i class="fas fa-info-circle"></i>
+            {{ 'PROFILE.PERSONAL_INFO' | translate }}
+          </h4>
           <div class="field input-icon">
             <i class="fas fa-user"></i>
             <input
-              id="firstName"
               formControlName="firstName"
               placeholder="{{ 'PROFILE.FIRST_NAME_PLACEHOLDER' | translate }}"
             />
           </div>
-
           <div class="field input-icon">
             <i class="fas fa-user"></i>
             <input
-              id="lastName"
               formControlName="lastName"
               placeholder="{{ 'PROFILE.LAST_NAME_PLACEHOLDER' | translate }}"
             />
           </div>
-
           <div class="field input-icon">
             <i class="fas fa-phone-alt"></i>
             <input
-              id="phoneNumber"
               formControlName="phoneNumber"
               placeholder="{{ 'PROFILE.PHONE_PLACEHOLDER' | translate }}"
             />
           </div>
-
           <div class="field input-icon">
             <i class="fas fa-map-marker-alt"></i>
             <input
-              id="address"
               formControlName="address"
               placeholder="{{ 'PROFILE.ADDRESS_PLACEHOLDER' | translate }}"
             />
           </div>
         </div>
 
+        <!-- CHANGE PASSWORD -->
+        <div class="form-section password-section">
+          <h4>
+            <i class="fas fa-lock"></i>
+            {{ 'PROFILE.CHANGE_PWD_TITLE' | translate }}
+          </h4>
+          <div class="field input-icon">
+            <i class="fas fa-key"></i>
+            <input
+              type="password"
+              formControlName="oldPassword"
+              placeholder="{{ 'PROFILE.OLD_PWD_PLACEHOLDER' | translate }}"
+            />
+          </div>
+          <div class="field input-icon">
+            <i class="fas fa-key"></i>
+            <input
+              type="password"
+              formControlName="newPassword"
+              placeholder="{{ 'PROFILE.NEW_PWD_PLACEHOLDER' | translate }}"
+            />
+          </div>
+          <div class="field input-icon">
+            <i class="fas fa-key"></i>
+            <input
+              type="password"
+              formControlName="confirmPassword"
+              placeholder="{{ 'PROFILE.CONFIRM_PWD_PLACEHOLDER' | translate }}"
+            />
+          </div>
+          <div *ngIf="passwordMismatch" class="status error small">
+            {{ 'PROFILE.PWD_MISMATCH' | translate }}
+          </div>
+        </div>
+
         <!-- ENROLLED COURSES -->
         <div class="form-section courses-section">
-          <h4><i class="fas fa-book-reader"></i> {{ 'PROFILE.ENROLLED_LABEL' | translate }}</h4>
+          <h4>
+            <i class="fas fa-book-reader"></i>
+            {{ 'PROFILE.ENROLLED_LABEL' | translate }}
+          </h4>
           <ul class="course-list">
             <li *ngFor="let c of enrolledCourses">
               <i class="fas fa-book"></i>
@@ -138,8 +169,11 @@
         </div>
 
         <!-- SAVE BUTTON -->
-        <div class="actions" *ngIf="form.dirty">
-          <button type="submit" [disabled]="form.invalid">
+        <div class="actions" *ngIf="profileForm.dirty">
+          <button
+            type="submit"
+            [disabled]="profileForm.invalid"
+          >
             <i class="fas fa-save"></i>
             {{ 'PROFILE.SAVE' | translate }}
           </button>

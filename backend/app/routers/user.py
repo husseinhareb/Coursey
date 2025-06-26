@@ -21,6 +21,9 @@ from app.schemas.activity import ActivityLogCreate
 from app.crud.activity import create_activity_log
 from fastapi import status
 
+from pydantic import BaseModel, Field
+from app.crud.user import change_user_password
+from fastapi import Body
 router = APIRouter(
     prefix="/users",
     tags=["users"],
@@ -203,4 +206,26 @@ async def delete_user_endpoint(
     if not success:
         raise HTTPException(status_code=404, detail="User not found")
     # 204 No Content on success
+    return
+
+class ChangePwdIn(BaseModel):
+    oldPassword: str = Field(..., description="Current password")
+    newPassword: str = Field(..., description="Desired new password")
+
+@router.post(
+    "/{user_id}/password",
+    status_code=status.HTTP_204_NO_CONTENT
+)
+async def change_password_endpoint(
+    user_id: str,
+    data: ChangePwdIn = Body(...),
+    current_user: UserDB = Depends(get_current_active_user)
+):
+    # Only the user themself may change their password
+    if user_id != current_user.id:
+        raise HTTPException(403, "Cannot change another user's password")
+
+    ok = await change_user_password(user_id, data.oldPassword, data.newPassword)
+    if not ok:
+        raise HTTPException(400, "Old password incorrect or user not found")
     return

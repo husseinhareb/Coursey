@@ -35,7 +35,7 @@ export interface Enrollment {
 export class UserService {
   private base = `${environment.apiUrl}/users`;
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   /** fetch /users/me, normalize _id → id */
   getMe(): Observable<User> {
@@ -51,43 +51,63 @@ export class UserService {
     );
   }
 
-  /** list all users (unchanged) */
+  /** list all users */
   getUsers(): Observable<User[]> {
     return this.http.get<any[]>(`${this.base}/`).pipe(
       map(list => list.map(u => ({ ...u, id: u._id })))
     );
   }
 
+  /** list a user's enrollments */
   listEnrollments(userId: string): Observable<Enrollment[]> {
-    return this.http.get<Enrollment[]>(`${this.base}/${userId}/enrollments`).pipe(
-      map(arr => arr.map(e => ({ ...e, enrolledAt: e.enrolledAt })))
+    return this.http
+      .get<Enrollment[]>(`${this.base}/${userId}/enrollments`)
+      .pipe(map(arr => arr.map(e => ({ ...e, enrolledAt: e.enrolledAt }))));
+  }
+
+  /** enroll a user in a course */
+  enroll(userId: string, courseId: string): Observable<Enrollment> {
+    return this.http.post<Enrollment>(
+      `${this.base}/${userId}/enrollments`,
+      { courseId }
     );
   }
 
-  enroll(userId: string, courseId: string): Observable<Enrollment> {
-    return this.http.post<Enrollment>(`${this.base}/${userId}/enrollments`, { courseId });
+  /** unenroll a user from a course */
+  unenroll(userId: string, courseId: string): Observable<any> {
+    return this.http.delete(
+      `${this.base}/${userId}/enrollments/${courseId}`
+    );
   }
 
-  unenroll(userId: string, courseId: string): Observable<any> {
-    return this.http.delete(`${this.base}/${userId}/enrollments/${courseId}`);
-  }
+  /** get a user by ID */
   getById(userId: string): Observable<User> {
-    return this.http
-      .get<any>(`${this.base}/${userId}`)
-      .pipe(
-        map(u => {
-          // Si le back-end renvoie “_id”, on le recopie dans le champ “id” attendu par Angular
-          // (tout en conservant _id au besoin).
-          return {
-            ...u,
-            id: u._id ?? u.id  // si le JSON n’a pas _id mais déjà “id”, on garde “id”
-          } as User;
-        })
-      );
+    return this.http.get<any>(`${this.base}/${userId}`).pipe(
+      map(u => ({
+        ...u,
+        id: u._id ?? u.id
+      } as User))
+    );
   }
+
+  /** delete a user */
   deleteUser(userId: string): Observable<void> {
-    // Calls DELETE /users/{userId}
     return this.http.delete<void>(`${this.base}/${userId}`);
   }
 
+  /**
+   * Change a user's password.
+   * POST /users/{userId}/password
+   * Body: { oldPassword, newPassword }
+   */
+  changePassword(
+    userId: string,
+    oldPassword: string,
+    newPassword: string
+  ): Observable<void> {
+    return this.http.post<void>(
+      `${this.base}/${userId}/password`,
+      { oldPassword, newPassword }
+    );
+  }
 }
