@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule }      from '@angular/common';
-import { TranslateModule }   from '@ngx-translate/core';
-import { NgChartsModule }    from 'ng2-charts';
+import { CommonModule } from '@angular/common';
+import { TranslateModule } from '@ngx-translate/core';
+import { NgChartsModule } from 'ng2-charts';
 import { ChartData, ChartOptions } from 'chart.js';
 
 import {
@@ -9,15 +9,16 @@ import {
   AdminOverview,
   TeacherOverview
 } from '../services/dashboard.service';
-import { DashboardService }  from '../services/dashboard.service';
-import { AuthService, Me }   from '../auth/auth.service';
+import { DashboardService } from '../services/dashboard.service';
+import { AuthService, Me } from '../auth/auth.service';
 
-import { UserService, Enrollment }    from '../services/user.service';
-import { CourseService, Course }      from '../services/course.service';
-import { ForumService }               from '../services/forum.service';
-import { PostService }                from '../services/post.service';
+import { UserService, Enrollment } from '../services/user.service';
+import { CourseService, Course } from '../services/course.service';
+import { ForumService } from '../services/forum.service';
+import { PostService } from '../services/post.service';
+import { CompletionService, Completion } from '../services/completion.service';
 
-import { forkJoin, of }    from 'rxjs';
+import { forkJoin, of, Observable } from 'rxjs';
 import { switchMap, map, catchError } from 'rxjs/operators';
 
 @Component({
@@ -49,16 +50,28 @@ export class DashboardComponent implements OnInit {
   teacherCourses: Array<{ code: string; title: string; enrolledCount: number }> = [];
   teacherForumsCount = 0;
   teacherForumMessagesCount = 0;
-  teacherEnrollChartData: ChartData<'bar', number[], string> = { labels: [], datasets: [{ data: [], label: 'Students' }] };
-  teacherEnrollOptions: ChartOptions<'bar'> = { responsive: true, scales: { y: { beginAtZero: true } } };
+  teacherEnrollChartData: ChartData<'bar', number[], string> = {
+    labels: [], datasets: [{ data: [], label: 'Students' }]
+  };
+  teacherEnrollOptions: ChartOptions<'bar'> = {
+    responsive: true,
+    scales: { y: { beginAtZero: true } }
+  };
 
   // ADMIN view
   adminTotals = { users: 0, courses: 0, posts: 0 };
   adminForumsCount = 0;
   adminForumMessagesCount = 0;
-  submissionsData: ChartData<'doughnut', number[], string> = { labels: [], datasets: [{ data: [] }] };
-  submissionsOptions: ChartOptions<'doughnut'> = { responsive: true, plugins: { legend: { position: 'bottom' } } };
-  activityChartData: ChartData<'bar', number[], string> = { labels: [], datasets: [{ data: [], label: 'Actions' }] };
+  submissionsData: ChartData<'doughnut', number[], string> = {
+    labels: [], datasets: [{ data: [] }]
+  };
+  submissionsOptions: ChartOptions<'doughnut'> = {
+    responsive: true,
+    plugins: { legend: { position: 'bottom' } }
+  };
+  activityChartData: ChartData<'bar', number[], string> = {
+    labels: [], datasets: [{ data: [], label: 'Actions' }]
+  };
   activityOptions: ChartOptions<'bar'> = {
     responsive: true,
     scales: {
@@ -69,12 +82,13 @@ export class DashboardComponent implements OnInit {
 
   constructor(
     private svc: DashboardService,
-    public  auth: AuthService,
+    public auth: AuthService,
     private userService: UserService,
     private courseService: CourseService,
     private forumService: ForumService,
-    private postService: PostService
-  ) {}
+    private postService: PostService,
+    private completionService: CompletionService
+  ) { }
 
   ngOnInit() {
     const u: Me | null = this.auth.user;
@@ -92,10 +106,10 @@ export class DashboardComponent implements OnInit {
     }
 
     this.svc.getOverview().subscribe({
-      next: overview => {
+      next: (overview: DashboardOverview) => {
         this.overview = overview;
-        this.role     = overview.role;
-        this.loading  = false;
+        this.role = overview.role;
+        this.loading = false;
 
         if (this.role === 'admin') {
           this.setupAdmin(overview as AdminOverview);
@@ -114,7 +128,6 @@ export class DashboardComponent implements OnInit {
   }
 
   private setupAdmin(a: AdminOverview) {
-    // Basic totals & charts from API
     this.adminTotals = { ...a.totals };
     this.submissionsData = {
       labels: Object.keys(a.submissions),
@@ -125,43 +138,51 @@ export class DashboardComponent implements OnInit {
       datasets: [{ data: Object.values(a.activityLast7Days), label: 'Actions' }]
     };
 
-    // Ensure total courses is correct
-    this.courseService.list().subscribe(all => {
+    this.courseService.list().subscribe((all: Course[]) => {
       this.adminTotals.courses = all.length;
     });
 
-    // Gather forums & messages across every course
     this.courseService.list().pipe(
-      switchMap(courses => {
+      switchMap((courses: Course[]) => {
         const forums$ = forkJoin(
-          courses.map(c => this.forumService.listTopics(c.id).pipe(
-            map(ts => ts.length),
-            catchError(() => of(0))
-          ))
-        ).pipe(map(arr => arr.reduce((s, n) => s + n, 0)));
+          courses.map(c =>
+            this.forumService.listTopics(c.id).pipe(
+              map(ts => ts.length),
+              catchError(() => of(0))
+            )
+          )
+        ).pipe(map(arr => arr.reduce((sum, n) => sum + n, 0)));
 
         const messages$ = forkJoin(
-          courses.map(c => this.forumService.listTopics(c.id).pipe(
-            switchMap(ts => ts.length
-              ? forkJoin(ts.map(t =>
-                  this.forumService.getTopic(c.id, t._id).pipe(
-                    map(topic => topic.messages.length),
-                    catchError(() => of(0))
-                  )
-                ))
-              : of([] as number[])
-            ),
-            map(arr => arr.reduce((s, n) => s + n, 0)),
-            catchError(() => of(0))
-          ))
-        ).pipe(map(arr => arr.reduce((s, n) => s + n, 0)));
+          courses.map(c =>
+            this.forumService.listTopics(c.id).pipe(
+              switchMap(ts =>
+                ts.length
+                  ? forkJoin(
+                      ts.map(t =>
+                        this.forumService.getTopic(c.id, t._id).pipe(
+                          map(topic => topic.messages.length),
+                          catchError(() => of(0))
+                        )
+                      )
+                    )
+                  : of([] as number[])
+              ),
+              map(arr => arr.reduce((sum, n) => sum + n, 0)),
+              catchError(() => of(0))
+            )
+          )
+        ).pipe(map(arr => arr.reduce((sum, n) => sum + n, 0)));
 
         return forkJoin([forums$, messages$]);
       })
-    ).subscribe(([fCount, mCount]) => {
-      this.adminForumsCount = fCount;
-      this.adminForumMessagesCount = mCount;
-    }, err => console.error(err));
+    ).subscribe({
+      next: ([fCount, mCount]: [number, number]) => {
+        this.adminForumsCount = fCount;
+        this.adminForumMessagesCount = mCount;
+      },
+      error: err => console.error(err)
+    });
   }
 
   private setupTeacher(t: TeacherOverview) {
@@ -178,78 +199,109 @@ export class DashboardComponent implements OnInit {
 
     forkJoin([
       // total forums
-      forkJoin(this.teacherCourses.map(c =>
-        this.forumService.listTopics(c.code).pipe(
-          map(ts => ts.length),
-          catchError(() => of(0))
+      forkJoin(
+        this.teacherCourses.map(tc =>
+          this.forumService.listTopics(tc.code).pipe(
+            map(ts => ts.length),
+            catchError(() => of(0))
+          )
         )
-      )).pipe(map(arr => arr.reduce((s, n) => s + n, 0))),
+      ).pipe(map(arr => arr.reduce((sum, n) => sum + n, 0))),
       // total messages
-      forkJoin(this.teacherCourses.map(c =>
-        this.forumService.listTopics(c.code).pipe(
-          switchMap(ts => ts.length
-            ? forkJoin(ts.map(tpc =>
-                this.forumService.getTopic(c.code, tpc._id).pipe(
-                  map(topic => topic.messages.length),
-                  catchError(() => of(0))
-                )
-              ))
-            : of([] as number[])
-          ),
-          map(arr => arr.reduce((s, n) => s + n, 0)),
-          catchError(() => of(0))
+      forkJoin(
+        this.teacherCourses.map(tc =>
+          this.forumService.listTopics(tc.code).pipe(
+            switchMap(ts =>
+              ts.length
+                ? forkJoin(
+                    ts.map(topic =>
+                      this.forumService.getTopic(tc.code, topic._id).pipe(
+                        map(t => t.messages.length),
+                        catchError(() => of(0))
+                      )
+                    )
+                  )
+                : of([] as number[])
+            ),
+            map(arr => arr.reduce((sum, n) => sum + n, 0)),
+            catchError(() => of(0))
+          )
         )
-      )).pipe(map(arr => arr.reduce((s, n) => s + n, 0)))
-    ]).subscribe(([fCount, mCount]) => {
-      this.teacherForumsCount = fCount;
-      this.teacherForumMessagesCount = mCount;
-    }, err => console.error(err));
+      ).pipe(map(arr => arr.reduce((sum, n) => sum + n, 0)))
+    ]).subscribe({
+      next: ([fCount, mCount]: [number, number]) => {
+        this.teacherForumsCount = fCount;
+        this.teacherForumMessagesCount = mCount;
+      },
+      error: err => console.error(err)
+    });
   }
 
   private setupStudent(userId: string) {
-    this.userService.listEnrollments(userId).pipe(
-      switchMap(enrs => {
-        if (!enrs.length) {
-          return of([] as Array<{ due: number; progress: number; courseId: string }>);
-        }
-        return forkJoin(
-          enrs.map(e =>
-            this.postService.list(e.courseId).pipe(
-              map(posts => ({
-                due: posts.filter(p =>
-                  p.type === 'homework' &&
-                  p.due_date && new Date(p.due_date) > new Date()
-                ).length,
-                progress: (e as any).progress ?? 0,
-                courseId: e.courseId
-              })),
-              catchError(() => of({ due: 0, progress: 0, courseId: e.courseId }))
+  this.userService.listEnrollments(userId).pipe(
+    switchMap((enrs: Enrollment[]) => {
+      if (!enrs.length) {
+        return of([] as Array<{ courseId: string; due: number; progress: number }>);
+      }
+      return forkJoin(
+        enrs.map(e =>
+          forkJoin({
+            posts: this.postService.list(e.courseId),
+            completions: this.completionService.getCompletions(e.courseId)
+          }).pipe(
+            map(({ posts, completions }) => {
+              // Only homework posts
+              const hwPosts = posts.filter(p => p.type === 'homework');
+              const totalHw = hwPosts.length;
+              // Count how many of those the student has marked complete
+              const doneHw = completions.filter(c =>
+                hwPosts.some(p => p._id === c.post_id)
+              ).length;
+
+              return {
+                courseId: e.courseId,
+                // now due = uncompleted homeworks
+                due: totalHw - doneHw,
+                progress: totalHw > 0 ? (doneHw / totalHw) * 100 : 0
+              };
+            }),
+            catchError(() =>
+              of({ courseId: e.courseId, due: 0, progress: 0 })
             )
           )
-        );
-      })
-    ).subscribe(items => {
+        )
+      );
+    })
+  ).subscribe({
+    next: (items) => {
+      // Sum uncompleted homeworks across all courses
       this.homeworksDue = items.reduce((sum, x) => sum + x.due, 0);
+
+      // Average percent complete remains the same
       this.avgCompletion = items.length
         ? items.reduce((sum, x) => sum + x.progress, 0) / items.length
         : 0;
+
       this.studentProgressChartData = {
-        labels: items.map((_, i) => `#${i + 1}`),
+        labels:   items.map((_, i) => `#${i + 1}`),
         datasets: [{ data: items.map(x => x.progress) }]
       };
 
-      if (!items.length) {
+      if (items.length) {
+        forkJoin(items.map(x => this.courseService.get(x.courseId)))
+          .subscribe((courses: Course[]) => {
+            this.enrolledCourses = courses.map((c, i) => ({
+              code:     c.code,
+              title:    c.title,
+              progress: items[i].progress
+            }));
+          }, err => console.error(err));
+      } else {
         this.enrolledCourses = [];
-        return;
       }
-      forkJoin(items.map(x => this.courseService.get(x.courseId)))
-        .subscribe(courses => {
-          this.enrolledCourses = courses.map((c, i) => ({
-            code: c.code,
-            title: c.title,
-            progress: items[i].progress
-          }));
-        }, err => console.error(err));
-    }, err => console.error(err));
-  }
+    },
+    error: err => console.error(err)
+  });
+}
+
 }
