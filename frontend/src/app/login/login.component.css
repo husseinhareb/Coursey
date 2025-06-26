@@ -9,17 +9,28 @@
   min-height: 100vh;
   padding: var(--spacing-md);
   background-color: var(--color-bg);
-}
-
-/* Logo above the card */
-.login-logo-outside {
-  max-width: 120px;
-  margin-bottom: calc(-1 * var(--spacing-lg));
-  z-index: 1;
   position: relative;
 }
 
-/* Card wrapper */
+/* BRAND outside the card */
+.login-brand-outside {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: calc(-0.5 * var(--spacing-lg)); /* overlap just a little */
+  z-index: 2;
+}
+
+.brand-icon {
+  max-width: 120px; 
+  width: 100%;
+  height: auto;
+  margin-bottom: 20px;
+}
+
+/*------------------------------------
+  Card wrapper
+------------------------------------*/
 .login-card {
   width: 100%;
   max-width: 360px;
@@ -105,7 +116,9 @@
   color: var(--color-primary);
 }
 
-/* Inline error text */
+/*------------------------------------
+  Inline error text
+------------------------------------*/
 .error-message {
   display: block;
   margin-top: var(--spacing-xs);
@@ -136,8 +149,6 @@
   border-radius: var(--border-radius);
   font-weight: 600;
   cursor: pointer;
-  position: relative;
-  overflow: hidden;
   transition: background-color var(--transition-speed),
               transform var(--transition-speed);
 }
@@ -165,19 +176,17 @@
   animation: fadeIn var(--transition-speed) ease-in;
 }
 
-/* Fade-in keyframes */
+/*------------------------------------
+  Fade-in keyframes
+------------------------------------*/
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(-10px); }
+  to   { opacity: 1; transform: translateY(0);  }
 }
 
-/* Dark theme tweaks */
+/*------------------------------------
+  Dark theme tweaks
+------------------------------------*/
 [data-theme="dark"] .login-card {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
@@ -191,15 +200,14 @@
   background-color: var(--color-primary-hover);
 }
 
-/* Responsive adjustments */
+/*------------------------------------
+  Responsive adjustments
+------------------------------------*/
 @media (max-width: 480px) {
   .login-card {
     max-width: 100%;
   }
-  .login-logo-outside {
-  max-width: 120px;
-  margin-bottom: calc(-1 * var(--spacing-xl));
-  z-index: 1;
-  position: relative;
-}
+  .brand-icon {
+    max-width: 60px;
+  }
 }

@@ -1,16 +1,15 @@
 <div class="login-container">
 
-  <!-- Logo sits above the card entirely -->
-  <img src="assets/images/logo.png" alt="Coursey Logo" class="login-logo-outside" />
+  <!-- BRAND outside the card -->
+  <div class="login-brand-outside">
+    <img src="assets/images/logo.png" alt="Coursey Logo" class="brand-icon" />
+  </div>
 
   <div class="login-card">
-
-    <!-- Header now only contains the “Log In” title -->
     <div class="login-header">
       <h2>{{ 'LOGIN.TITLE' | translate }}</h2>
     </div>
 
-    <!-- Body with form -->
     <div class="login-body">
       <form [formGroup]="form" (ngSubmit)="onSubmit()">
         <!-- Email Field -->

@@ -1,5 +1,3 @@
-<!-- src/app/courses/courses.component.html -->
-
 <!-- Page header -->
 <div class="courses-header">
   <h2>{{ 'COURSES.TITLE' | translate }}</h2>
@@ -22,38 +20,51 @@
 <!-- Courses grid -->
 <div *ngIf="!loading && !error" class="courses-grid">
   <div *ngFor="let c of courses" class="course-card">
-    <!-- Header: image or color via helper -->
-    <div
-      class="course-card__header"
-      [ngStyle]="getHeaderStyle(c)"
-    ></div>
+    <!-- Entire header+body clickable -->
+    <a
+      class="course-card__link"
+      [routerLink]="['/courses', c.id]"
+    >
+      <!-- Header (image/color) -->
+      <div
+        class="course-card__header"
+        [ngStyle]="getHeaderStyle(c)"
+      ></div>
 
-    <!-- Body -->
-    <div class="course-card__body">
-      <h3 class="course-card__title">{{ c.title }}</h3>
-      <p class="course-card__code">{{ c.code }}</p>
-      <p class="course-card__desc">{{ c.description }}</p>
-
-      <div class="course-card__actions">
-        <button class="btn btn--info"
-                [routerLink]="['/courses', c.id]">
-          <i class="fa-solid fa-info"></i>
-          {{ 'COURSES.INFO' | translate }}
-        </button>
-
-        <ng-container *ngIf="isAdmin">
-          <button class="btn btn--edit"
-                  (click)="edit(c.id)">
-            <i class="fa-solid fa-pen"></i>
-            {{ 'COURSES.EDIT' | translate }}
-          </button>
-          <button class="btn btn--delete"
-                  (click)="delete(c.id)">
-            <i class="fa-solid fa-trash"></i>
-            {{ 'COURSES.DELETE' | translate }}
-          </button>
-        </ng-container>
+      <!-- Body -->
+      <div class="course-card__body">
+        <h3 class="course-card__title">{{ c.title }}</h3>
+        <p class="course-card__code">{{ c.code }}</p>
+        <p class="course-card__desc">{{ c.description }}</p>
       </div>
+    </a>
+
+    <!-- Action buttons -->
+    <div class="course-card__actions">
+      <button
+        class="btn btn--info"
+        [routerLink]="['/courses', c.id]"
+      >
+        <i class="fa-solid fa-info"></i>
+        {{ 'COURSES.INFO' | translate }}
+      </button>
+
+      <ng-container *ngIf="isAdmin">
+        <button
+          class="btn btn--edit"
+          (click)="edit(c.id); $event.stopPropagation()"
+        >
+          <i class="fa-solid fa-pen"></i>
+          {{ 'COURSES.EDIT' | translate }}
+        </button>
+        <button
+          class="btn btn--delete"
+          (click)="delete(c.id); $event.stopPropagation()"
+        >
+          <i class="fa-solid fa-trash"></i>
+          {{ 'COURSES.DELETE' | translate }}
+        </button>
+      </ng-container>
     </div>
   </div>
 </div>
