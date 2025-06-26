@@ -121,3 +121,19 @@
 .homework-actions {
   margin-top: var(--spacing-md);
 }
+.post-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.post-header__left {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.completion-btn {
+  white-space: nowrap;
+}

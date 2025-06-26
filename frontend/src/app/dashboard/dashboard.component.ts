@@ -15,7 +15,7 @@ import { AuthService, Me }   from '../auth/auth.service';
 import { UserService, Enrollment }    from '../services/user.service';
 import { CourseService, Course }      from '../services/course.service';
 import { ForumService }               from '../services/forum.service';
-import { PostService, Post }          from '../services/post.service';
+import { PostService }                from '../services/post.service';
 
 import { forkJoin, of }    from 'rxjs';
 import { switchMap, map, catchError } from 'rxjs/operators';
@@ -114,6 +114,7 @@ export class DashboardComponent implements OnInit {
   }
 
   private setupAdmin(a: AdminOverview) {
+    // Basic totals & charts from API
     this.adminTotals = { ...a.totals };
     this.submissionsData = {
       labels: Object.keys(a.submissions),
@@ -124,33 +125,38 @@ export class DashboardComponent implements OnInit {
       datasets: [{ data: Object.values(a.activityLast7Days), label: 'Actions' }]
     };
 
-    // count forums and messages across all courses
+    // Ensure total courses is correct
+    this.courseService.list().subscribe(all => {
+      this.adminTotals.courses = all.length;
+    });
+
+    // Gather forums & messages across every course
     this.courseService.list().pipe(
       switchMap(courses => {
-        const forumCount$ = forkJoin(
+        const forums$ = forkJoin(
           courses.map(c => this.forumService.listTopics(c.id).pipe(
-            map(topics => topics.length),
+            map(ts => ts.length),
             catchError(() => of(0))
           ))
-        ).pipe(map(arr => arr.reduce((sum, n) => sum + n, 0)));
+        ).pipe(map(arr => arr.reduce((s, n) => s + n, 0)));
 
-        const messageCount$ = forkJoin(
+        const messages$ = forkJoin(
           courses.map(c => this.forumService.listTopics(c.id).pipe(
-            switchMap(topics => topics.length
-              ? forkJoin(topics.map(t =>
+            switchMap(ts => ts.length
+              ? forkJoin(ts.map(t =>
                   this.forumService.getTopic(c.id, t._id).pipe(
-                    map(f => f.messages.length),
+                    map(topic => topic.messages.length),
                     catchError(() => of(0))
                   )
                 ))
               : of([] as number[])
             ),
-            map(arr => arr.reduce((sum, n) => sum + n, 0)),
+            map(arr => arr.reduce((s, n) => s + n, 0)),
             catchError(() => of(0))
           ))
-        ).pipe(map(arr => arr.reduce((sum, n) => sum + n, 0)));
+        ).pipe(map(arr => arr.reduce((s, n) => s + n, 0)));
 
-        return forkJoin([forumCount$, messageCount$]);
+        return forkJoin([forums$, messages$]);
       })
     ).subscribe(([fCount, mCount]) => {
       this.adminForumsCount = fCount;
@@ -174,17 +180,17 @@ export class DashboardComponent implements OnInit {
       // total forums
       forkJoin(this.teacherCourses.map(c =>
         this.forumService.listTopics(c.code).pipe(
-          map(topics => topics.length),
+          map(ts => ts.length),
           catchError(() => of(0))
         )
       )).pipe(map(arr => arr.reduce((s, n) => s + n, 0))),
       // total messages
       forkJoin(this.teacherCourses.map(c =>
         this.forumService.listTopics(c.code).pipe(
-          switchMap(topics => topics.length
-            ? forkJoin(topics.map(tpc =>
+          switchMap(ts => ts.length
+            ? forkJoin(ts.map(tpc =>
                 this.forumService.getTopic(c.code, tpc._id).pipe(
-                  map(th => th.messages.length),
+                  map(topic => topic.messages.length),
                   catchError(() => of(0))
                 )
               ))
@@ -203,12 +209,17 @@ export class DashboardComponent implements OnInit {
   private setupStudent(userId: string) {
     this.userService.listEnrollments(userId).pipe(
       switchMap(enrs => {
-        if (!enrs.length) return of([] as Array<{ due: number; progress: number; courseId: string }>);
+        if (!enrs.length) {
+          return of([] as Array<{ due: number; progress: number; courseId: string }>);
+        }
         return forkJoin(
           enrs.map(e =>
             this.postService.list(e.courseId).pipe(
               map(posts => ({
-                due: posts.filter(p => p.type === 'homework' && p.due_date && new Date(p.due_date) > new Date()).length,
+                due: posts.filter(p =>
+                  p.type === 'homework' &&
+                  p.due_date && new Date(p.due_date) > new Date()
+                ).length,
                 progress: (e as any).progress ?? 0,
                 courseId: e.courseId
               })),
@@ -218,7 +229,6 @@ export class DashboardComponent implements OnInit {
         );
       })
     ).subscribe(items => {
-      // items: array of {due,progress,courseId}
       this.homeworksDue = items.reduce((sum, x) => sum + x.due, 0);
       this.avgCompletion = items.length
         ? items.reduce((sum, x) => sum + x.progress, 0) / items.length
@@ -228,15 +238,18 @@ export class DashboardComponent implements OnInit {
         datasets: [{ data: items.map(x => x.progress) }]
       };
 
-      // fetch course details
-      if (!items.length) return;
-      forkJoin(items.map(x => this.courseService.get(x.courseId))).subscribe(courses => {
-        this.enrolledCourses = courses.map((c, i) => ({
-          code: c.code,
-          title: c.title,
-          progress: items[i].progress
-        }));
-      }, err => console.error(err));
+      if (!items.length) {
+        this.enrolledCourses = [];
+        return;
+      }
+      forkJoin(items.map(x => this.courseService.get(x.courseId)))
+        .subscribe(courses => {
+          this.enrolledCourses = courses.map((c, i) => ({
+            code: c.code,
+            title: c.title,
+            progress: items[i].progress
+          }));
+        }, err => console.error(err));
     }, err => console.error(err));
   }
 }

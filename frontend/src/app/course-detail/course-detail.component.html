@@ -13,7 +13,10 @@
 <!-- Course Info -->
 <div *ngIf="course" class="course-header">
   <div class="course-title-wrapper">
-    <h2 class="course-title"><i class="fas fa-graduation-cap"></i> {{ course.title }}</h2>
+    <h2 class="course-title">
+      <i class="fas fa-graduation-cap"></i>
+      {{ course.title }}
+    </h2>
     <button
       class="btn btn--forum"
       [routerLink]="['/courses', courseId, 'forums']"
@@ -25,6 +28,7 @@
   <p class="course-description">{{ course.description }}</p>
 </div>
 
+<hr class="section-divider" />
 
 <!-- Add / Edit Post -->
 <div class="post-controls" *ngIf="canModifyPosts">
@@ -32,7 +36,10 @@
     class="btn btn--add-post"
     (click)="toggleForm()"
   >
-    <i class="fas" [ngClass]="editing ? 'fa-edit' : 'fa-plus-circle'"></i>
+    <i
+      class="fas"
+      [ngClass]="editing ? 'fa-edit' : 'fa-plus-circle'"
+    ></i>
     {{ editing
        ? ('COURSE_DETAIL.EDIT_POST'   | translate)
        : ('COURSE_DETAIL.ADD_POST'    | translate)
@@ -40,13 +47,45 @@
   </button>
 </div>
 
+<!-- Post Form -->
 <div *ngIf="showForm && canModifyPosts" class="post-form">
-  <!-- …your existing <form> here… -->
+  <form [formGroup]="postForm" (ngSubmit)="savePost()">
+    <label>
+      {{ 'COURSE_DETAIL.POST_TITLE' | translate }}
+      <input formControlName="title" />
+    </label>
+    <label>
+      {{ 'COURSE_DETAIL.POST_CONTENT' | translate }}
+      <textarea formControlName="content"></textarea>
+    </label>
+    <label>
+      {{ 'COURSE_DETAIL.POST_TYPE' | translate }}
+      <select formControlName="type">
+        <option value="lecture">{{ 'POSTS.TYPE_LECTURE' | translate }}</option>
+        <option value="reminder">{{ 'POSTS.TYPE_REMINDER' | translate }}</option>
+        <option value="homework">{{ 'POSTS.TYPE_HOMEWORK' | translate }}</option>
+      </select>
+    </label>
+    <label *ngIf="postForm.get('type')?.value === 'homework'">
+      {{ 'COURSE_DETAIL.POST_DUE_DATE' | translate }}
+      <input type="datetime-local" formControlName="due_date" />
+    </label>
+    <div class="form-actions">
+      <button type="submit" class="btn btn--primary" [disabled]="postForm.invalid">
+        <i class="fas fa-save"></i>
+        {{ 'COURSE_DETAIL.SAVE_POST' | translate }}
+      </button>
+      <button type="button" class="btn" (click)="toggleForm()">
+        <i class="fas fa-times"></i>
+        {{ 'COURSE_DETAIL.CANCEL' | translate }}
+      </button>
+    </div>
+  </form>
 </div>
 
 <hr class="section-divider" />
 
-<!-- Posts list -->
+<!-- Posts List -->
 <app-posts
   [posts]="posts"
   [loading]="loadingPosts"
@@ -58,12 +97,18 @@
   [showSubmissionFormForPostId]="showSubmissionFormForPostId"
   [showOwnSubmissionListForPostId]="showOwnSubmissionListForPostId"
   [showSubmissionListForPostId]="showSubmissionListForPostId"
+  [completions]="completions"
+
   (toggleSubmissionForm)="toggleSubmissionForm($event)"
   (viewOwnSubmission)="showOwnSubmissionListForPostId = $event"
   (toggleSubmissionList)="toggleSubmissionList($event)"
+
   (togglePin)="togglePin($event)"
   (moveUp)="moveUp($event)"
   (moveDown)="moveDown($event)"
   (editPost)="toggleForm($event)"
   (deletePost)="deletePost($event)"
-></app-posts>
+
+  (toggleComplete)="onToggleComplete($event)"
+>
+</app-posts>

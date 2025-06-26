@@ -1,14 +1,19 @@
-// src/app/posts/posts.component.ts
+import {
+  Component,
+  Input,
+  Output,
+  EventEmitter,
+  ChangeDetectionStrategy
+} from '@angular/core';
+import { CommonModule }    from '@angular/common';
+import { RouterModule }    from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
 
-
-import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
 import { SubmissionFormComponent } from '../submissions/submission-form.component';
 import { SubmissionListComponent } from '../submissions/submission-list.component';
-import { Post } from '../services/post.service';
+
+import { Post }       from '../services/post.service';
 import { Submission } from '../services/submission.service';
-import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-posts',
@@ -16,40 +21,58 @@ import { TranslateModule } from '@ngx-translate/core';
   imports: [
     CommonModule,
     RouterModule,
+    TranslateModule,
     SubmissionFormComponent,
-    SubmissionListComponent,
-    TranslateModule
+    SubmissionListComponent
   ],
   templateUrl: './posts.component.html',
-  styleUrls: ['./posts.component.css']
+  styleUrls: ['./posts.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PostsComponent {
-  //TODO: use a class called posts for redundancy see page 21 course angular components
+  /** Core inputs */
   @Input() posts!: Post[];
   @Input() loading = false;
   @Input() error: string | null = null;
   @Input() courseId!: string;
+
+  /** Permissions & helpers */
   @Input() isStudentInCourse = false;
   @Input() studentSubmissions: { [postId: string]: Submission } = {};
   @Input() canModifyPosts = false;
+
+  /** Panel state */
   @Input() showSubmissionFormForPostId: string | null = null;
   @Input() showOwnSubmissionListForPostId: string | null = null;
   @Input() showSubmissionListForPostId: string | null = null;
 
+  /** Completion map: postId → done? */
+  @Input() completions: { [postId: string]: boolean } = {};
+
+  /** Admin actions */
+  @Output() togglePin        = new EventEmitter<Post>();
+  @Output() moveUp           = new EventEmitter<Post>();
+  @Output() moveDown         = new EventEmitter<Post>();
+  @Output() editPost         = new EventEmitter<Post>();
+  @Output() deletePost       = new EventEmitter<Post>();
+
+  /** Submission events */
   @Output() toggleSubmissionForm = new EventEmitter<string | null>();
-  @Output() viewOwnSubmission = new EventEmitter<string | null>();
+  @Output() viewOwnSubmission    = new EventEmitter<string | null>();
   @Output() toggleSubmissionList = new EventEmitter<string | null>();
-  @Output() togglePin = new EventEmitter<Post>();
-  @Output() moveUp = new EventEmitter<Post>();
-  @Output() moveDown = new EventEmitter<Post>();
-  @Output() editPost = new EventEmitter<Post>();
-  @Output() deletePost = new EventEmitter<Post>();
+
+  /** Completion event */
+  @Output() toggleComplete = new EventEmitter<string>();
 
   get unpinnedCount(): number {
     return this.posts.filter(p => !p.ispinned).length;
   }
 
   onSubmitted(): void {
-    // bubble up if additional handling is needed
+    // Stub: bubble up if parent needs to reload
+  }
+
+  onToggleDone(postId: string): void {
+    this.toggleComplete.emit(postId);
   }
 }

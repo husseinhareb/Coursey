@@ -1,3 +1,5 @@
+// src/app/course-detail/course-detail.component.ts
+
 import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
@@ -7,15 +9,17 @@ import {
   Validators
 } from '@angular/forms';
 import { RouterModule, ActivatedRoute, ParamMap } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { Subscription, of } from 'rxjs';
+import { switchMap, catchError } from 'rxjs/operators';
 
 import { CourseService, Course } from '../services/course.service';
 import { PostService, Post } from '../services/post.service';
 import { SubmissionService, Submission } from '../services/submission.service';
+import { CompletionService, Completion } from '../services/completion.service';
 import { AuthService, Me } from '../auth/auth.service';
 import { Enrollment } from '../services/user.service';
 import { PostsComponent } from '../posts/posts.component';
-import { TranslateModule }       from '@ngx-translate/core';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-course-detail',
@@ -36,6 +40,7 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
   private courseSvc = inject(CourseService);
   private postSvc = inject(PostService);
   private submissionSvc = inject(SubmissionService);
+  private completionSvc = inject(CompletionService);
   private auth = inject(AuthService);
 
   private subs = new Subscription();
@@ -51,6 +56,8 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
 
   public studentSubmissions: { [postId: string]: Submission } = {};
   private requestedPostId: string | null = null;
+
+  public completions: { [postId: string]: boolean } = {};
 
   public showForm = false;
   public editing?: Post;
@@ -72,6 +79,7 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
   public isStudentInCourse = false;
 
   ngOnInit() {
+    // Watch route params
     this.subs.add(
       this.route.paramMap.subscribe((params: ParamMap) => {
         const id = params.get('id');
@@ -88,13 +96,15 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
       })
     );
 
+    // Watch auth user
     this.subs.add(
       this.auth.user$.subscribe({
-        next: user => {
+        next: (user: Me | null) => {
           this.currentUser = user;
           this.computePermissions();
-          if (this.isStudentInCourse && this.posts.length > 0) {
+          if (this.isStudentInCourse) {
             this.loadStudentSubmissions();
+            this.loadCompletions();
           }
         },
         error: () => {
@@ -114,10 +124,8 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
     this.isAdmin = !!u && u.roles.map(r => r.toLowerCase()).includes('admin');
     if (u && u.enrollments) {
       const found = (u.enrollments as Enrollment[]).find(e => e.courseId === this.courseId);
-      this.isProfessorInCourse = !!found &&
-        u.roles.map(r => r.toLowerCase()).includes('teacher');
-      this.isStudentInCourse = !!found &&
-        u.roles.map(r => r.toLowerCase()).includes('student');
+      this.isProfessorInCourse = !!found && u.roles.map(r => r.toLowerCase()).includes('teacher');
+      this.isStudentInCourse = !!found && u.roles.map(r => r.toLowerCase()).includes('student');
     } else {
       this.isProfessorInCourse = false;
       this.isStudentInCourse = false;
@@ -145,11 +153,11 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
     this.loadingCourse = true;
     this.courseError = null;
     this.courseSvc.get(this.courseId).subscribe({
-      next: c => {
+      next: (c: Course) => {
         this.course = c;
         this.loadingCourse = false;
       },
-      error: e => {
+      error: (e: any) => {
         this.courseError = e.error?.detail || 'Failed to load course';
         this.loadingCourse = false;
       }
@@ -159,33 +167,87 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
   private loadPosts() {
     this.loadingPosts = true;
     this.postsError = null;
-    this.postSvc.list(this.courseId).subscribe({
-      next: ps => {
+    this.postSvc.list(this.courseId).pipe(
+      switchMap((ps: Post[]) => {
         this.posts = ps;
         this.loadingPosts = false;
-        if (this.isStudentInCourse) this.loadStudentSubmissions();
+        if (this.isStudentInCourse) {
+          this.loadStudentSubmissions();
+          this.loadCompletions();
+        }
         this.scrollToRequestedPost();
-      },
-      error: e => {
-        this.postsError = e.error?.detail || 'Failed to load posts';
+        return of(null);
+      }),
+      catchError((err: any) => {
+        this.postsError = err.error?.detail || 'Failed to load posts';
         this.loadingPosts = false;
-      }
-    });
+        return of(null);
+      })
+    ).subscribe();
   }
 
   private loadStudentSubmissions() {
     if (!this.currentUser) return;
-    this.posts.filter(p => p.type === 'homework').forEach(p => {
-      this.submissionSvc.list(this.courseId, p._id).subscribe({
-        next: subs => {
-          const mine = subs.find(s => s.student_id === this.currentUser!.id);
-          if (mine) this.studentSubmissions[p._id] = mine;
-          else delete this.studentSubmissions[p._id];
-        },
-        error: () => delete this.studentSubmissions[p._id]
+    this.posts
+      .filter((p: Post) => p.type === 'homework')
+      .forEach((p: Post) => {
+        this.submissionSvc.list(this.courseId, p._id).subscribe({
+          next: (subs: Submission[]) => {
+            const mine = subs.find(s => s.student_id === this.currentUser!.id);
+            if (mine) this.studentSubmissions[p._id] = mine;
+            else delete this.studentSubmissions[p._id];
+          },
+          error: () => {
+            delete this.studentSubmissions[p._id];
+          }
+        });
       });
+  }
+
+  private loadCompletions() {
+    if (!this.currentUser) return;
+    this.completionSvc.getCompletions(this.courseId).subscribe({
+      next: (list: Completion[]) => {
+        this.completions = {};
+        list.forEach((c: Completion) => {
+          this.completions[c.post_id] = true;
+        });
+      },
+      error: () => {
+        this.completions = {};
+      }
     });
   }
+
+  /** Called when student clicks “mark done” or “undo” */
+  onToggleComplete(postId: string) {
+    if (!this.isStudentInCourse) return;
+    const done = !!this.completions[postId];
+
+    if (done) {
+      this.completionSvc
+        .unmarkComplete(this.courseId, postId)
+        .pipe(
+          switchMap(() => this.completionSvc.getCompletions(this.courseId)),
+          catchError(() => of([] as Completion[]))
+        )
+        .subscribe(completionList => this.updateCompletions(completionList));
+    } else {
+      this.completionSvc
+        .markComplete(this.courseId, postId)
+        .pipe(
+          switchMap(() => this.completionSvc.getCompletions(this.courseId)),
+          catchError(() => of([] as Completion[]))
+        )
+        .subscribe(completionList => this.updateCompletions(completionList));
+    }
+  }
+
+  private updateCompletions(list: Completion[]) {
+    this.completions = {};
+    list.forEach(c => (this.completions[c.post_id] = true));
+  }
+
 
   private scrollToRequestedPost() {
     if (!this.requestedPostId) return;
@@ -198,9 +260,7 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
     }, 0);
   }
 
-  get unpinnedCount(): number {
-    return this.posts.filter(p => !p.ispinned).length;
-  }
+  // --- Post create/edit/delete/pin/move methods ---
 
   toggleForm(post?: Post) {
     if (!this.canModifyPosts) return;
@@ -232,9 +292,15 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
     const obs = this.editing
       ? this.postSvc.update(this.courseId, this.editing._id, payload)
       : this.postSvc.create(this.courseId, payload);
+
     obs.subscribe({
-      next: () => { this.toggleForm(); this.loadPosts(); },
-      error: e => { this.postsError = e.error?.detail || 'Save failed'; }
+      next: () => {
+        this.toggleForm();
+        this.loadPosts();
+      },
+      error: (e: any) => {
+        this.postsError = e.error?.detail || 'Save failed';
+      }
     });
   }
 
@@ -243,24 +309,40 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
     if (!confirm(`Delete post "${p.title}"?`)) return;
     this.postSvc.delete(this.courseId, p._id).subscribe({
       next: () => this.loadPosts(),
-      error: e => { this.postsError = e.error?.detail || 'Delete failed'; }
+      error: (e: any) => {
+        this.postsError = e.error?.detail || 'Delete failed';
+      }
     });
   }
 
   togglePin(p: Post) {
     if (!this.canModifyPosts) return;
-    const action = p.ispinned ? this.postSvc.unpin : this.postSvc.pin;
-    action.call(this.postSvc, this.courseId, p._id).subscribe({
-      next: () => this.loadPosts(),
-      error: e => { this.postsError = e.error?.detail || (p.ispinned ? 'Unpin failed' : 'Pin failed'); }
-    });
+
+    if (p.ispinned) {
+      this.postSvc
+        .unpin(this.courseId, p._id)
+        .subscribe({
+          next: () => this.loadPosts(),
+          error: e => this.postsError = e.error?.detail ?? 'Unpin failed'
+        });
+    } else {
+      this.postSvc
+        .pin(this.courseId, p._id)
+        .subscribe({
+          next: () => this.loadPosts(),
+          error: e => this.postsError = e.error?.detail ?? 'Pin failed'
+        });
+    }
   }
+
 
   moveUp(p: Post) {
     if (!this.canModifyPosts || p.ispinned) return;
     this.postSvc.moveUp(this.courseId, p._id).subscribe({
       next: () => this.loadPosts(),
-      error: e => { this.postsError = e.error?.detail || 'Move up failed'; }
+      error: (e: any) => {
+        this.postsError = e.error?.detail || 'Move up failed';
+      }
     });
   }
 
@@ -268,7 +350,9 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
     if (!this.canModifyPosts || p.ispinned) return;
     this.postSvc.moveDown(this.courseId, p._id).subscribe({
       next: () => this.loadPosts(),
-      error: e => { this.postsError = e.error?.detail || 'Move down failed'; }
+      error: (e: any) => {
+        this.postsError = e.error?.detail || 'Move down failed';
+      }
     });
   }
 
