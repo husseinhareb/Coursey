@@ -11,7 +11,8 @@ import { TranslateModule }       from '@ngx-translate/core';
   selector: 'app-manage-enrollments',
   standalone: true,
   imports: [CommonModule, TranslateModule],
-  templateUrl: './manage-enrollments.component.html'
+  templateUrl: './manage-enrollments.component.html',
+  styleUrl: './manage-enrollments.component.css'
 })
 export class ManageEnrollmentsComponent implements OnInit {
   userId!: string;
