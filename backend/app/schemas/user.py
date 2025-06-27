@@ -1,5 +1,3 @@
-# /app/schemas/user.py
-
 from pydantic import BaseModel, EmailStr, Field
 from typing import List, Optional
 from datetime import datetime
@@ -23,6 +21,7 @@ class Profile(BaseModel):
         "validate_by_name": True,
         "from_attributes":  True
     }
+
 class SignupIn(BaseModel):
     email:     EmailStr
     password:  str
@@ -53,19 +52,10 @@ class EnrollmentUser(BaseModel):
     class Config:
         validate_by_name = True
         form_attributes = True
+
 class Access(BaseModel):
     courseId:   str
     accessedAt: datetime
-
-    model_config = {
-        "validate_by_name": True,
-        "from_attributes":  True
-    }
-
-class Alert(BaseModel):
-    alertId:        str
-    createdAt:      datetime
-    acknowledgedAt: Optional[datetime] = None
 
     model_config = {
         "validate_by_name": True,
@@ -81,7 +71,6 @@ class UserDB(BaseModel):
     roles:        List[str]       = []
     enrollments:  List[Enrollment] = []
     accesses:     List[Access]     = []
-    alerts:       List[Alert]      = []
     createdAt:    datetime
     updatedAt:    datetime
 
@@ -98,7 +87,6 @@ class UserOut(BaseModel):
     roles:     List[str]
     enrollments: List[Enrollment]
     accesses:    List[Access]
-    alerts:      List[Alert]
     createdAt: datetime
     updatedAt: datetime
 

@@ -1,34 +1,39 @@
 // src/app/services/user.service.ts
 
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable, map } from 'rxjs';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { environment } from '../environments/environment';
 
 export interface Profile {
-  firstName: string;
-  lastName: string;
+  firstName:   string;
+  lastName:    string;
   profilePic?: string;
   phoneNumber?: string;
-  address?: string;
-}
-
-export interface User {
-  id: string;
-  email: string;
-  username: string;
-  profile: Profile;
-  roles: string[];
-  enrollments: any[];
-  accesses: any[];
-  alerts: any[];
-  createdAt: string;
-  updatedAt: string;
+  address?:     string;
 }
 
 export interface Enrollment {
-  courseId: string;
-  enrolledAt: string; // ISO
+  courseId:   string;
+  enrolledAt: string; // ISO string
+}
+
+export interface Access {
+  courseId:   string;
+  accessedAt: string; // ISO string
+}
+
+export interface User {
+  id:          string;
+  email:       string;
+  username:    string;
+  profile:     Profile;
+  roles:       string[];
+  enrollments: Enrollment[];
+  accesses:    Access[];
+  createdAt:   string;
+  updatedAt:   string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -37,35 +42,65 @@ export class UserService {
 
   constructor(private http: HttpClient) {}
 
-  /** fetch /users/me, normalize _id → id */
+  /** GET /users/me */
   getMe(): Observable<User> {
     return this.http.get<any>(`${this.base}/me`).pipe(
-      map(u => ({ ...u, id: u._id }))
+      map(u => ({
+        id:          u._id,
+        email:       u.email,
+        username:    u.username,
+        profile:     u.profile,
+        roles:       u.roles,
+        enrollments: u.enrollments,
+        accesses:    u.accesses,
+        createdAt:   u.createdAt,
+        updatedAt:   u.updatedAt
+      }))
     );
   }
 
-  /** update profile; returns the new user and normalizes _id → id */
-  updateProfile(id: string, profile: Profile): Observable<User> {
-    return this.http.put<any>(`${this.base}/${id}`, profile).pipe(
-      map(u => ({ ...u, id: u._id }))
+  /** GET /users/{id} */
+  getById(userId: string): Observable<User> {
+    return this.http.get<any>(`${this.base}/${userId}`).pipe(
+      map(u => ({
+        id:          u._id,
+        email:       u.email,
+        username:    u.username,
+        profile:     u.profile,
+        roles:       u.roles,
+        enrollments: u.enrollments,
+        accesses:    u.accesses,
+        createdAt:   u.createdAt,
+        updatedAt:   u.updatedAt
+      }))
     );
   }
 
-  /** list all users */
+  /** GET /users */
   getUsers(): Observable<User[]> {
-    return this.http.get<any[]>(`${this.base}/`).pipe(
-      map(list => list.map(u => ({ ...u, id: u._id })))
+    return this.http.get<any[]>(`${this.base}`).pipe(
+      map(list =>
+        list.map(u => ({
+          id:          u._id,
+          email:       u.email,
+          username:    u.username,
+          profile:     u.profile,
+          roles:       u.roles,
+          enrollments: u.enrollments,
+          accesses:    u.accesses,
+          createdAt:   u.createdAt,
+          updatedAt:   u.updatedAt
+        }))
+      )
     );
   }
 
-  /** list a user's enrollments */
+  /** GET /users/{userId}/enrollments */
   listEnrollments(userId: string): Observable<Enrollment[]> {
-    return this.http
-      .get<Enrollment[]>(`${this.base}/${userId}/enrollments`)
-      .pipe(map(arr => arr.map(e => ({ ...e, enrolledAt: e.enrolledAt }))));
+    return this.http.get<Enrollment[]>(`${this.base}/${userId}/enrollments`);
   }
 
-  /** enroll a user in a course */
+  /** POST /users/{userId}/enrollments */
   enroll(userId: string, courseId: string): Observable<Enrollment> {
     return this.http.post<Enrollment>(
       `${this.base}/${userId}/enrollments`,
@@ -73,33 +108,36 @@ export class UserService {
     );
   }
 
-  /** unenroll a user from a course */
-  unenroll(userId: string, courseId: string): Observable<any> {
-    return this.http.delete(
+  /** DELETE /users/{userId}/enrollments/{courseId} */
+  unenroll(userId: string, courseId: string): Observable<void> {
+    return this.http.delete<void>(
       `${this.base}/${userId}/enrollments/${courseId}`
     );
   }
 
-  /** get a user by ID */
-  getById(userId: string): Observable<User> {
-    return this.http.get<any>(`${this.base}/${userId}`).pipe(
+  /** PUT /users/{id} */
+  updateProfile(id: string, profile: Profile): Observable<User> {
+    return this.http.put<any>(`${this.base}/${id}`, profile).pipe(
       map(u => ({
-        ...u,
-        id: u._id ?? u.id
-      } as User))
+        id:          u._id,
+        email:       u.email,
+        username:    u.username,
+        profile:     u.profile,
+        roles:       u.roles,
+        enrollments: u.enrollments,
+        accesses:    u.accesses,
+        createdAt:   u.createdAt,
+        updatedAt:   u.updatedAt
+      }))
     );
   }
 
-  /** delete a user */
+  /** DELETE /users/{userId} */
   deleteUser(userId: string): Observable<void> {
     return this.http.delete<void>(`${this.base}/${userId}`);
   }
 
-  /**
-   * Change a user's password.
-   * POST /users/{userId}/password
-   * Body: { oldPassword, newPassword }
-   */
+  /** POST /users/{userId}/password */
   changePassword(
     userId: string,
     oldPassword: string,
@@ -109,5 +147,14 @@ export class UserService {
       `${this.base}/${userId}/password`,
       { oldPassword, newPassword }
     );
+  }
+
+  /**
+   * GET /users/me/accesses?limit={limit}
+   * Returns the most recently accessed courses for the current user.
+   */
+  getRecentAccesses(limit: number = 10): Observable<Access[]> {
+    const params = new HttpParams().set('limit', limit.toString());
+    return this.http.get<Access[]>(`${this.base}/me/accesses`, { params });
   }
 }

@@ -20,7 +20,7 @@ from app.schemas.activity import ActivityLogCreate
 from app.crud.activity import create_activity_log
 
 from app.crud.user import add_enrollment, list_users_by_course
-
+from app.crud.user import upsert_access
 router = APIRouter(
     prefix="/courses",
     tags=["courses"],
@@ -228,3 +228,17 @@ async def api_list_enrolled_users(
     )
     await create_activity_log(log)
     return enrolled
+
+@router.get("/{course_id}", response_model=CourseOut)
+async def read_course(
+    course_id: str,
+    current_user: UserDB = Depends(get_current_active_user),
+):
+    course = await get_course(course_id)
+    if not course:
+        raise HTTPException(404, "Course not found")
+
+    # Record the access
+    await upsert_access(current_user.id, course_id)
+
+    return course

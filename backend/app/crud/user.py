@@ -1,40 +1,31 @@
-# /app/crud/user.py
-
 from typing import Optional, List
 from datetime import datetime
 from bson import ObjectId
 
 from app.db.mongodb import users_collection
-from app.schemas.user import UserDB, Profile, Enrollment, Access, Alert
+from app.schemas.user import UserDB, Profile, Enrollment, Access
+from app.schemas.user import UserOut, EnrollmentUser
 
-from app.schemas.user import UserOut
-from app.schemas.user import EnrollmentUser
-
-def _normalize_user_doc(doc: dict) -> UserDB:
+async def _normalize_user_doc(doc: dict) -> UserDB:
     """Convert ObjectId fields to str and return a UserDB."""
     doc["_id"] = str(doc["_id"])
 
     # If roles were stored as plain strings, str(r) will just keep them unchanged.
     doc["roles"] = [str(r) for r in doc.get("roles", [])]
 
+    # Normalize enrollments
     doc["enrollments"] = [
         {"courseId": str(e["courseId"]), "enrolledAt": e["enrolledAt"]}
         for e in doc.get("enrollments", [])
     ]
+
+    # Normalize accesses
     doc["accesses"] = [
         {"courseId": str(a["courseId"]), "accessedAt": a["accessedAt"]}
         for a in doc.get("accesses", [])
     ]
-    doc["alerts"] = [
-        {
-            "alertId": str(al["alertId"]),
-            "createdAt": al["createdAt"],
-            "acknowledgedAt": al.get("acknowledgedAt")
-        }
-        for al in doc.get("alerts", [])
-    ]
-    return UserDB(**doc)
 
+    return UserDB(**doc)
 
 async def create_user(
     email: str,
@@ -46,7 +37,6 @@ async def create_user(
     if await users_collection.find_one({"email": email}):
         return None
 
-    # import here to avoid circular
     from app.services.auth import hash_password
 
     now = datetime.utcnow()
@@ -57,19 +47,16 @@ async def create_user(
         "username":     username,
         "passwordHash": hash_password(raw_password),
         "profile":      profile.model_dump(),
-        # ← Store incoming role‐strings directly
         "roles":        roles or [],
         "enrollments":  [],
         "accesses":     [],
-        "alerts":       [],
         "createdAt":    now,
         "updatedAt":    now
     }
 
     res = await users_collection.insert_one(user_doc)
     doc = await users_collection.find_one({"_id": res.inserted_id})
-    return _normalize_user_doc(doc)
-
+    return await _normalize_user_doc(doc)
 
 async def authenticate_user(email: str, password: str) -> Optional[UserDB]:
     """Verify credentials; return normalized UserDB or None."""
@@ -77,36 +64,32 @@ async def authenticate_user(email: str, password: str) -> Optional[UserDB]:
     if not doc:
         return None
 
-    # import here to avoid circular
     from app.services.auth import verify_password
 
     if not verify_password(password, doc.get("passwordHash", "")):
         return None
 
-    return _normalize_user_doc(doc)
-
+    return await _normalize_user_doc(doc)
 
 async def get_user_by_id(user_id: str) -> Optional[UserDB]:
     """Fetch a single user by ObjectId string, returning None if ID is invalid or not found."""
     try:
         oid = ObjectId(user_id)
-    except InvalidId:
+    except Exception:
         return None
 
     doc = await users_collection.find_one({"_id": oid})
     if not doc:
         return None
-    return _normalize_user_doc(doc)  # reuse normalization logic
-
+    return await _normalize_user_doc(doc)
 
 async def list_users() -> List[UserDB]:
     """Return all users, normalized and sorted by creation time desc."""
     out: List[UserDB] = []
     cursor = users_collection.find().sort("createdAt", -1)
     async for doc in cursor:
-        out.append(_normalize_user_doc(doc))
+        out.append(await _normalize_user_doc(doc))
     return out
-
 
 async def update_user(user_id: str, profile: Profile) -> Optional[UserDB]:
     """Update only the profile & updatedAt, then return fresh UserDB."""
@@ -118,7 +101,6 @@ async def update_user(user_id: str, profile: Profile) -> Optional[UserDB]:
     if res.matched_count == 0:
         return None
     return await get_user_by_id(user_id)
-
 
 async def list_enrollments(user_id: str) -> List[Enrollment]:
     """List a user’s enrollments."""
@@ -133,7 +115,6 @@ async def list_enrollments(user_id: str) -> List[Enrollment]:
         for e in doc.get("enrollments", [])
     ]
 
-
 async def add_enrollment(user_id: str, course_id: str) -> Enrollment:
     """Enroll a user in a course."""
     now = datetime.utcnow()
@@ -144,7 +125,6 @@ async def add_enrollment(user_id: str, course_id: str) -> Enrollment:
     )
     return Enrollment(courseId=course_id, enrolledAt=now)
 
-
 async def remove_enrollment(user_id: str, course_id: str) -> bool:
     """Remove a course from a user’s enrollments."""
     res = await users_collection.update_one(
@@ -153,36 +133,20 @@ async def remove_enrollment(user_id: str, course_id: str) -> bool:
     )
     return res.modified_count > 0
 
-
 async def list_users_by_course(course_id: str) -> List[EnrollmentUser]:
-    """
-    Find all users who have an entry in their `enrollments` array for this course.
-    Return only (_id, email, first_name, last_name) for each user.
-    """
+    """Find all users in a course, return slim user info."""
     oid = ObjectId(course_id)
-
-    # We only project the four fields we need.
     cursor = users_collection.find(
         {"enrollments.courseId": oid},
-        {
-            "_id": 1,
-            "email": 1,
-            "profile.firstName": 1,
-            "profile.lastName": 1
-        }
+        {"_id": 1, "email": 1, "profile.firstName": 1, "profile.lastName": 1}
     )
-
     out: List[EnrollmentUser] = []
     async for raw in cursor:
         raw["_id"] = str(raw["_id"])
-        prof = raw.get("profile") or {}
-        first = prof.get("firstName") if isinstance(prof, dict) else ""
-        last  = prof.get("lastName")  if isinstance(prof, dict) else ""
-        raw["first_name"] = first or ""
-        raw["last_name"]  = last  or ""
-        raw.pop("profile", None)
+        prof = raw.pop("profile", {}) or {}
+        raw["first_name"] = prof.get("firstName", "")
+        raw["last_name"] = prof.get("lastName", "")
         out.append(EnrollmentUser(**raw))
-
     return out
 
 async def delete_user(user_id: str) -> bool:
@@ -194,35 +158,64 @@ async def delete_user(user_id: str) -> bool:
     res = await users_collection.delete_one({"_id": oid})
     return res.deleted_count == 1
 
-
 async def change_user_password(
     user_id: str, old_password: str, new_password: str
 ) -> bool:
-    """
-    Verify the old password, then update to the new hashed password.
-    Returns True on success, False otherwise.
-    """
+    """Verify the old password, then update to the new hashed password."""
     try:
         oid = ObjectId(user_id)
     except Exception:
         return False
 
-    # 1) Fetch only the passwordHash
     doc = await users_collection.find_one({"_id": oid}, {"passwordHash": 1})
     if not doc:
         return False
 
-    # 2) Import here to break the circular dependency
     from app.services.auth import verify_password, hash_password
-
-    # 3) Verify old password
     if not verify_password(old_password, doc.get("passwordHash", "")):
         return False
 
-    # 4) Hash new password and update
     new_hash = hash_password(new_password)
     res = await users_collection.update_one(
         {"_id": oid},
         {"$set": {"passwordHash": new_hash, "updatedAt": datetime.utcnow()}}
     )
     return res.modified_count == 1
+
+
+async def upsert_access(user_id: str, course_id: str) -> None:
+    """
+    Record that `user_id` viewed `course_id` right now.
+    If an access entry already exists, update its timestamp; otherwise insert it.
+    """
+    now = datetime.utcnow()
+    oid = ObjectId(user_id)
+    coid = ObjectId(course_id)
+
+    # Try to update an existing entry
+    res = await users_collection.update_one(
+        {"_id": oid, "accesses.courseId": coid},
+        {"$set": {"accesses.$.accessedAt": now}}
+    )
+
+    if res.matched_count == 0:
+        # No existing entry → push a new one
+        await users_collection.update_one(
+            {"_id": oid},
+            {"$push": {"accesses": {"courseId": coid, "accessedAt": now}}}
+        )
+
+
+async def list_accesses(user_id: str, limit: int = 10) -> List[Access]:
+    """
+    Return up to `limit` Access objects, sorted by accessedAt descending.
+    """
+    doc = await users_collection.find_one(
+        {"_id": ObjectId(user_id)},
+        {"accesses": 1}
+    )
+    raw = doc.get("accesses", []) if doc else []
+    # sort in-memory (or you could $slice + $sort in projection)
+    raw_sorted = sorted(raw, key=lambda a: a["accessedAt"], reverse=True)[:limit]
+    return [Access(courseId=str(a["courseId"]), accessedAt=a["accessedAt"])
+            for a in raw_sorted]
