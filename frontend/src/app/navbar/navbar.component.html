@@ -72,8 +72,57 @@
   </div>
 
   <!-- CENTER: search -->
+  <!-- CENTER: search -->
   <div *ngIf="auth.isLoggedIn" class="navbar-center">
-    <!-- (your search markup unchanged) -->
+    <div class="search-container" #searchContainer>
+      <input type="text" class="search-input" [(ngModel)]="searchQuery" (ngModelChange)="onSearch()"
+        placeholder="{{ 'NAV.SEARCH_PLACEHOLDER' | translate }}" />
+      <div *ngIf="searchResults" class="search-dropdown">
+        <ul>
+          <li *ngIf="searchResults.courses.length">
+            <strong>{{ 'NAV.SEARCH_COURSES' | translate }}</strong>
+          </li>
+          <li *ngFor="let c of searchResults.courses">
+            <a [routerLink]="['/courses', c.id]">
+              {{ c.code }} — {{ c.title }}
+            </a>
+          </li>
+
+          <li *ngIf="searchResults.users.length" class="mt-sm">
+            <strong>{{ 'NAV.SEARCH_USERS' | translate }}</strong>
+          </li>
+          <li *ngFor="let u of searchResults.users" class="search-user-item">
+            <a [routerLink]="['/users', u.id]" (click)="onPostClick()" class="search-user-link">
+              <img *ngIf="u.profile.profilePic" [src]="u.profile.profilePic" alt="{{ u.username }}’s avatar"
+                class="search-user-avatar" />
+              <div class="search-user-info">
+                <div class="search-user-name">
+                  {{ u.profile.firstName }} {{ u.profile.lastName }}
+                </div>
+                <div class="search-user-email">{{ u.email }}</div>
+              </div>
+            </a>
+          </li>
+
+          <li *ngIf="searchResults.posts.length" class="mt-sm">
+            <strong>{{ 'NAV.SEARCH_POSTS' | translate }}</strong>
+          </li>
+          <li *ngFor="let p of searchResults.posts">
+            <a [routerLink]="['/courses', p.course_id, 'posts', p._id]" (click)="onPostClick()">
+              {{ p.title }}
+            </a>
+          </li>
+
+          <li *ngIf="
+              !searchResults.courses.length &&
+              !searchResults.users.length &&
+              !searchResults.posts.length
+            ">
+            <em>{{ 'NAV.SEARCH_NONE' | translate }}</em>
+          </li>
+        </ul>
+      </div>
+    </div>
   </div>
 
   <!-- RIGHT: links + user info -->
