@@ -26,7 +26,14 @@
       "ACTION": "Action",
       "DETAILS": "Details"
     },
-    "NO_LOGS": "No activity to display."
+    "NO_LOGS": "No activity to display.",
+    "ACTION": {
+      "VIEW_COURSE": "View Course"
+    },
+    "DETAIL": {
+      "USER_ID": "User ID",
+      "COUNT": "Count"
+    }
   },
   "LOGIN": {
     "TITLE": "Log In",
@@ -61,7 +68,11 @@
     "NO_ENROLLMENTS": "No enrolled courses.",
     "SAVE": "Save Changes",
     "SUCCESS": "Profile updated successfully.",
-    "UPDATE_ERROR": "Update failed."
+    "UPDATE_ERROR": "Update failed.",
+    "CHANGE_PWD_TITLE": "Change Password",
+    "OLD_PWD_PLACEHOLDER": "Current Password",
+    "NEW_PWD_PLACEHOLDER": "New Password",
+    "CONFIRM_PWD_PLACEHOLDER": "Confirm Password"
   },
   "COURSES": {
     "TITLE": "Courses",
@@ -76,7 +87,8 @@
     },
     "EDIT": "Edit",
     "DELETE": "Delete",
-    "INFO": "Info"
+    "INFO": "Info",
+    "SEARCH_PLACEHOLDER": "🔍 Search courses…"
   },
   "SIGNUP": {
     "TITLE": "Sign Up",
@@ -114,14 +126,24 @@
     "HIDE_MY_SUB": "Hide My Submission",
     "VIEW_ALL_SUB": "View All Submissions",
     "HIDE_ALL_SUB": "Hide Submissions",
-    "NO_POSTS": "No posts available."
+    "NO_POSTS": "No posts available.",
+    "MARK_DONE": "Mark Done",
+    "MARK_UNDONE": "Mark Undone",
+    "COMPLETION": "Completion"
   },
   "COURSE_DETAIL": {
     "LOADING": "Loading course…",
     "ERROR": "Failed to load course.",
     "VIEW_FORUM": "View Course Forum",
+    "CREATE_FORUM": "Create Forum",
     "ADD_POST": "+ Add Post",
-    "EDIT_POST": "Edit Post"
+    "EDIT_POST": "Edit Post",
+    "POST_TITLE": "Post Title",
+    "POST_CONTENT": "Content",
+    "POST_TYPE": "Type",
+    "POST_DUE_DATE": "Due Date",
+    "SAVE_POST": "Save Post",
+    "CANCEL": "Cancel"
   },
   "COURSE_FORM": {
     "ADD_TITLE": "Add Course",
@@ -187,7 +209,8 @@
       "ENROLLMENTS": "Enrollments",
       "NO_ENROLLMENTS": "— no enrollments —",
       "ACTIONS": "Actions",
-      "MANAGE_ENROLLMENT": "Manage Enrollment"
+      "MANAGE_ENROLLMENT": "Manage Enrollment",
+      "DELETE_USER": "Delete User"
     },
     "MANAGE_ENROLLMENTS": {
       "TITLE": "Manage Enrollments",
@@ -197,16 +220,9 @@
       "TABLE": {
         "COURSE": "Course",
         "ENROLLED": "Enrolled"
-      }
+      },
+      "LIST_ENROLLMENTS": "List Enrollments"
     }
-  },
-  "USER_DETAIL": {
-    "LOADING": "Loading user…",
-    "ERROR": "Failed to load user.",
-    "AVATAR_ALT": "User avatar",
-    "EMAIL_LABEL": "Email:",
-    "ROLES_LABEL": "Roles:",
-    "ENROLLED_TITLE": "Enrolled Courses"
   },
   "SUBMISSIONS": {
     "LIST": {
@@ -272,6 +288,10 @@
     "COURSES": "Courses",
     "POSTS": "Posts",
     "SUBMISSIONS": "Submissions",
-    "ACTIVITY_7D": "Activity (Last 7 Days)"
+    "ACTIVITY_7D": "Activity (Last 7 Days)",
+    "HOMEWORKS_DUE": "Homeworks Due",
+    "AVG_COMPLETION": "Average Completion",
+    "FORUMS": "Forums",
+    "MESSAGES": "Messages"
   }
 }
