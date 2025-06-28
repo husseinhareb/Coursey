@@ -13,13 +13,13 @@ import { Subscription, of } from 'rxjs';
 import { switchMap, catchError } from 'rxjs/operators';
 
 import { CourseService, Course } from '../services/course.service';
-import { PostService, Post } from '../services/post.service';
 import { SubmissionService, Submission } from '../services/submission.service';
 import { CompletionService, Completion } from '../services/completion.service';
 import { AuthService, Me } from '../auth/auth.service';
 import { Enrollment } from '../services/user.service';
 import { PostsComponent } from '../posts/posts.component';
 import { TranslateModule } from '@ngx-translate/core';
+import { PostService, Post, PostCreate, PostUpdate } from '../services/post.service';
 
 @Component({
   selector: 'app-course-detail',
@@ -78,6 +78,9 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
   public isProfessorInCourse = false;
   public isStudentInCourse = false;
 
+  selectedFile: File | null = null;
+
+
   ngOnInit() {
     // Watch route params
     this.subs.add(
@@ -120,21 +123,27 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
   }
 
   private computePermissions() {
-  const u = this.currentUser;
-  this.isAdmin = !!u && u.roles.map(r => r.toLowerCase()).includes('admin');
+    const u = this.currentUser;
+    this.isAdmin = !!u && u.roles.map(r => r.toLowerCase()).includes('admin');
 
-  if (u && u.enrollments) {
-    const found = (u.enrollments as Enrollment[]).find(e => e.courseId === this.courseId);
-    const roles = u.roles.map(r => r.toLowerCase());
-    // allow either "teacher" or "professor"
-    this.isProfessorInCourse = !!found && (roles.includes('teacher') || roles.includes('professor'));
-    this.isStudentInCourse   = !!found && roles.includes('student');
-  } else {
-    this.isProfessorInCourse = false;
-    this.isStudentInCourse   = false;
+    if (u && u.enrollments) {
+      const found = (u.enrollments as Enrollment[]).find(e => e.courseId === this.courseId);
+      const roles = u.roles.map(r => r.toLowerCase());
+      // allow either "teacher" or "professor"
+      this.isProfessorInCourse = !!found && (roles.includes('teacher') || roles.includes('professor'));
+      this.isStudentInCourse = !!found && roles.includes('student');
+    } else {
+      this.isProfessorInCourse = false;
+      this.isStudentInCourse = false;
+    }
   }
-}
 
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.selectedFile = input.files && input.files.length
+      ? input.files[0]
+      : null;
+  }
 
   get canModifyPosts(): boolean {
     return this.isAdmin || this.isProfessorInCourse;
@@ -247,6 +256,8 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
     }
   }
 
+
+
   private updateCompletions(list: Completion[]) {
     this.completions = {};
     list.forEach(c => (this.completions[c.post_id] = true));
@@ -285,27 +296,60 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
 
   savePost() {
     if (!this.canModifyPosts || this.postForm.invalid) return;
+
     const raw = this.postForm.value;
-    const payload: any = {
+    const payload: PostCreate | PostUpdate = {
       title: raw.title,
       content: raw.content,
       type: raw.type,
-      file_id: raw.file_id || undefined,
-      due_date: raw.due_date ? new Date(raw.due_date).toISOString() : undefined
+      due_date: raw.due_date
+        ? new Date(raw.due_date).toISOString()
+        : undefined
     };
-    const obs = this.editing
-      ? this.postSvc.update(this.courseId, this.editing._id, payload)
-      : this.postSvc.create(this.courseId, payload);
 
-    obs.subscribe({
-      next: () => {
-        this.toggleForm();
-        this.loadPosts();
-      },
-      error: (e: any) => {
-        this.postsError = e.error?.detail || 'Save failed';
+    const callCreateOrUpdate = (fileId?: string) => {
+      if (fileId) {
+        (payload as any).file_id = fileId;
       }
-    });
+      return this.editing
+        ? this.postSvc.update(
+          this.courseId,
+          this.editing!._id,
+          payload as PostUpdate
+        )
+        : this.postSvc.create(
+          this.courseId,
+          payload as PostCreate
+        );
+    };
+
+    if (this.selectedFile) {
+      // upload, then create/update
+      this.postSvc.uploadFile(this.courseId, this.selectedFile).pipe(
+        switchMap(res => callCreateOrUpdate(res.file_id))
+      ).subscribe({
+        next: () => this.afterSave(),
+        error: e => this.postsError = e.error?.detail || 'Save failed'
+      });
+    } else {
+      // no file: immediate create/update
+      callCreateOrUpdate().subscribe({
+        next: () => this.afterSave(),
+        error: e => this.postsError = e.error?.detail || 'Save failed'
+      });
+    }
+  }
+
+  private afterSave() {
+    this.toggleForm();
+    this.selectedFile = null;
+    this.loadPosts();
+  }
+
+  private onSaveSuccess() {
+    this.toggleForm();
+    this.selectedFile = null;    // reset for next time
+    this.loadPosts();
   }
 
   deletePost(p: Post) {
@@ -377,11 +421,6 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
     this.loadStudentSubmissions();
   }
 
-  onFileSelected(event: Event): void {
-    const inputEl = event.target as HTMLInputElement;
-    if (!inputEl.files?.length) return;
-    this.postForm.patchValue({ file_id: '' });
-  }
 
   private formatForInput(iso: string): string {
     const dt = new Date(iso);

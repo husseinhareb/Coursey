@@ -13,25 +13,30 @@
 <!-- Course Info -->
 <div *ngIf="course" class="course-header">
   <div class="course-title-wrapper">
-    <h2 class="course-title">
-      <i class="fas fa-graduation-cap"></i>
-      {{ course.title }}
-    </h2>
-
-    <!-- always available: view existing forum -->
-    <button class="btn btn--forum" [routerLink]="['/courses', courseId, 'forums']">
-      <i class="fas fa-comments"></i>
-      {{ 'COURSE_DETAIL.VIEW_FORUM' | translate }}
-    </button>
+    <h2 class="course-title">{{ course.title }}</h2>
 
     <!-- only admins & professors: create a new forum -->
-    <button *ngIf="canModifyPosts" class="btn btn--forum btn--primary"
-      [routerLink]="['/courses', courseId, 'forums', 'create']">
+    <button
+      *ngIf="canModifyPosts"
+      type="button"
+      class="btn btn--forum btn--primary"
+      [routerLink]="['/courses', courseId, 'forums', 'create']"
+    >
       <i class="fas fa-plus-circle"></i>
       {{ 'COURSE_DETAIL.CREATE_FORUM' | translate }}
     </button>
-
   </div>
+
+  <!-- centered "View Forum" -->
+  <button
+    type="button"
+    class="btn btn--forum view-forum-btn"
+    [routerLink]="['/courses', courseId, 'forums']"
+  >
+    <i class="fas fa-comments"></i>
+    {{ 'COURSE_DETAIL.VIEW_FORUM' | translate }}
+  </button>
+
   <p class="course-description">{{ course.description }}</p>
 </div>
 
@@ -39,11 +44,12 @@
 
 <!-- Add / Edit Post -->
 <div class="post-controls" *ngIf="canModifyPosts">
-  <button class="btn btn--add-post" (click)="toggleForm()">
+  <button type="button" class="btn btn--add-post" (click)="toggleForm()">
     <i class="fas" [ngClass]="editing ? 'fa-edit' : 'fa-plus-circle'"></i>
-    {{ editing
-    ? ('COURSE_DETAIL.EDIT_POST' | translate)
-    : ('COURSE_DETAIL.ADD_POST' | translate)
+    {{
+      editing
+        ? ('COURSE_DETAIL.EDIT_POST' | translate)
+        : ('COURSE_DETAIL.ADD_POST'  | translate)
     }}
   </button>
 </div>
@@ -53,30 +59,54 @@
   <form [formGroup]="postForm" (ngSubmit)="savePost()">
     <label>
       {{ 'COURSE_DETAIL.POST_TITLE' | translate }}
-      <input formControlName="title" />
+      <input type="text" formControlName="title" />
     </label>
+
     <label>
       {{ 'COURSE_DETAIL.POST_CONTENT' | translate }}
       <textarea formControlName="content"></textarea>
     </label>
+
     <label>
       {{ 'COURSE_DETAIL.POST_TYPE' | translate }}
       <select formControlName="type">
-        <option value="lecture">{{ 'POSTS.TYPE_LECTURE' | translate }}</option>
-        <option value="reminder">{{ 'POSTS.TYPE_REMINDER' | translate }}</option>
+        <option value="lecture"  >{{ 'POSTS.TYPE_LECTURE'  | translate }}</option>
+        <option value="reminder" >{{ 'POSTS.TYPE_REMINDER' | translate }}</option>
         <option value="homework">{{ 'POSTS.TYPE_HOMEWORK' | translate }}</option>
       </select>
     </label>
+
+    <!-- due date for homework -->
     <label *ngIf="postForm.get('type')?.value === 'homework'">
       {{ 'COURSE_DETAIL.POST_DUE_DATE' | translate }}
       <input type="datetime-local" formControlName="due_date" />
     </label>
+
+    <!-- file upload for lecture & homework -->
+    <label
+      *ngIf="
+        postForm.get('type')?.value === 'lecture' ||
+        postForm.get('type')?.value === 'homework'
+      "
+    >
+      {{ 'COURSE_DETAIL.POST_FILE' | translate }}
+      <input type="file" (change)="onFileSelected($event)" />
+    </label>
+
     <div class="form-actions">
-      <button type="submit" class="btn btn--primary" [disabled]="postForm.invalid">
+      <button
+        type="submit"
+        class="btn btn--primary"
+        [disabled]="postForm.invalid"
+      >
         <i class="fas fa-save"></i>
         {{ 'COURSE_DETAIL.SAVE_POST' | translate }}
       </button>
-      <button type="button" class="btn" (click)="toggleForm()">
+      <button
+        type="button"
+        class="btn btn--secondary"
+        (click)="toggleForm()"
+      >
         <i class="fas fa-times"></i>
         {{ 'COURSE_DETAIL.CANCEL' | translate }}
       </button>
@@ -87,13 +117,25 @@
 <hr class="section-divider" />
 
 <!-- Posts List -->
-<app-posts [posts]="posts" [loading]="loadingPosts" [error]="postsError" [courseId]="courseId"
-  [isStudentInCourse]="isStudentInCourse" [studentSubmissions]="studentSubmissions" [canModifyPosts]="canModifyPosts"
+<app-posts
+  [posts]="posts"
+  [loading]="loadingPosts"
+  [error]="postsError"
+  [courseId]="courseId"
+  [isStudentInCourse]="isStudentInCourse"
+  [studentSubmissions]="studentSubmissions"
+  [canModifyPosts]="canModifyPosts"
   [showSubmissionFormForPostId]="showSubmissionFormForPostId"
   [showOwnSubmissionListForPostId]="showOwnSubmissionListForPostId"
-  [showSubmissionListForPostId]="showSubmissionListForPostId" [completions]="completions"
-  (toggleSubmissionForm)="toggleSubmissionForm($event)" (viewOwnSubmission)="showOwnSubmissionListForPostId = $event"
-  (toggleSubmissionList)="toggleSubmissionList($event)" (togglePin)="togglePin($event)" (moveUp)="moveUp($event)"
-  (moveDown)="moveDown($event)" (editPost)="toggleForm($event)" (deletePost)="deletePost($event)"
-  (toggleComplete)="onToggleComplete($event)">
-</app-posts>
+  [showSubmissionListForPostId]="showSubmissionListForPostId"
+  [completions]="completions"
+  (toggleSubmissionForm)="toggleSubmissionForm($event)"
+  (viewOwnSubmission)="showOwnSubmissionListForPostId = $event"
+  (toggleSubmissionList)="toggleSubmissionList($event)"
+  (togglePin)="togglePin($event)"
+  (moveUp)="moveUp($event)"
+  (moveDown)="moveDown($event)"
+  (editPost)="toggleForm($event)"
+  (deletePost)="deletePost($event)"
+  (toggleComplete)="onToggleComplete($event)"
+></app-posts>

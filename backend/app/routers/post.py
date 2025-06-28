@@ -1,8 +1,10 @@
 # app/routers/post.py
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Response
 from typing import List
 from datetime import datetime
+from bson import ObjectId
+from motor.motor_asyncio import AsyncIOMotorGridFSBucket
 
 from app.schemas.post import PostCreate, PostOut, PostUpdate
 from app.crud.post import (
@@ -18,9 +20,9 @@ from app.crud.post import (
 )
 from app.services.auth import get_current_active_user
 from app.schemas.user import UserDB
-
 from app.schemas.activity import ActivityLogCreate
 from app.crud.activity import create_activity_log
+from app.db.mongodb import posts_collection
 
 router = APIRouter(
     prefix="/courses/{course_id}/posts",
@@ -37,41 +39,39 @@ async def api_list_posts(
     posts = await list_posts(course_id)
 
     # Log "list_posts" activity
-    log = ActivityLogCreate(
+    await create_activity_log(ActivityLogCreate(
         user_id=current_user.id,
         action="list_posts",
         timestamp=datetime.utcnow(),
         metadata={"course_id": course_id, "count": len(posts)}
-    )
-    await create_activity_log(log)
+    ))
 
     return posts
 
 
 @router.post("/", response_model=PostOut)
 async def api_create_post(
-    course_id:    str,
-    post_in:      PostCreate,
+    course_id: str,
+    post_in: PostCreate,
     current_user: UserDB = Depends(get_current_active_user)
 ):
     post = await create_post(course_id, current_user.id, post_in)
 
     # Log "create_post" activity
-    log = ActivityLogCreate(
+    await create_activity_log(ActivityLogCreate(
         user_id=current_user.id,
         action="create_post",
         timestamp=datetime.utcnow(),
         metadata={"course_id": course_id, "post_id": post.id}
-    )
-    await create_activity_log(log)
+    ))
 
     return post
 
 
 @router.get("/{post_id}", response_model=PostOut)
 async def api_get_post(
-    course_id:    str,
-    post_id:      str,
+    course_id: str,
+    post_id: str,
     current_user: UserDB = Depends(get_current_active_user)
 ):
     post = await get_post(post_id)
@@ -79,22 +79,21 @@ async def api_get_post(
         raise HTTPException(status_code=404, detail="Post not found")
 
     # Log "view_post" activity
-    log = ActivityLogCreate(
+    await create_activity_log(ActivityLogCreate(
         user_id=current_user.id,
         action="view_post",
         timestamp=datetime.utcnow(),
         metadata={"course_id": course_id, "post_id": post_id}
-    )
-    await create_activity_log(log)
+    ))
 
     return post
 
 
 @router.put("/{post_id}", response_model=PostOut)
 async def api_update_post(
-    course_id:    str,
-    post_id:      str,
-    post_in:      PostUpdate,
+    course_id: str,
+    post_id: str,
+    post_in: PostUpdate,
     current_user: UserDB = Depends(get_current_active_user)
 ):
     updated = await update_post(post_id, post_in)
@@ -102,21 +101,20 @@ async def api_update_post(
         raise HTTPException(status_code=404, detail="Post not found")
 
     # Log "update_post" activity
-    log = ActivityLogCreate(
+    await create_activity_log(ActivityLogCreate(
         user_id=current_user.id,
         action="update_post",
         timestamp=datetime.utcnow(),
         metadata={"course_id": course_id, "post_id": post_id}
-    )
-    await create_activity_log(log)
+    ))
 
     return updated
 
 
 @router.delete("/{post_id}", response_model=dict)
 async def api_delete_post(
-    course_id:    str,
-    post_id:      str,
+    course_id: str,
+    post_id: str,
     current_user: UserDB = Depends(get_current_active_user)
 ):
     ok = await delete_post(post_id)
@@ -124,21 +122,20 @@ async def api_delete_post(
         raise HTTPException(status_code=404, detail="Post not found")
 
     # Log "delete_post" activity
-    log = ActivityLogCreate(
+    await create_activity_log(ActivityLogCreate(
         user_id=current_user.id,
         action="delete_post",
         timestamp=datetime.utcnow(),
         metadata={"course_id": course_id, "post_id": post_id}
-    )
-    await create_activity_log(log)
+    ))
 
     return {"deleted": True}
 
 
 @router.patch("/{post_id}/pin", response_model=PostOut)
 async def api_pin_post(
-    course_id:    str,
-    post_id:      str,
+    course_id: str,
+    post_id: str,
     current_user: UserDB = Depends(get_current_active_user)
 ):
     pinned = await pin_post(post_id)
@@ -146,21 +143,20 @@ async def api_pin_post(
         raise HTTPException(status_code=404, detail="Post not found")
 
     # Log "pin_post" activity
-    log = ActivityLogCreate(
+    await create_activity_log(ActivityLogCreate(
         user_id=current_user.id,
         action="pin_post",
         timestamp=datetime.utcnow(),
         metadata={"course_id": course_id, "post_id": post_id}
-    )
-    await create_activity_log(log)
+    ))
 
     return pinned
 
 
 @router.patch("/{post_id}/unpin", response_model=PostOut)
 async def api_unpin_post(
-    course_id:    str,
-    post_id:      str,
+    course_id: str,
+    post_id: str,
     current_user: UserDB = Depends(get_current_active_user)
 ):
     unp = await unpin_post(post_id)
@@ -168,21 +164,20 @@ async def api_unpin_post(
         raise HTTPException(status_code=404, detail="Post not found")
 
     # Log "unpin_post" activity
-    log = ActivityLogCreate(
+    await create_activity_log(ActivityLogCreate(
         user_id=current_user.id,
         action="unpin_post",
         timestamp=datetime.utcnow(),
         metadata={"course_id": course_id, "post_id": post_id}
-    )
-    await create_activity_log(log)
+    ))
 
     return unp
 
 
 @router.patch("/{post_id}/moveUp", response_model=PostOut)
 async def api_move_up(
-    course_id:    str,
-    post_id:      str,
+    course_id: str,
+    post_id: str,
     current_user: UserDB = Depends(get_current_active_user)
 ):
     moved = await move_up(post_id)
@@ -190,21 +185,20 @@ async def api_move_up(
         raise HTTPException(status_code=404, detail="Post not found")
 
     # Log "move_up_post" activity
-    log = ActivityLogCreate(
+    await create_activity_log(ActivityLogCreate(
         user_id=current_user.id,
         action="move_up_post",
         timestamp=datetime.utcnow(),
         metadata={"course_id": course_id, "post_id": post_id}
-    )
-    await create_activity_log(log)
+    ))
 
     return moved
 
 
 @router.patch("/{post_id}/moveDown", response_model=PostOut)
 async def api_move_down(
-    course_id:    str,
-    post_id:      str,
+    course_id: str,
+    post_id: str,
     current_user: UserDB = Depends(get_current_active_user)
 ):
     moved = await move_down(post_id)
@@ -212,12 +206,28 @@ async def api_move_down(
         raise HTTPException(status_code=404, detail="Post not found")
 
     # Log "move_down_post" activity
-    log = ActivityLogCreate(
+    await create_activity_log(ActivityLogCreate(
         user_id=current_user.id,
         action="move_down_post",
         timestamp=datetime.utcnow(),
         metadata={"course_id": course_id, "post_id": post_id}
-    )
-    await create_activity_log(log)
+    ))
 
     return moved
+
+
+@router.post(
+    "/upload",
+    response_model=dict,
+    summary="Upload a file to GridFS and return its file_id"
+)
+async def upload_file_to_gridfs(
+    course_id: str,
+    file: UploadFile = File(...)
+):
+    bucket = AsyncIOMotorGridFSBucket(posts_collection.database)
+    data = await file.read()
+    # this returns a Motor ObjectId
+    gridfs_id = await bucket.upload_from_stream(file.filename, data)
+
+    return {"file_id": str(gridfs_id)}

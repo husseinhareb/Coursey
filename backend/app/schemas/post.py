@@ -1,29 +1,38 @@
 # app/schemas/post.py
 
 from pydantic import BaseModel, Field
-from typing import Optional
+from typing import Optional, Literal
 from datetime import datetime
 
 class PostBase(BaseModel):
+    """
+    Shared properties for creating/updating posts.
+    Now supports optional file upload (GridFS) and due_date for homework.
+    """
     title:    str
     content:  str
-    type:     str            # "lecture" | "reminder" | "homework"
-    file_id:  Optional[str]  = None
-    due_date: Optional[datetime] = None  # <-- New!
+    type:     Literal["lecture", "reminder", "homework"]
+    file_id:  Optional[str]     = None
+    due_date: Optional[datetime] = None
 
 class PostCreate(PostBase):
-    """All fields needed to create a post; now includes optional due_date."""
+    """All fields needed to create a post; optional file_id & due_date."""
     pass
 
 class PostUpdate(PostBase):
-    """All fields allowed when updating a post; now includes optional due_date."""
+    """Fields allowed when updating a post; optional file_id & due_date."""
     pass
 
 class PostDB(PostBase):
-    id:         str           = Field(..., alias="_id")
+    """
+    Internal representation of a Post in the database.
+    - Uses `_id` alias for Mongo ObjectId
+    - Tracks ordering (position), pin state, and timestamps
+    """
+    id:         str               = Field(..., alias="_id")
     course_id:  str
     author_id:  str
-    position:   int           # ordering index among unpinned posts
+    position:   int               # order among unpinned posts
     ispinned:   bool
     pinnedAt:   Optional[datetime] = None
     created_at: datetime
@@ -36,5 +45,5 @@ class PostDB(PostBase):
     }
 
 class PostOut(PostDB):
-    """What we return to the client; includes due_date via inheritance."""
+    """What we return to the client; includes file_id & due_date via inheritance."""
     pass
