@@ -69,9 +69,10 @@
 
     <!-- Attachment link -->
     <div class="post-attachment" *ngIf="p.file_id">
-      <button class="action-btn" (click)="downloadAttachment(p)" title="{{ 'POSTS.DOWNLOAD_FILE' | translate }}">
+      <button class="action-btn" (click)="downloadAttachment(p)"
+        [title]="p.file_name || ('POSTS.DOWNLOAD_FILE' | translate)">
         <i class="fas fa-paperclip"></i>
-        {{ 'POSTS.DOWNLOAD_FILE' | translate }}
+        {{ p.file_name || ('POSTS.DOWNLOAD_FILE' | translate) }}
       </button>
     </div>
 
