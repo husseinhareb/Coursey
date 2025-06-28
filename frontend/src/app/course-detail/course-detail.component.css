@@ -109,3 +109,111 @@
     justify-content: center;
   }
 }
+
+.post-form {
+  background: #2d2f36;    
+  padding: 1rem;           
+  border-radius: 8px;
+  margin-bottom: var(--spacing-lg);
+}
+
+.post-form form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+}
+
+.post-form label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #c0c0c0;
+  font-size: 0.9rem;
+}
+
+.post-form input,
+.post-form textarea,
+.post-form select {
+  background: #3a3d47;
+  border: 1px solid #4e515d;
+  border-radius: 4px;
+  color: #fff;
+  font-size: 0.9rem;
+  padding: 0.25rem 0.5rem;
+  min-width: 8rem;
+}
+
+.post-form textarea {
+  height: 1.5rem;
+  resize: vertical;
+}
+
+.post-form .form-actions {
+  margin-left: auto;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.post-form .btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  padding: 0.5rem 0.75rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+/* Save */
+.post-form .btn.btn--primary {
+  background: #5b9def;
+  color: #fff;
+}
+.post-form .btn.btn--primary:hover {
+  background: #4a8de2;
+}
+
+/* Cancel */
+.post-form .btn.btn--secondary {
+  background: transparent;
+  color: #c0c0c0;
+}
+.post-form .btn.btn--secondary:hover {
+  background: rgba(255,255,255,0.1);
+}
+
+/* ====================================
+   View Submission button
+   ==================================== */
+.homework-actions .action-btn {
+  /* use your “info” color for this action */
+  background: var(--color-info);
+  color: var(--color-surface);
+  border: none;
+  border-radius: var(--border-radius);
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-size: var(--font-size-sm);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  cursor: pointer;
+  transition: background var(--transition-speed),
+              transform var(--transition-speed);
+}
+
+/*Hover/active state*/
+.homework-actions .action-btn:hover:not(:disabled),
+.homework-actions .action-btn:focus {
+  background: var(--color-info-hover);
+  transform: translateY(-1px);
+  outline: none;
+}
+
+/* Disabled state (if you ever disable it) */
+.homework-actions .action-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

@@ -136,7 +136,7 @@
     "ERROR": "Error al cargar el curso.",
     "VIEW_FORUM": "Ver foro del curso",
     "CREATE_FORUM": "Crear foro",
-    "ADD_POST": "+ Agregar publicación",
+    "ADD_POST": "Agregar publicación",
     "EDIT_POST": "Editar publicación",
     "POST_TITLE": "Título",
     "POST_CONTENT": "Contenido",

@@ -137,3 +137,88 @@
 .completion-btn {
   white-space: nowrap;
 }
+
+/* admin action icons (pin / move up / move down / edit / delete) */
+.admin-actions .action-btn {
+  /* remove default button styles */
+  background: none;
+  border: none;
+  padding: 0.5rem;
+  margin: 0 0.25rem;
+  border-radius: 4px;
+  color: var(--color-muted);
+  cursor: pointer;
+  transition: background var(--transition-speed), color var(--transition-speed), transform var(--transition-speed);
+  font-size: 1.1rem; /* size of the Font-Awesome icon */
+}
+
+/* hover/focus state */
+.admin-actions .action-btn:hover:not(:disabled),
+.admin-actions .action-btn:focus {
+  background: var(--color-bg-alt);
+  color: var(--color-primary);
+  transform: translateY(-1px);
+  outline: none;
+}
+
+/* disabled state */
+.admin-actions .action-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* delete button gets a red tint */
+.admin-actions .action-btn.danger {
+  color: var(--color-danger);
+}
+.admin-actions .action-btn.danger:hover:not(:disabled) {
+  background: var(--color-bg-alt);
+  color: var(--color-danger-dark);
+}
+
+/* adjust icon spacing */
+.admin-actions .action-btn i {
+  pointer-events: none; /* let clicks hit the button */
+}
+
+/* ―― Admin “View All / Hide All Submissions” Button ―― */
+.admin-submissions .action-btn {
+  background: var(--color-secondary);
+  color: var(--color-surface);
+  border: none;
+  border-radius: var(--border-radius);
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-size: var(--font-size-sm);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  cursor: pointer;
+  transition: background var(--transition-speed), transform var(--transition-speed);
+}
+
+.admin-submissions .action-btn i {
+  font-size: 1rem;
+}
+
+/* Hover & focus */
+.admin-submissions .action-btn:hover,
+.admin-submissions .action-btn:focus {
+  background: var(--color-secondary-hover);
+  transform: translateY(-1px);
+  outline: none;
+}
+
+/* ―― All‐Submissions Panel ―― */
+.all-submissions {
+  margin-top: var(--spacing-md);
+  padding: var(--spacing-md);
+  background: var(--color-bg-alt);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius);
+}
+
+/* You can style the inner <app-submission-list> if needed: */
+.all-submissions app-submission-list {
+  /* ensure it stretches to full width */
+  width: 100%;
+}

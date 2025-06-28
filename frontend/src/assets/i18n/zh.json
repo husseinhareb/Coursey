@@ -136,7 +136,7 @@
     "ERROR": "加载课程失败。",
     "VIEW_FORUM": "查看课程论坛",
     "CREATE_FORUM": "创建论坛",
-    "ADD_POST": "+ 添加帖子",
+    "ADD_POST": "添加帖子",
     "EDIT_POST": "编辑帖子",
     "POST_TITLE": "标题",
     "POST_CONTENT": "内容",

@@ -8,6 +8,7 @@
       </a>
     </div>
 
+
     <div class="language-picker">
       <i class="fa-solid fa-language language-picker__icon"></i>
       <select id="language-picker-select" class="language-picker__select li4-btn li4-btn--subtle"
@@ -69,9 +70,12 @@
       <i class="fa-solid fa-house"></i>
       {{ 'NAV.HOME' | translate }}
     </a>
+    <a *ngIf="auth.isLoggedIn && isAdmin" routerLink="/users" routerLinkActive="active" class="nav-link">
+      <i class="fa-solid fa-users"></i>
+      {{ 'NAV.USERS' | translate }}
+    </a>
   </div>
 
-  <!-- CENTER: search -->
   <!-- CENTER: search -->
   <div *ngIf="auth.isLoggedIn" class="navbar-center">
     <div class="search-container" #searchContainer>
@@ -130,11 +134,6 @@
     <a *ngIf="!auth.isLoggedIn" routerLink="/login" routerLinkActive="active" class="nav-link">
       <i class="fa-solid fa-right-to-bracket"></i>
       {{ 'NAV.LOG_IN' | translate }}
-    </a>
-
-    <a *ngIf="auth.isLoggedIn && isAdmin" routerLink="/users" routerLinkActive="active" class="nav-link">
-      <i class="fa-solid fa-users"></i>
-      {{ 'NAV.USERS' | translate }}
     </a>
     <a *ngIf="auth.isLoggedIn && isAdmin" routerLink="/activity-logs" routerLinkActive="active" class="nav-link">
       <i class="fa-solid fa-file-lines"></i>

@@ -136,7 +136,7 @@
     "ERROR": "Échec du chargement du cours.",
     "VIEW_FORUM": "Voir le forum du cours",
     "CREATE_FORUM": "Créer un forum",
-    "ADD_POST": "+ Ajouter une publication",
+    "ADD_POST": "Ajouter une publication",
     "EDIT_POST": "Modifier la publication",
     "POST_TITLE": "Titre",
     "POST_CONTENT": "Contenu",

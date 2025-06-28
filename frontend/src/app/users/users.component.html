@@ -85,11 +85,12 @@
             <i class="fas fa-user-edit"></i>
             {{ 'USERS.TABLE.MANAGE_ENROLLMENT' | translate }}
           </a>
-          <button *ngIf="isAdmin" class="action-link btn--delete-user"
+          <button *ngIf="isAdmin" type="button" class="action-link btn--delete-user"
             (click)="onDeleteUser(u.id); $event.stopPropagation()">
             <i class="fas fa-user-slash"></i>
             {{ 'USERS.TABLE.DELETE_USER' | translate }}
           </button>
+
         </td>
       </tr>
     </tbody>

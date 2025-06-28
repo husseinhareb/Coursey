@@ -185,3 +185,7 @@
 .action-link:hover {
   color: var(--color-secondary-hover);
 }
+
+.action-link.btn--delete-user {
+  cursor: pointer;
+}

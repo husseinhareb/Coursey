@@ -136,7 +136,7 @@
     "ERROR": "Failed to load course.",
     "VIEW_FORUM": "View Course Forum",
     "CREATE_FORUM": "Create Forum",
-    "ADD_POST": "+ Add Post",
+    "ADD_POST": "Add Post",
     "EDIT_POST": "Edit Post",
     "POST_TITLE": "Post Title",
     "POST_CONTENT": "Content",
