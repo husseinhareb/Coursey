@@ -10,8 +10,7 @@ import {
 } from '@angular/forms';
 import { RouterModule, ActivatedRoute, ParamMap } from '@angular/router';
 import { Subscription, of } from 'rxjs';
-import { switchMap, catchError } from 'rxjs/operators';
-
+import { switchMap, catchError, map } from 'rxjs/operators';
 import { CourseService, Course } from '../services/course.service';
 import { SubmissionService, Submission } from '../services/submission.service';
 import { CompletionService, Completion } from '../services/completion.service';
@@ -295,50 +294,53 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
   }
 
   savePost() {
-    if (!this.canModifyPosts || this.postForm.invalid) return;
+  if (!this.canModifyPosts || this.postForm.invalid) return;
 
-    const raw = this.postForm.value;
-    const payload: PostCreate | PostUpdate = {
-      title: raw.title,
-      content: raw.content,
-      type: raw.type,
-      due_date: raw.due_date
-        ? new Date(raw.due_date).toISOString()
-        : undefined
-    };
+  const raw = this.postForm.value;
+  const payload: PostCreate | PostUpdate = {
+    title:   raw.title,
+    content: raw.content,
+    type:    raw.type,
+    due_date: raw.due_date
+      ? new Date(raw.due_date).toISOString()
+      : undefined,
+  };
 
-    const callCreateOrUpdate = (fileId?: string) => {
-      if (fileId) {
-        (payload as any).file_id = fileId;
-      }
-      return this.editing
-        ? this.postSvc.update(
-          this.courseId,
-          this.editing!._id,
-          payload as PostUpdate
-        )
-        : this.postSvc.create(
-          this.courseId,
-          payload as PostCreate
-        );
-    };
+  const doCreate = () =>
+    this.postSvc.create(this.courseId, payload)
+      .pipe(switchMap(post => {
+        // if there's a file, upload it against the new post.id
+        if (this.selectedFile) {
+          return this.postSvc.uploadFile(
+            this.courseId,
+            post._id,
+            this.selectedFile
+          ).pipe(map(() => post));
+        }
+        return of(post);
+      }));
 
-    if (this.selectedFile) {
-      // upload, then create/update
-      this.postSvc.uploadFile(this.courseId, this.selectedFile).pipe(
-        switchMap(res => callCreateOrUpdate(res.file_id))
-      ).subscribe({
-        next: () => this.afterSave(),
-        error: e => this.postsError = e.error?.detail || 'Save failed'
-      });
-    } else {
-      // no file: immediate create/update
-      callCreateOrUpdate().subscribe({
-        next: () => this.afterSave(),
-        error: e => this.postsError = e.error?.detail || 'Save failed'
-      });
-    }
-  }
+  const doUpdate = () =>
+    this.postSvc.update(this.courseId, this.editing!._id, payload)
+      .pipe(switchMap(post => {
+        if (this.selectedFile) {
+          return this.postSvc.uploadFile(
+            this.courseId,
+            this.editing!._id,
+            this.selectedFile
+          ).pipe(map(() => post));
+        }
+        return of(post);
+      }));
+
+  const op$ = this.editing ? doUpdate() : doCreate();
+
+  op$.subscribe({
+    next: () => this.afterSave(),
+    error: e => this.postsError = e.error?.detail || 'Save failed'
+  });
+}
+
 
   private afterSave() {
     this.toggleForm();

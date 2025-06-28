@@ -1,9 +1,12 @@
+// src/app/posts/posts.component.ts
+
 import {
   Component,
   Input,
   Output,
   EventEmitter,
-  ChangeDetectionStrategy
+  ChangeDetectionStrategy,
+  inject
 } from '@angular/core';
 import { CommonModule }    from '@angular/common';
 import { RouterModule }    from '@angular/router';
@@ -12,8 +15,8 @@ import { TranslateModule } from '@ngx-translate/core';
 import { SubmissionFormComponent } from '../submissions/submission-form.component';
 import { SubmissionListComponent } from '../submissions/submission-list.component';
 
-import { Post }       from '../services/post.service';
-import { Submission } from '../services/submission.service';
+import { PostService, Post }    from '../services/post.service';
+import { Submission }           from '../services/submission.service';
 
 @Component({
   selector: 'app-posts',
@@ -30,6 +33,8 @@ import { Submission } from '../services/submission.service';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PostsComponent {
+  private postService = inject(PostService);
+
   /** Core inputs */
   @Input() posts!: Post[];
   @Input() loading = false;
@@ -42,9 +47,9 @@ export class PostsComponent {
   @Input() canModifyPosts = false;
 
   /** Panel state */
-  @Input() showSubmissionFormForPostId: string | null = null;
-  @Input() showOwnSubmissionListForPostId: string | null = null;
-  @Input() showSubmissionListForPostId: string | null = null;
+  @Input() showSubmissionFormForPostId:   string | null = null;
+  @Input() showOwnSubmissionListForPostId:string | null = null;
+  @Input() showSubmissionListForPostId:   string | null = null;
 
   /** Completion map: postId → done? */
   @Input() completions: { [postId: string]: boolean } = {};
@@ -57,9 +62,9 @@ export class PostsComponent {
   @Output() deletePost       = new EventEmitter<Post>();
 
   /** Submission events */
-  @Output() toggleSubmissionForm = new EventEmitter<string | null>();
-  @Output() viewOwnSubmission    = new EventEmitter<string | null>();
-  @Output() toggleSubmissionList = new EventEmitter<string | null>();
+  @Output() toggleSubmissionForm = new EventEmitter<string|null>();
+  @Output() viewOwnSubmission    = new EventEmitter<string|null>();
+  @Output() toggleSubmissionList = new EventEmitter<string|null>();
 
   /** Completion event */
   @Output() toggleComplete = new EventEmitter<string>();
@@ -68,11 +73,37 @@ export class PostsComponent {
     return this.posts.filter(p => !p.ispinned).length;
   }
 
-  onSubmitted(): void {
-    // Stub: bubble up if parent needs to reload
-  }
-
   onToggleDone(postId: string): void {
     this.toggleComplete.emit(postId);
+  }
+
+  /**
+   * Download the file from GridFS, preserving the original filename.
+   * Uses HttpClient so that your auth header is included.
+   */
+    downloadAttachment(post: Post): void {
+    if (!post.file_id) return;
+
+    this.postService.downloadFile(this.courseId, post._id, post.file_id)
+      .subscribe({
+        next: blob => {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = post.file_name ?? 'download';
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        },
+        error: err => {
+          console.error('Failed to download file', err);
+        }
+      });
+  }
+
+
+  onSubmitted(): void {
+    // bubble up if you need to
   }
 }

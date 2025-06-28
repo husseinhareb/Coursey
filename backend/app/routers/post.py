@@ -231,3 +231,56 @@ async def upload_file_to_gridfs(
     gridfs_id = await bucket.upload_from_stream(file.filename, data)
 
     return {"file_id": str(gridfs_id)}
+
+@router.post("/{post_id}/upload", response_model=dict)
+async def upload_post_file(
+    course_id: str,
+    post_id: str,
+    file: UploadFile = File(...)
+):
+    """
+    Upload a file into GridFS, attach its ID and original filename to the Post,
+    and return {"file_id": "...", "file_name": "..."}.
+    """
+    bucket = AsyncIOMotorGridFSBucket(posts_collection.database)
+    grid_in = bucket.open_upload_stream(file.filename)   # no await here
+    contents = await file.read()
+    await grid_in.write(contents)
+    await grid_in.close()
+    file_id = grid_in._id
+
+    # store file_id + file_name in the post document
+    await posts_collection.update_one(
+        {"_id": ObjectId(post_id)},
+        {
+          "$set": {
+            "file_id":    ObjectId(file_id),
+            "file_name":  file.filename,
+            "updated_at": datetime.utcnow()
+          }
+        }
+    )
+
+    return {"file_id": str(file_id), "file_name": file.filename}
+
+
+@router.get("/{post_id}/files/{file_id}")
+async def get_post_file(
+    course_id: str,
+    post_id: str,
+    file_id: str
+):
+    """
+    Stream the file from GridFS with a Content-Disposition header so browsers
+    will download it with the correct name.
+    """
+    bucket = AsyncIOMotorGridFSBucket(posts_collection.database)
+    grid_out = await bucket.open_download_stream(ObjectId(file_id))
+    data = await grid_out.read()
+    return Response(
+      content=data,
+      media_type="application/octet-stream",
+      headers={
+        "Content-Disposition": f'attachment; filename="{grid_out.filename}"'
+      }
+    )

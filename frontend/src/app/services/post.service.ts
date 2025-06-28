@@ -9,45 +9,50 @@ import {
 import { Observable } from 'rxjs';
 import { environment } from '../environments/environment';
 
-export interface Post {
-  _id:        string;
-  course_id:  string;
-  author_id:  string;
-  title:      string;
-  content:    string;
-  type:       'lecture' | 'reminder' | 'homework';
-  file_id?:   string;
-  due_date?:  string;      // ISO string if homework
 
-  position:   number;
-  ispinned:   boolean;
-  pinnedAt?:  string;
+export interface Post {
+  _id: string;
+  course_id: string;
+  author_id: string;
+  title: string;
+  content: string;
+  type: 'lecture' | 'reminder' | 'homework';
+  file_id?: string;
+  file_name?: string;
+  due_date?: string;
+
+  position: number;
+  ispinned: boolean;
+  pinnedAt?: string;
 
   created_at: string;
   updated_at: string;
 }
 
+
 export interface PostCreate {
-  title:     string;
-  content:   string;
-  type:      'lecture' | 'reminder' | 'homework';
-  file_id?:  string;
+  title: string;
+  content: string;
+  type: 'lecture' | 'reminder' | 'homework';
+  file_id?: string;
   due_date?: string;
 }
 
 export interface PostUpdate {
-  title:     string;
-  content:   string;
-  type:      'lecture' | 'reminder' | 'homework';
-  file_id?:  string;
+  title: string;
+  content: string;
+  type: 'lecture' | 'reminder' | 'homework';
+  file_id?: string;
   due_date?: string;
 }
 
-@Injectable({ providedIn: 'root' })
+@Injectable({
+  providedIn: 'root'
+})
 export class PostService {
   private base = `${environment.apiUrl}/courses`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   /** List all posts in a course */
   list(courseId: string): Observable<Post[]> {
@@ -68,7 +73,11 @@ export class PostService {
   }
 
   /** Update an existing post */
-  update(courseId: string, postId: string, payload: PostUpdate): Observable<Post> {
+  update(
+    courseId: string,
+    postId: string,
+    payload: PostUpdate
+  ): Observable<Post> {
     return this.http.put<Post>(
       `${this.base}/${courseId}/posts/${postId}`,
       payload
@@ -85,81 +94,73 @@ export class PostService {
   /** Pin a post */
   pin(courseId: string, postId: string): Observable<Post> {
     return this.http.patch<Post>(
-      `${this.base}/${courseId}/posts/${postId}/pin`, {}
+      `${this.base}/${courseId}/posts/${postId}/pin`,
+      {}
     );
   }
 
   /** Unpin a post */
   unpin(courseId: string, postId: string): Observable<Post> {
     return this.http.patch<Post>(
-      `${this.base}/${courseId}/posts/${postId}/unpin`, {}
+      `${this.base}/${courseId}/posts/${postId}/unpin`,
+      {}
     );
   }
 
   /** Move an unpinned post up */
   moveUp(courseId: string, postId: string): Observable<Post> {
     return this.http.patch<Post>(
-      `${this.base}/${courseId}/posts/${postId}/moveUp`, {}
+      `${this.base}/${courseId}/posts/${postId}/moveUp`,
+      {}
     );
   }
 
   /** Move an unpinned post down */
   moveDown(courseId: string, postId: string): Observable<Post> {
     return this.http.patch<Post>(
-      `${this.base}/${courseId}/posts/${postId}/moveDown`, {}
+      `${this.base}/${courseId}/posts/${postId}/moveDown`,
+      {}
     );
   }
 
-  /**
-   * Upload a file (PDF, image, etc.) to GridFS.
-   * Returns the new file_id to attach to a Post.
-   */
-  uploadFile(courseId: string, file: File): Observable<{ file_id: string }> {
+  uploadFile(
+    courseId: string,
+    postId: string,
+    file: File
+  ): Observable<{ file_id: string; file_name: string }> {
     const form = new FormData();
     form.append('file', file, file.name);
-    return this.http.post<{ file_id: string }>(
-      `${this.base}/${courseId}/posts/upload`,
+    return this.http.post<{ file_id: string; file_name: string }>(
+      `${this.base}/${courseId}/posts/${postId}/upload`,
       form
     );
   }
 
-  /**
-   * Upload a file with progress events.
-   * Emits HttpEvent<any> so you can track upload progress.
-   */
   uploadFileWithProgress(
     courseId: string,
+    postId: string,
     file: File
   ): Observable<HttpEvent<any>> {
     const form = new FormData();
     form.append('file', file, file.name);
-
-    const req = new HttpRequest(
+    // use `any` here so that FormData is acceptable
+    const req = new HttpRequest<any>(
       'POST',
-      `${this.base}/${courseId}/posts/upload`,
+      `${this.base}/${courseId}/posts/${postId}/upload`,
       form,
       { reportProgress: true }
     );
-
     return this.http.request(req);
   }
 
-  /**
-   * Download a stored file from GridFS as a Blob.
-   * Use blob for previews or save via a link.
-   */
-  downloadFile(courseId: string, fileId: string): Observable<Blob> {
+  downloadFile(courseId: string, postId: string, fileId: string): Observable<Blob> {
     return this.http.get(
-      `${this.base}/${courseId}/posts/files/${fileId}`,
+      `${this.base}/${courseId}/posts/${postId}/files/${fileId}`,
       { responseType: 'blob' }
     );
   }
 
-  /**
-   * Helper to build a direct download URL for a GridFS file.
-   * e.g. <a [href]="postService.getFileUrl(cid, fid)">Download</a>
-   */
-  getFileUrl(courseId: string, fileId: string): string {
-    return `${this.base}/${courseId}/posts/files/${fileId}`;
+  getFileUrl(courseId: string, postId: string, fileId: string): string {
+    return `${this.base}/${courseId}/posts/${postId}/files/${fileId}`;
   }
 }

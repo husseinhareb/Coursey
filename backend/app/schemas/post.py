@@ -5,14 +5,11 @@ from typing import Optional, Literal
 from datetime import datetime
 
 class PostBase(BaseModel):
-    """
-    Shared properties for creating/updating posts.
-    Now supports optional file upload (GridFS) and due_date for homework.
-    """
     title:    str
     content:  str
-    type:     Literal["lecture", "reminder", "homework"]
+    type:     Literal["lecture","reminder","homework"]
     file_id:  Optional[str]     = None
+    file_name: Optional[str]     = None 
     due_date: Optional[datetime] = None
 
 class PostCreate(PostBase):
