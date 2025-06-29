@@ -2,80 +2,101 @@
   Chat Component Styles
 ====================================*/
 
-/* Ensure full-viewport layout */
+/* 1. Full-viewport & no outer scrolling */
 html,
 body,
 .chat-wrapper {
   height: 100vh;
   margin: 0;
+  overflow: hidden;              /* Prevent page-level scroll */
   background-color: var(--color-bg);
   color: var(--color-text);
+
 }
 
 .chat-wrapper {
   display: flex;
   justify-content: center;
+  align-items: stretch;
+  overflow: hidden;
 }
 
+/* 2. Container flex layout */
 .chat-container {
   display: flex;
   flex-direction: column;
   width: 100%;
+  max-width: 600px;              /* adjust as needed */
   height: 100%;
   background: var(--color-surface);
   border-radius: var(--border-radius);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
+  overflow: hidden;              /* children handle scrolling */
   font-family: var(--font-family-base);
 }
 
-/* Header */
+/*====================================
+  Header (always visible)
+====================================*/
 .chat-header {
+  position: sticky;
+  top: 0;
+  flex: 0 0 auto;
   padding: var(--spacing-md);
   background: var(--color-surface);
   border-bottom: 1px solid var(--color-border);
+  z-index: 10;
 }
+
 .chat-title {
   margin: 0;
   font-size: var(--font-size-lg);
   color: var(--color-text);
 }
+
 .chat-meta {
   margin-top: var(--spacing-xs);
   font-size: var(--font-size-sm);
   color: var(--color-muted);
 }
 
-/* Status messages */
+/*====================================
+  Status Messages (beneath header)
+====================================*/
 .chat-status {
+  flex: 0 0 auto;
   padding: var(--spacing-sm);
   text-align: center;
   color: var(--color-text);
 }
+
 .chat-status.error {
   color: var(--color-error);
 }
 
-/* Messages list: scrollable, with bottom margin for fixed footer */
+/*====================================
+  Messages Pane (scrollable)
+====================================*/
 .messages {
-  flex: 1;
+  flex: 1 1 auto;                /* fills available space */
   padding: var(--spacing-md);
-  overflow-y: auto;
   background: var(--color-bg);
+  overflow-y: auto;              /* only this scrolls */
   display: flex;
   flex-direction: column;
   gap: var(--spacing-sm);
-  margin-bottom: 60px; /* height of footer */
 }
 
-/* Each message row spans full width */
+/* Message alignment */
 .message {
   display: flex;
   width: 100%;
 }
+
 .message.incoming {
   justify-content: flex-start;
 }
+
 .message.outgoing {
   justify-content: flex-end;
 }
@@ -88,25 +109,39 @@ body,
   background: var(--color-border);
   color: var(--color-text);
 }
+
 .message.outgoing .bubble {
   background: var(--color-primary);
   color: var(--color-surface);
 }
 
-/* Author label */
+/* Author & timestamp */
 .bubble-author {
   font-size: var(--font-size-sm);
   font-weight: 600;
   margin-bottom: var(--spacing-xs);
   opacity: 0.85;
-  text-align: left;
   color: var(--color-muted);
 }
+
 .message.outgoing .bubble-author {
   text-align: right;
 }
 
-/* Attached image thumbnail */
+.bubble-time {
+  display: block;
+  font-size: var(--font-size-sm);
+  opacity: 0.6;
+  text-align: right;
+  margin-top: var(--spacing-xs);
+}
+
+/* Text & images */
+.bubble-text {
+  white-space: pre-wrap;
+  color: inherit;
+}
+
 .bubble-image {
   display: block;
   max-width: 100%;
@@ -117,35 +152,28 @@ body,
   cursor: pointer;
 }
 
-/* Message text & time */
-.bubble-text {
-  white-space: pre-wrap;
-  color: inherit;
-}
-.bubble-time {
-  display: block;
-  font-size: var(--font-size-sm);
-  opacity: 0.6;
-  text-align: right;
-  margin-top: var(--spacing-xs);
-}
-
-/* Empty list state */
+/* No messages fallback */
 .no-messages {
   text-align: center;
   color: var(--color-muted);
   margin-top: var(--spacing-lg);
 }
 
-/* Preview container: sits just above the footer */
+/*====================================
+  Preview Bar (above footer)
+====================================*/
 .preview-container {
+  position: sticky;
+  bottom: calc(var(--spacing-sm) + var(--spacing-sm)); /* sits above footer */
+  flex: 0 0 auto;
   display: flex;
   align-items: center;
   padding: var(--spacing-sm) var(--spacing-md);
   background: var(--color-container-bg);
-  border-bottom: 1px solid var(--color-border);
-  margin-bottom: 60px;
+  border-top: 1px solid var(--color-border);
+  z-index: 9;
 }
+
 .preview-image {
   max-height: 80px;
   max-width: 80px;
@@ -153,6 +181,7 @@ body,
   margin-right: var(--spacing-md);
   object-fit: cover;
 }
+
 .remove-btn {
   background: transparent;
   border: none;
@@ -161,13 +190,13 @@ body,
   color: var(--color-error);
 }
 
-/* Fixed footer */
+/*====================================
+  Footer (always visible)
+====================================*/
 .chat-footer {
-  position: fixed;
+  position: sticky;
   bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 100%;
+  flex: 0 0 auto;
   display: flex;
   align-items: center;
   padding: var(--spacing-sm) var(--spacing-md);
@@ -176,7 +205,7 @@ body,
   z-index: 10;
 }
 
-/* Input and buttons */
+/* Input & buttons */
 .input {
   flex: 1;
   border: none;
@@ -188,14 +217,17 @@ body,
   outline: none;
   color: var(--color-text);
 }
+
 .attach {
   cursor: pointer;
   margin-right: var(--spacing-sm);
   font-size: 1.2rem;
 }
+
 .attach input {
   display: none;
 }
+
 .send-btn {
   background: var(--color-primary);
   border: none;
@@ -207,29 +239,15 @@ body,
   transition: background-color var(--transition-speed),
               transform var(--transition-speed);
 }
+
 .send-btn:disabled {
   opacity: 0.5;
   cursor: default;
 }
 
-/* Smooth transitions */
-.chat-container,
-#theme-toggle-button svg,
-.messages,
-.bubble,
-.preview-container,
-.chat-footer,
-.send-btn {
-  transition: background-color var(--transition-speed),
-              color var(--transition-speed),
-              transform var(--transition-speed);
-}
-
 /*====================================
   Image Modal (Lightbox)
 ====================================*/
-
-/* Modal backdrop */
 .image-modal-overlay {
   position: fixed;
   top: 0;
@@ -243,21 +261,18 @@ body,
   z-index: 1000;
 }
 
-/* Container to hold the enlarged image and close button */
 .image-modal-content {
   position: relative;
   max-width: 90%;
   max-height: 90%;
 }
 
-/* Enlarged image */
 .image-modal-content img {
   max-width: 100%;
   max-height: 100%;
   border-radius: var(--border-radius);
 }
 
-/* Close button */
 .modal-close {
   position: absolute;
   top: -10px;

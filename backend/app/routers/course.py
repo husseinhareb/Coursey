@@ -76,36 +76,6 @@ async def api_list_courses(
     await create_activity_log(log)
     return courses
 
-
-@router.get("/{course_id}", response_model=CourseOut)
-async def api_get_course(
-    course_id: str,
-    current_user: UserDB = Depends(get_current_active_user),
-):
-    course = await get_course(course_id)
-    if not course:
-        raise HTTPException(status_code=404, detail="Course not found")
-
-    # Si non-admin, vérifier qu'il est inscrit à ce cours
-    roles_lower = [r.lower() for r in current_user.roles]
-    if "admin" not in roles_lower:
-        enrolled_ids = [e.courseId for e in current_user.enrollments]
-        if course_id not in enrolled_ids:
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="Vous n'êtes pas autorisé à voir ce cours."
-            )
-
-    log = ActivityLogCreate(
-        user_id=current_user.id,
-        action="view_course",
-        timestamp=datetime.utcnow(),
-        metadata={"course_id": course_id}
-    )
-    await create_activity_log(log)
-    return course
-
-
 @router.put("/{course_id}", response_model=CourseOut)
 async def api_update_course(
     course_id: str,
@@ -230,15 +200,31 @@ async def api_list_enrolled_users(
     return enrolled
 
 @router.get("/{course_id}", response_model=CourseOut)
-async def read_course(
+async def api_get_course(
     course_id: str,
     current_user: UserDB = Depends(get_current_active_user),
 ):
     course = await get_course(course_id)
     if not course:
-        raise HTTPException(404, "Course not found")
+        raise HTTPException(status_code=404, detail="Course not found")
 
-    # Record the access
+    # Non-admin users must be enrolled
+    roles_lower = [r.lower() for r in current_user.roles]
+    if "admin" not in roles_lower:
+        enrolled_ids = [e.courseId for e in current_user.enrollments]
+        if course_id not in enrolled_ids:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Vous n'êtes pas autorisé à voir ce cours."
+            )
+
+    # Log the view and record access
+    await create_activity_log(ActivityLogCreate(
+        user_id=current_user.id,
+        action="view_course",
+        timestamp=datetime.utcnow(),
+        metadata={"course_id": course_id}
+    ))
     await upsert_access(current_user.id, course_id)
 
     return course

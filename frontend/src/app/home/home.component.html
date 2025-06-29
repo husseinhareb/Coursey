@@ -22,7 +22,10 @@
 </div>
 
 <!-- Recently Viewed Courses -->
-<section *ngIf="!loadingRecents && recentCourses.length" class="recent-section">
+<section
+  *ngIf="!loadingRecents && recentCourses.length"
+  class="recent-section"
+>
   <h3>{{ 'HOME.RECENTLY_VIEWED' | translate }}</h3>
 
   <div class="courses-grid">
@@ -53,19 +56,21 @@
   </div>
 </section>
 
-<!-- Loading / Error for recents -->
+<!-- Loading indicator for recents -->
 <div *ngIf="loadingRecents" class="status">
   {{ 'HOME.LOADING_RECENTS' | translate }}
-</div>
-<div *ngIf="errorRecents" class="status status--error">
-  {{ errorRecents }}
 </div>
 
 <hr class="section-divider" />
 
-<!-- Full Courses grid (as before) -->
+<!-- Full Courses grid -->
 <div *ngIf="!loading && !error" class="courses-grid">
   <div *ngFor="let c of filteredCourses" class="course-card">
-    <!-- ... same card as above ... -->
+    <!-- ... same card layout as recent ... -->
   </div>
+</div>
+
+<!-- Error for full list -->
+<div *ngIf="error" class="status status--error">
+  {{ error }}
 </div>

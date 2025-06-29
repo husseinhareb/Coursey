@@ -1,11 +1,10 @@
-// src/app/home/home.component.ts
-
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
-import { forkJoin, of, switchMap, map } from 'rxjs';
+import { forkJoin, of, throwError } from 'rxjs';
+import { switchMap, map, catchError } from 'rxjs/operators';
 
 import { CourseService, Course } from '../services/course.service';
 import { UserService, Access } from '../services/user.service';
@@ -37,6 +36,7 @@ export class HomeComponent implements OnInit {
   // Recent courses
   recentCourses: RecentCourse[] = [];
   loadingRecents: boolean       = false;
+  // we no longer show an error message; 404 just means “no recents”
   errorRecents: string | null   = null;
 
   ngOnInit(): void {
@@ -47,12 +47,13 @@ export class HomeComponent implements OnInit {
   private loadCourses(): void {
     this.loading = true;
     this.error   = null;
+
     this.courseSvc.list().subscribe({
-      next: (cs: Course[]) => {
+      next: cs => {
         this.courses = cs;
         this.loading = false;
       },
-      error: (e: any) => {
+      error: e => {
         this.error   = e.error?.detail || 'Failed to load courses';
         this.loading = false;
       }
@@ -62,29 +63,43 @@ export class HomeComponent implements OnInit {
   private loadRecents(): void {
     this.loadingRecents = true;
     this.errorRecents   = null;
+
     this.userSvc.getRecentAccesses().pipe(
+      // Treat 404 as “no recents”
+      catchError(err => {
+        if (err.status === 404) {
+          return of([] as Access[]);
+        }
+        return throwError(() => err);
+      }),
       switchMap((accesses: Access[]) => {
         if (!accesses.length) {
-          this.loadingRecents = false;
-          return of([]);
+          return of([] as RecentCourse[]);
         }
         return forkJoin(
           accesses.map(a =>
             this.courseSvc.get(a.courseId).pipe(
-              map(c => ({ ...c, accessedAt: new Date(a.accessedAt) } as RecentCourse))
+              map(c => ({ 
+                ...c, 
+                accessedAt: new Date(a.accessedAt) 
+              } as RecentCourse)),
+              catchError(() => of(null)) // skip missing courses
             )
           )
+        ).pipe(
+          // filter out any nulls if a course lookup failed
+          map(results => results.filter((c): c is RecentCourse => !!c))
         );
+      }),
+      catchError(err => {
+        // for any non-404 error, we log and suppress the error
+        console.error('Failed to load recents:', err);
+        return of([] as RecentCourse[]);
       })
-    ).subscribe({
-      next: (list: RecentCourse[]) => {
-        this.recentCourses   = list;
-        this.loadingRecents  = false;
-      },
-      error: (err: any) => {
-        this.errorRecents    = err.error?.detail || 'Failed to load recent courses';
-        this.loadingRecents  = false;
-      }
+    )
+    .subscribe(list => {
+      this.recentCourses  = list;
+      this.loadingRecents = false;
     });
   }
 
