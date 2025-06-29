@@ -15,36 +15,29 @@
   <div class="course-title-wrapper">
     <h2 class="course-title">{{ course.title }}</h2>
 
-    <!-- only admins & professors: create a new forum -->
+    <!-- Always show “View Forum” -->
     <button
-      *ngIf="canModifyPosts"
       type="button"
-      class="btn btn--forum btn--primary"
-      [routerLink]="['/courses', courseId, 'forums', 'create']"
+      class="btn btn--forum view-forum-btn"
+      [routerLink]="['/courses', courseId, 'forums']"
     >
-      <i class="fas fa-plus-circle"></i>
-      {{ 'COURSE_DETAIL.CREATE_FORUM' | translate }}
+      <i class="fas fa-comments"></i>
+      {{ 'COURSE_DETAIL.VIEW_FORUM' | translate }}
     </button>
   </div>
-
-  <!-- centered "View Forum" -->
-  <button
-    type="button"
-    class="btn btn--forum view-forum-btn"
-    [routerLink]="['/courses', courseId, 'forums']"
-  >
-    <i class="fas fa-comments"></i>
-    {{ 'COURSE_DETAIL.VIEW_FORUM' | translate }}
-  </button>
 
   <p class="course-description">{{ course.description }}</p>
 </div>
 
 <hr class="section-divider" />
 
-<!-- Add / Edit Post -->
-<div class="post-controls" *ngIf="canModifyPosts">
-  <button type="button" class="btn btn--add-post" (click)="toggleForm()">
+<!-- Add / Edit Post Controls -->
+<div *ngIf="canModifyPosts" class="post-controls">
+  <button
+    type="button"
+    class="btn btn--add-post"
+    (click)="toggleForm()"
+  >
     <i class="fas" [ngClass]="editing ? 'fa-edit' : 'fa-plus-circle'"></i>
     {{
       editing
@@ -70,8 +63,8 @@
     <label>
       {{ 'COURSE_DETAIL.POST_TYPE' | translate }}
       <select formControlName="type">
-        <option value="lecture"  >{{ 'POSTS.TYPE_LECTURE'  | translate }}</option>
-        <option value="reminder" >{{ 'POSTS.TYPE_REMINDER' | translate }}</option>
+        <option value="lecture">{{ 'POSTS.TYPE_LECTURE'  | translate }}</option>
+        <option value="reminder">{{ 'POSTS.TYPE_REMINDER' | translate }}</option>
         <option value="homework">{{ 'POSTS.TYPE_HOMEWORK' | translate }}</option>
       </select>
     </label>

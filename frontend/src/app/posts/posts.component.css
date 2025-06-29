@@ -222,3 +222,31 @@
   /* ensure it stretches to full width */
   width: 100%;
 }
+
+.post-attachment {
+  margin-top: 1rem;
+}
+
+.file-btn {
+  background: transparent;
+  border: none;
+  padding: 0.25rem 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #007bff;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.file-btn:hover {
+  text-decoration: underline;
+}
+
+.file-btn i {
+  font-size: 1.2rem;
+}
+
+.file-name {
+  font-size: 0.9rem;
+}

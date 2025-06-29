@@ -1,7 +1,5 @@
-// src/app/forum-list/forum-list.component.ts
-
 import { Component, OnInit } from '@angular/core';
-import { CommonModule }      from '@angular/common';
+import { CommonModule } from '@angular/common';
 import {
   ReactiveFormsModule,
   FormBuilder,
@@ -9,15 +7,15 @@ import {
   Validators
 } from '@angular/forms';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
-import { TranslateModule }   from '@ngx-translate/core';
+import { TranslateModule } from '@ngx-translate/core';
 
-import { forkJoin, of }      from 'rxjs';
-import { catchError }        from 'rxjs/operators';
+import { forkJoin, of, combineLatest } from 'rxjs';
+import { catchError, filter } from 'rxjs/operators';
 
 import { ForumService, ForumTopic, NewTopic } from '../services/forum.service';
-import { AuthService, Me }                   from '../auth/auth.service';
-import { UserService, User }                 from '../services/user.service';
-import { Enrollment }                        from '../services/user.service';
+import { AuthService, Me } from '../auth/auth.service';
+import { UserService, User } from '../services/user.service';
+import { Enrollment } from '../services/user.service';
 
 @Component({
   selector: 'app-forum-list',
@@ -43,10 +41,7 @@ export class ForumListComponent implements OnInit {
   currentUser: Me | null = null;
   canCreateTopic = false;
 
-  /** Map topic.author_id → "First Last" */
   authorNames: Record<string, string> = {};
-
-  /** Map topic._id → message count */
   messageCounts: Record<string, number> = {};
 
   constructor(
@@ -63,7 +58,7 @@ export class ForumListComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // 1. Get courseId from URL
+    // 1) extract courseId
     const cid = this.route.snapshot.paramMap.get('id');
     if (!cid) {
       this.error = 'Missing course ID';
@@ -71,41 +66,45 @@ export class ForumListComponent implements OnInit {
     }
     this.courseId = cid;
 
-    // 2. Subscribe to current user for permission logic
-    this.auth.user$.subscribe({
-      next: user => {
-        this.currentUser = user;
-        this.computeCanCreateTopic();
-      },
-      error: () => {
-        this.currentUser = null;
-        this.computeCanCreateTopic();
+    // 2) react to auth changes AND queryParamMap together
+    combineLatest([
+      this.auth.user$.pipe(filter(u => u !== undefined)),
+      this.route.queryParamMap
+    ]).subscribe(([user, qp]) => {
+      this.currentUser = user as Me | null;
+      // compute permission
+      this.computeCanCreateTopic();
+      // only allow opening form if permitted
+      if (this.canCreateTopic && qp.get('newTopic') === 'true') {
+        this.showNewTopicForm = true;
       }
     });
 
-    // 3. Load forum topics
+    // 3) initial load
     this.loadTopics();
   }
 
   private computeCanCreateTopic(): void {
     if (!this.currentUser) {
       this.canCreateTopic = false;
-      return;
+    } else {
+      const roles = this.currentUser.roles.map(r => r.toLowerCase());
+      const isInstructor = roles.includes('teacher') || roles.includes('professor');
+      const enrolled = Array.isArray(this.currentUser.enrollments)
+        && (this.currentUser.enrollments as Enrollment[])
+            .some(e => e.courseId === this.courseId);
+
+      this.canCreateTopic = isInstructor && enrolled;
     }
-    const roles = this.currentUser.roles.map(r => r.toLowerCase());
-    if (!roles.includes('teacher')) {
-      this.canCreateTopic = false;
-      return;
-    }
-    // Ensure user is enrolled in this course
-    const enrolled = (this.currentUser.enrollments as Enrollment[])
-      .some(e => e.courseId === this.courseId);
-    this.canCreateTopic = enrolled;
+
+    console.log('ForumList – canCreateTopic:', this.canCreateTopic,
+                'roles:', this.currentUser?.roles,
+                'enrolled:', this.currentUser?.enrollments);
   }
 
   loadTopics(): void {
     this.loading = true;
-    this.error   = null;
+    this.error = null;
 
     this.forumSvc.listTopics(this.courseId).subscribe({
       next: topics => {
@@ -115,13 +114,12 @@ export class ForumListComponent implements OnInit {
         this.loading = false;
       },
       error: err => {
-        this.error   = err.error?.detail || 'Failed to load topics';
+        this.error = err.error?.detail || 'Failed to load topics';
         this.loading = false;
       }
     });
   }
 
-  /** Fetch and cache each topic creator’s display name */
   private populateAuthorNames(): void {
     const ids = Array.from(new Set(this.topics.map(t => t.author_id)));
     if (!ids.length) return;
@@ -135,13 +133,12 @@ export class ForumListComponent implements OnInit {
     ).subscribe(users => {
       users.forEach((u, idx) => {
         const id = ids[idx];
-        const nameParts = [u.profile.firstName, u.profile.lastName].filter(Boolean);
-        this.authorNames[id] = nameParts.join(' ') || id;
+        const parts = [u.profile.firstName, u.profile.lastName].filter(Boolean);
+        this.authorNames[id] = parts.join(' ') || id;
       });
     });
   }
 
-  /** Fetch each topic’s full message count */
   private populateMessageCounts(): void {
     if (!this.topics.length) return;
 
@@ -160,12 +157,14 @@ export class ForumListComponent implements OnInit {
   }
 
   toggleNewTopicForm(): void {
+    if (!this.canCreateTopic) { return; }
     this.showNewTopicForm = !this.showNewTopicForm;
   }
 
   createTopic(): void {
-    if (this.newTopicForm.invalid) return;
-
+    if (this.newTopicForm.invalid) {
+      return;
+    }
     const payload: NewTopic = { title: this.newTopicForm.value.title };
     this.forumSvc.createTopic(this.courseId, payload).subscribe({
       next: () => {

@@ -114,6 +114,7 @@ export const routes: Routes = [
     component: ForumListComponent,
     canActivate: [AuthGuard]
   },
+  
   {
     path: 'courses/:id/forums/:threadId',
     component: ForumThreadComponent,
