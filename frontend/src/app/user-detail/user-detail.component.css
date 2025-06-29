@@ -1,0 +1,142 @@
+/* Card container */
+.user-detail-card {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 1.5rem;
+  background: #fff;
+  border-radius: 1rem;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+  font-family: 'Segoe UI', sans-serif;
+}
+
+/* Header layout */
+.user-detail-header {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  border-bottom: 1px solid #e0e0e0;
+  padding-bottom: 1rem;
+  margin-bottom: 1rem;
+}
+
+/* Avatar */
+.user-detail-avatar {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 4px solid #007bff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* Basic info */
+.user-basic-info {
+  flex: 1;
+}
+
+.user-name {
+  font-size: 1.75rem;
+  margin: 0;
+  color: #333;
+}
+
+.user-name .fa-user-circle {
+  margin-right: 0.5rem;
+  color: #007bff;
+}
+
+.user-email {
+  margin: 0.25rem 0 0;
+  font-size: 1rem;
+  color: #555;
+}
+
+.user-email .fa-envelope {
+  margin-right: 0.5rem;
+  color: #28a745;
+}
+
+/* Sections */
+.user-roles,
+.user-courses {
+  margin-top: 1.5rem;
+}
+
+.user-roles h3,
+.user-courses h3 {
+  font-size: 1.25rem;
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  color: #333;
+}
+
+.user-roles h3 .fa-user-tag,
+.user-courses h3 .fa-graduation-cap {
+  margin-right: 0.5rem;
+  color: #ffc107;
+}
+
+/* Lists */
+.user-roles ul,
+.user-courses ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.user-roles li,
+.user-courses li {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.user-roles li:last-child,
+.user-courses li:last-child {
+  border-bottom: none;
+}
+
+.user-roles li .fa-check-circle {
+  margin-right: 0.75rem;
+  color: #17a2b8;
+}
+
+.user-courses li .fa-book-open {
+  margin-right: 0.75rem;
+  color: #6f42c1;
+}
+
+.course-code {
+  font-weight: 600;
+  color: #555;
+}
+
+.course-title {
+  margin-left: 0.5rem;
+  color: #777;
+}
+
+/* Loading / Error */
+.status {
+  text-align: center;
+  padding: 1rem;
+  font-size: 1rem;
+}
+
+.status--error {
+  color: #dc3545;
+}
+
+/* Responsive tweaks */
+@media (max-width: 600px) {
+  .user-detail-header {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .user-basic-info {
+    text-align: center;
+  }
+}

@@ -1,40 +1,55 @@
-<!-- src/app/users/user-detail.component.html -->
-
 <div *ngIf="loading" class="status">
+  <i class="fas fa-spinner fa-spin"></i>
   {{ 'USER_DETAIL.LOADING' | translate }}
 </div>
+
 <div *ngIf="error" class="status status--error">
+  <i class="fas fa-exclamation-triangle"></i>
   {{ error || ('USER_DETAIL.ERROR' | translate) }}
 </div>
 
-<article *ngIf="user" class="user-detail">
-  <img
-    *ngIf="user.profile.profilePic"
-    [src]="user.profile.profilePic"
-    alt="{{ 'USER_DETAIL.AVATAR_ALT' | translate }}"
-    class="user-detail-avatar"
-  />
+<article *ngIf="user" class="user-detail-card">
+  <header class="user-detail-header">
+    <img
+      *ngIf="user.profile.profilePic"
+      [src]="user.profile.profilePic"
+      alt="{{ 'USER_DETAIL.AVATAR_ALT' | translate }}"
+      class="user-detail-avatar"
+    />
+    <div class="user-basic-info">
+      <h2 class="user-name">
+        <i class="fas fa-user-circle"></i>
+        {{ user.profile.firstName }} {{ user.profile.lastName }}
+      </h2>
+      <p class="user-email">
+        <i class="fas fa-envelope"></i>
+        {{ user.email }}
+      </p>
+    </div>
+  </header>
 
-  <h2>
-    {{ user.profile.firstName }} {{ user.profile.lastName }}
-  </h2>
-  <p>
-    <strong>{{ 'USER_DETAIL.EMAIL_LABEL' | translate }}</strong>
-    {{ user.email }}
-  </p>
+  <section *ngIf="user.roles?.length" class="user-roles">
+    <h3>
+      <i class="fas fa-user-tag"></i>
+      {{ 'USER_DETAIL.ROLES_LABEL' | translate }}
+    </h3>
+    <ul>
+      <li *ngFor="let r of user.roles">
+        <i class="fas fa-check-circle"></i> {{ r }}
+      </li>
+    </ul>
+  </section>
 
-  <p *ngIf="user.roles?.length">
-    <strong>{{ 'USER_DETAIL.ROLES_LABEL' | translate }}</strong>
-    <span *ngFor="let r of user.roles; let last = last">
-      {{ r }}<span *ngIf="!last">, </span>
-    </span>
-  </p>
-
-  <section *ngIf="enrolledCourses.length">
-    <h3>{{ 'USER_DETAIL.ENROLLED_TITLE' | translate }}</h3>
+  <section *ngIf="enrolledCourses.length" class="user-courses">
+    <h3>
+      <i class="fas fa-graduation-cap"></i>
+      {{ 'USER_DETAIL.ENROLLED_TITLE' | translate }}
+    </h3>
     <ul>
       <li *ngFor="let c of enrolledCourses">
-        {{ c.code }} — {{ c.title }}
+        <i class="fas fa-book-open"></i>
+        <span class="course-code">{{ c.code }}</span> —
+        <span class="course-title">{{ c.title }}</span>
       </li>
     </ul>
   </section>
