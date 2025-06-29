@@ -1,6 +1,6 @@
 // src/app/submissions/submission-list.component.ts
 
-import { Component, Input, OnInit, inject } from '@angular/core';
+import { Component, Input, OnInit, OnChanges, SimpleChanges, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   ReactiveFormsModule,
@@ -77,21 +77,29 @@ export class SubmissionListComponent implements OnInit {
   }
 
   ngOnInit() {
-    // Subscribe to the user stream to determine roles and load submissions
+    // 1) Always load the submissions
+    this.fetchSubmissions();
+
+    // 2) Separately subscribe to user changes for permissions + due date
     this.auth.user$.subscribe({
       next: (user) => {
         this.currentUser = user;
         this.computePermissions();
         this.fetchPostDueDate();
-        this.fetchSubmissions();
       },
       error: () => {
         this.currentUser = null;
         this.computePermissions();
         this.fetchPostDueDate();
-        this.fetchSubmissions();
       }
     });
+  }
+   ngOnChanges(changes: SimpleChanges) {
+    // only run once both IDs are truthy
+    if (this.courseId && this.postId) {
+      this.fetchPostDueDate();
+      this.fetchSubmissions();
+    }
   }
 
   /** Determine if currentUser is admin/professor/student in this course */
@@ -133,21 +141,15 @@ export class SubmissionListComponent implements OnInit {
   }
 
   /** Fetch all submissions, then filter for display */
-  private fetchSubmissions() {
-    this.loading = true;
+      private fetchSubmissions() {
     this.error = null;
     this.svc.list(this.courseId, this.postId).subscribe({
-      next: (subs: Submission[]) => {
-        console.log('raw submissions from server:', subs);
+      next: subs => {
         this.allSubmissions = subs;
         this.applyDisplayFilter();
-        console.log('after filter, displayedSubmissions =', this.displayedSubmissions);
-        this.loading = false;
       },
-      error: (err: any) => {
-        this.error =
-          err.error?.detail || 'Impossible de charger les soumissions';
-        this.loading = false;
+      error: err => {
+        this.error = err.error?.detail || 'Impossible de charger les soumissions';
       }
     });
   }

@@ -26,7 +26,6 @@ body,
   display: flex;
   flex-direction: column;
   width: 100%;
-  max-width: 600px;              /* adjust as needed */
   height: 100%;
   background: var(--color-surface);
   border-radius: var(--border-radius);

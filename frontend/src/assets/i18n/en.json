@@ -17,23 +17,20 @@
     "SEARCH_POSTS": "Posts",
     "SEARCH_NONE": "No results found"
   },
+  "HOME": {
+    "RECENTLY_VIEWED": "Recently Viewed",
+    "LOADING_RECENTS": "Loading recently viewed…"
+  },
   "ACTIVITY_LOG": {
     "TITLE": "Activity History",
     "LOADING": "Loading logs…",
+    "ERROR": "Failed to load activity logs.",
     "TABLE": {
       "DATE_TIME": "Date & Time",
-      "USER": "User",
       "ACTION": "Action",
       "DETAILS": "Details"
     },
-    "NO_LOGS": "No activity to display.",
-    "ACTION": {
-      "VIEW_COURSE": "View Course"
-    },
-    "DETAIL": {
-      "USER_ID": "User ID",
-      "COUNT": "Count"
-    }
+    "NO_LOGS": "No activity to display."
   },
   "LOGIN": {
     "TITLE": "Log In",
@@ -44,51 +41,6 @@
     "PASSWORD_PLACEHOLDER": "••••••••",
     "PASSWORD_ERROR": "Password is required.",
     "SUBMIT": "Log In"
-  },
-  "PROFILE": {
-    "TITLE": "My Profile",
-    "LOADING": "Loading profile…",
-    "ERROR_LOADING": "Failed to load profile.",
-    "AVATAR_ALT": "User avatar",
-    "UPLOAD_AVATAR": "Upload Avatar",
-    "EMAIL_LABEL": "Email",
-    "EMAIL_PLACEHOLDER": "you@example.com",
-    "USERNAME_LABEL": "Username",
-    "FIRST_NAME_LABEL": "First Name",
-    "FIRST_NAME_PLACEHOLDER": "Enter first name",
-    "LAST_NAME_LABEL": "Last Name",
-    "LAST_NAME_PLACEHOLDER": "Enter last name",
-    "PHONE_LABEL": "Phone Number",
-    "PHONE_PLACEHOLDER": "Enter phone number",
-    "ADDRESS_LABEL": "Address",
-    "ADDRESS_PLACEHOLDER": "Enter address",
-    "ROLES_LABEL": "Roles",
-    "PERSONAL_INFO": "Personal Information",
-    "ENROLLED_LABEL": "Enrolled Courses",
-    "NO_ENROLLMENTS": "No enrolled courses.",
-    "SAVE": "Save Changes",
-    "SUCCESS": "Profile updated successfully.",
-    "UPDATE_ERROR": "Update failed.",
-    "CHANGE_PWD_TITLE": "Change Password",
-    "OLD_PWD_PLACEHOLDER": "Current Password",
-    "NEW_PWD_PLACEHOLDER": "New Password",
-    "CONFIRM_PWD_PLACEHOLDER": "Confirm Password"
-  },
-  "COURSES": {
-    "TITLE": "Courses",
-    "ADD": "Add Course",
-    "LOADING": "Loading…",
-    "TABLE": {
-      "TITLE": "Title",
-      "CODE": "Code",
-      "DESCRIPTION": "Description",
-      "BACKGROUND": "Background",
-      "ACTIONS": "Actions"
-    },
-    "EDIT": "Edit",
-    "DELETE": "Delete",
-    "INFO": "Info",
-    "SEARCH_PLACEHOLDER": "🔍 Search courses…"
   },
   "SIGNUP": {
     "TITLE": "Sign Up",
@@ -108,40 +60,60 @@
     "ROLE_ADMIN": "Admin",
     "ROLE_ERROR": "You must select one role.",
     "SUBMIT": "Sign Up",
-    "SUCCESS": "Signup successful!"
+    "SUCCESS": "Signup successful!",
+    "ERROR": "Signup failed."
   },
-  "POSTS": {
-    "LOADING": "Loading posts…",
-    "HOMEWORK_FLAG": "HW",
-    "TYPE": "Type",
-    "POSITION": "Position",
-    "PINNED_AT": "Pinned At",
-    "DUE_DATE": "Due Date",
-    "PIN": "Pin",
-    "UNPIN": "Unpin",
+  "PROFILE": {
+    "TITLE": "My Profile",
+    "LOADING": "Loading profile…",
+    "ERROR_LOADING": "Failed to load profile.",
+    "SUCCESS": "Profile updated successfully.",
+    "UPDATE_ERROR": "Update failed.",
+    "AVATAR_ALT": "User avatar",
+    "UPLOAD_AVATAR": "Upload Avatar",
+    "EMAIL_LABEL": "Email",
+    "EMAIL_PLACEHOLDER": "you@example.com",
+    "USERNAME_LABEL": "Username",
+    "FIRST_NAME_LABEL": "First Name",
+    "FIRST_NAME_PLACEHOLDER": "Enter first name",
+    "LAST_NAME_LABEL": "Last Name",
+    "LAST_NAME_PLACEHOLDER": "Enter last name",
+    "PHONE_LABEL": "Phone Number",
+    "PHONE_PLACEHOLDER": "Enter phone number",
+    "ADDRESS_LABEL": "Address",
+    "ADDRESS_PLACEHOLDER": "Enter address",
+    "ROLES_LABEL": "Roles",
+    "PERSONAL_INFO": "Personal Information",
+    "CHANGE_PWD_TITLE": "Change Password",
+    "OLD_PWD_PLACEHOLDER": "Current Password",
+    "NEW_PWD_PLACEHOLDER": "New Password",
+    "CONFIRM_PWD_PLACEHOLDER": "Confirm Password",
+    "PWD_MISMATCH": "Passwords do not match.",
+    "ENROLLED_LABEL": "Enrolled Courses",
+    "NO_ENROLLMENTS": "No enrolled courses.",
+    "SAVE": "Save Changes"
+  },
+  "COURSES": {
+    "TITLE": "Courses",
+    "ADD": "Add Course",
+    "LOADING": "Loading…",
+    "ERROR": "Failed to load courses.",
+    "SEARCH_PLACEHOLDER": "🔍 Search courses…",
+    "INFO": "Info",
     "EDIT": "Edit",
-    "DELETE": "Delete",
-    "SUBMIT_HW": "Submit Homework",
-    "VIEW_MY_SUB": "View My Submission",
-    "HIDE_MY_SUB": "Hide My Submission",
-    "VIEW_ALL_SUB": "View All Submissions",
-    "HIDE_ALL_SUB": "Hide Submissions",
-    "NO_POSTS": "No posts available.",
-    "MARK_DONE": "Mark Done",
-    "MARK_UNDONE": "Mark Undone",
-    "COMPLETION": "Completion"
+    "DELETE": "Delete"
   },
   "COURSE_DETAIL": {
     "LOADING": "Loading course…",
     "ERROR": "Failed to load course.",
     "VIEW_FORUM": "View Course Forum",
-    "CREATE_FORUM": "Create Forum",
     "ADD_POST": "Add Post",
     "EDIT_POST": "Edit Post",
     "POST_TITLE": "Post Title",
     "POST_CONTENT": "Content",
     "POST_TYPE": "Type",
     "POST_DUE_DATE": "Due Date",
+    "POST_FILE": "Attach File",
     "SAVE_POST": "Save Post",
     "CANCEL": "Cancel"
   },
@@ -156,25 +128,51 @@
     "DESCRIPTION_PLACEHOLDER": "Enter a brief description",
     "BACKGROUND_LABEL": "Background",
     "BACKGROUND_PLACEHOLDER": "Image URL or hex color",
+    "UPLOADING": "Uploading background…",
     "CREATE": "Create Course",
     "SAVE": "Save Changes",
     "ERROR": "Failed to save course."
   },
+  "POSTS": {
+    "LOADING": "Loading posts…",
+    "HOMEWORK_BADGE": "HW",
+    "TYPE": "Type",
+    "TYPE_LECTURE": "Lecture",
+    "TYPE_REMINDER": "Reminder",
+    "TYPE_HOMEWORK": "Homework",
+    "HOMEWORK_FLAG": "Homework",
+    "PIN": "Pin",
+    "UNPIN": "Unpin",
+    "MOVE_UP": "Move Up",
+    "MOVE_DOWN": "Move Down",
+    "EDIT": "Edit",
+    "DELETE": "Delete",
+    "PINNED_AT": "Pinned At",
+    "DUE_DATE": "Due Date",
+    "SUBMIT_HW": "Submit Homework",
+    "VIEW_MY_SUB": "View My Submission",
+    "HIDE_MY_SUB": "Hide My Submission",
+    "VIEW_ALL_SUB": "View All Submissions",
+    "HIDE_ALL_SUB": "Hide Submissions",
+    "MARK_DONE": "Mark Done",
+    "MARK_UNDONE": "Mark Undone",
+    "NO_POSTS": "No posts available."
+  },
   "FORUM": {
     "LIST_TITLE": "Forums / Topics",
+    "CREATE_TOPIC": "Create Topic",
     "NEW_TOPIC": "+ New Topic",
     "CANCEL": "Cancel",
-    "TITLE_LABEL": "Topic Title",
-    "TITLE_PLACEHOLDER": "Enter title",
-    "TITLE_ERROR": "Title is required.",
+    "TOPIC_TITLE": "Topic Title",
+    "TOPIC_TITLE_PLACEHOLDER": "Enter title",
+    "TOPIC_TITLE_ERROR": "Title is required.",
     "CREATE_BUTTON": "Create",
     "NO_CREATE_PERMISSION": "Only enrolled instructors may create topics.",
     "LOADING": "Loading topics…",
     "ERROR_LOADING": "Failed to load topics.",
-    "CREATED_BY": "Created by",
-    "ON": "on",
-    "MESSAGES_COUNT": "messages",
-    "NO_TOPICS": "No topics yet."
+    "NO_TOPICS": "No topics yet.",
+    "UNKNOWN_AUTHOR": "Unknown Author",
+    "MESSAGES": "messages"
   },
   "FORUM_THREAD": {
     "LOADING": "Loading topic…",
@@ -221,7 +219,7 @@
         "COURSE": "Course",
         "ENROLLED": "Enrolled"
       },
-      "LIST_ENROLLMENTS": "List Enrollments"
+      "ENROLL": "Enroll"
     }
   },
   "SUBMISSIONS": {
@@ -229,6 +227,8 @@
       "TITLE_ALL": "All Submissions",
       "TITLE_MINE": "Your Submissions",
       "LOADING": "Loading submissions…",
+      "NO_ALL": "No submissions yet.",
+      "NO_MINE": "You haven't submitted anything.",
       "TABLE": {
         "STUDENT": "Student",
         "FILE": "File",
@@ -239,9 +239,7 @@
         "COMMENT": "Comment",
         "ACTIONS": "Actions",
         "GRADE_BUTTON": "Grade"
-      },
-      "NO_ALL": "No submissions yet.",
-      "NO_MINE": "You haven't submitted anything."
+      }
     },
     "STATUS": {
       "SUBMITTED": "Submitted",
@@ -277,21 +275,27 @@
       "CANCEL": "Cancel"
     }
   },
+  "USER_DETAIL": {
+    "ROLES_LABEL": "Roles",
+    "ENROLLED_TITLE": "Enrolled Courses"
+  },
   "DASH": {
     "LOADING": "Loading…",
     "MY_COURSES": "My Courses",
     "NO_COURSES": "No courses enrolled.",
     "MY_CREATED_COURSES": "My Created Courses",
     "NO_CREATED_COURSES": "No created courses.",
-    "STUDENTS": "Students",
+    "TOTAL_COURSES": "Total Courses",
+    "HOMEWORKS_DUE": "Homeworks Due",
+    "AVG_COMPLETION": "Average Completion",
+    "FORUMS": "Forums",
+    "MESSAGES": "Messages",
     "USERS": "Users",
     "COURSES": "Courses",
     "POSTS": "Posts",
     "SUBMISSIONS": "Submissions",
     "ACTIVITY_7D": "Activity (Last 7 Days)",
-    "HOMEWORKS_DUE": "Homeworks Due",
-    "AVG_COMPLETION": "Average Completion",
-    "FORUMS": "Forums",
-    "MESSAGES": "Messages"
+    "TOTAL_FORUMS": "Total Forums",
+    "TOTAL_MESSAGES": "Total Messages"
   }
 }

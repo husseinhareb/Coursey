@@ -1,6 +1,5 @@
 import { Routes } from '@angular/router';
 
-import { HomeComponent } from './home/home.component';
 import { RegisterComponent } from './register/register.component';
 import { LoginComponent } from './login/login.component';
 import { ProfileComponent } from './profile/profile.component';
@@ -26,22 +25,11 @@ import { UserDetailComponent } from './user-detail/user-detail.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 
 export const routes: Routes = [
-  // Public landing & auth
-  {
-    path: '',
-    component: HomeComponent
-  },
+
 
   {
     path: 'login',
     component: LoginComponent
-  },
-
-  // Protected area
-  {
-    path: 'home',
-    component: HomeComponent,
-    canActivate: [AuthGuard]
   },
   {
     path: 'profile',

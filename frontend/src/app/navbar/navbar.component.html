@@ -66,10 +66,6 @@
       </svg>
     </label>
 
-    <a routerLink="/home" routerLinkActive="active" class="nav-link">
-      <i class="fa-solid fa-house"></i>
-      {{ 'NAV.HOME' | translate }}
-    </a>
     <a *ngIf="auth.isLoggedIn && isAdmin" routerLink="/users" routerLinkActive="active" class="nav-link">
       <i class="fa-solid fa-users"></i>
       {{ 'NAV.USERS' | translate }}
